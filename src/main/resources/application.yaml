@@ -2,9 +2,9 @@ spring:
   application:
     name: gestioncabinet
   datasource:
-    url: jdbc:postgresql://localhost:5433/cabinet_medical
+    url: jdbc:postgresql://localhost:5432/cabinet_medical
     username: postgres
-    password: "2004"
+    password: "assia2004"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

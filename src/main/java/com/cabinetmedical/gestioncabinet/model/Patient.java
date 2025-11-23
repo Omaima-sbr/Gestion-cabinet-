@@ -6,33 +6,75 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "Patient", indexes = {
+        @Index(name = "idx_cin", columnList = "cin"),
+        @Index(name = "idx_nom", columnList = "nom, prenom")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Patient {  // Nom de classe en MAJUSCULE
+class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false, length = 20)
     private String cin;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nom;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String prenom;
 
+    @Column(name = "date_naissance", nullable = false)
     private LocalDate dateNaissance;
 
-    @Column(length = 1)
-    private String sexe; // M ou F
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Sexe sexe;
 
+    @Column(name = "num_tel", length = 20)
     private String numTel;
 
+    @Column(name = "type_mutuelle", length = 100)
     private String typeMutuelle;
+
+    @Column(length = 255)
+    private String adresse;
+
+    @Column(length = 100)
+    private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Patient_Cabinet"))
+    private Cabinet cabinet;
+
+    @Column(name = "date_creation", nullable = false, updatable = false)
+    private LocalDateTime dateCreation = LocalDateTime.now();
+
+    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    private DossierMedical dossierMedical;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<RendezVous> rendezVous;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Consultation> consultations;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Facture> factures;
+
+    public enum Sexe {
+        HOMME, FEMME
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        dateCreation = LocalDateTime.now();
+    }
 }
