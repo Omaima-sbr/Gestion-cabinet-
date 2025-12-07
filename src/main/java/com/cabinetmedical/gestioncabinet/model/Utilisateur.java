@@ -1,5 +1,6 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +46,8 @@ public class Utilisateur {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Utilisateur_Cabinet"))
-    private Cabinet cabinet;
+    @JsonIgnore
+    Cabinet cabinet;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();

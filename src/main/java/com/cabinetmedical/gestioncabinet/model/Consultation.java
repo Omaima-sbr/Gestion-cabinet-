@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Consultation", indexes = {
         @Index(name = "idx_patient", columnList = "id_patient"),
-        @Index(name = "idx_date", columnList = "date_consultation")
+        @Index(name = "consultation_idx_date", columnList = "date_consultation")
 })
 @Data
 @NoArgsConstructor
