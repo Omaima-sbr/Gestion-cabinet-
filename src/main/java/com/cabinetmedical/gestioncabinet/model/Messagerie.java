@@ -10,7 +10,7 @@ import java.util.List;
 @Table(name = "Messagerie", indexes = {
         @Index(name = "idx_expediteur", columnList = "id_expediteur"),
         @Index(name = "idx_destinataire", columnList = "id_destinataire, lu"),
-        @Index(name = "idx_date", columnList = "date_envoi")
+        @Index(name = "messagerie_idx_date", columnList = "date_envoi")
 })
 @Data
 @NoArgsConstructor
