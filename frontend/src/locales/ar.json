@@ -1,0 +1,229 @@
+{
+  "nav": {
+    "login": "تسجيل الدخول",
+    "signup": "عيادة جديدة"
+  },
+  "hero": {
+    "title": "إدارة العيادة",
+    "subtitle": "مبسطة وآمنة",
+    "description": "MediCore هي منصتك الشاملة لإدارة عيادتك الطبية. إدارة المرضى والمواعيد والملفات الطبية والمدفوعات في مكان واحد.",
+    "loginBtn": "تسجيل الدخول",
+    "signupBtn": "ابدأ الآن",
+    "stats": {
+      "clinics": "عيادات شريكة",
+      "patients": "مرضى مُدارون",
+      "uptime": "التوفر"
+    }
+  },
+  "features": {
+    "title": "كل ما تحتاجه",
+    "subtitle": "الأدوات الأساسية لإدارة عيادتك بكفاءة",
+    "items": {
+      "patients": {
+        "title": "إدارة المرضى",
+        "description": "إدارة ملفات المرضى الكاملة مع السجل الطبي الكامل"
+      },
+      "appointments": {
+        "title": "جدولة المواعيد",
+        "description": "نظام مواعيد ذكي مع تذكيرات تلقائية"
+      },
+      "records": {
+        "title": "السجلات الطبية",
+        "description": "تخزين آمن للسجلات الطبية مع وصول فوري"
+      },
+      "analytics": {
+        "title": "التحليلات والتقارير",
+        "description": "عرض إحصائيات عيادتك في الوقت الفعلي"
+      },
+      "security": {
+        "title": "أمان RGPD",
+        "description": "امتثال كامل لمعايير حماية البيانات"
+      },
+      "access": {
+        "title": "التحكم في الوصول",
+        "description": "إدارة الأدوار والصلاحيات لتأمين بياناتك"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "آراء عملائنا",
+    "subtitle": "اكتشف ما يقوله الأطباء والسكرتيرات الذين يستخدمون MediCore",
+    "items": [
+      {
+        "name": "د. أحمد بناني",
+        "role": "طبيب قلب - الرباط",
+        "comment": "أحدثت MediCore ثورة في إدارة عيادتي. توفير الوقت والكفاءة الملحوظة!"
+      },
+      {
+        "name": "د. فاطمة الزهراء",
+        "role": "طبيب عام - الدار البيضاء",
+        "comment": "واجهة بديهية ودعم عملاء ممتاز. أوصي بشدة!"
+      },
+      {
+        "name": "د. محمد يوسف",
+        "role": "طبيب جلدية - مراكش",
+        "comment": "أمن بيانات مرضاي هو أولويتي. MediCore تحترم المعايير!"
+      },
+      {
+        "name": "السيدة زينب عمر",
+        "role": "سكرتيرة طبية - فاس",
+        "comment": "أصبح تنظيم المواعيد لعبة أطفال مع MediCore!"
+      },
+      {
+        "name": "د. كريم حاج",
+        "role": "أنف وأذن وحنجرة - طنجة",
+        "comment": "أفضل استثمار لعيادتي. عائد استثمار مذهل بعد 3 أشهر!"
+      }
+    ]
+  },
+  "cta": {
+    "title": "هل أنت مستعد لتحويل عيادتك؟",
+    "description": "انضم إلى مئات العيادات الطبية التي تدير مرضاها بالفعل باستخدام MediCore. إنه بسيط وآمن وفعال.",
+    "loginBtn": "تسجيل الدخول",
+    "signupBtn": "سجل مجانًا"
+  },
+  "footer": {
+    "about": {
+      "title": "حول",
+      "items": ["من نحن؟", "مهمتنا", "الأخبار"]
+    },
+    "product": {
+      "title": "المنتج",
+      "items": ["الميزات", "التسعير", "الأمان"]
+    },
+    "support": {
+      "title": "الدعم",
+      "items": ["مركز المساعدة", "التوثيق", "اتصل بنا"]
+    },
+    "legal": {
+      "title": "قانوني",
+      "items": ["سياسة الخصوصية", "شروط الاستخدام", "الإشعارات القانونية"]
+    },
+    "copyright": "جميع الحقوق محفوظة. | إدارة عيادة ذكية"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "selectRole": "اختر دورك:",
+    "changeRole": "تغيير الدور",
+    "connectedAs": "متصل كـ:",
+    "roles": {
+      "admin": {
+        "label": "مدير",
+        "description": "الوصول الإداري"
+      },
+      "doctor": {
+        "label": "طبيب",
+        "description": "الوصول للعيادة"
+      },
+      "secretary": {
+        "label": "سكرتير",
+        "description": "الوصول للسكرتارية"
+      }
+    },
+    "fields": {
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "your@email.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "••••••••",
+      "cabinet": "اختر عيادتك",
+      "cabinetPlaceholder": "اختر عيادة..."
+    },
+    "cabinets": {
+      "rabat": "العيادة الطبية الرباط",
+      "casa": "عيادة الصحة الدار البيضاء",
+      "marrakech": "المركز الطبي مراكش"
+    },
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "submitBtn": "تسجيل الدخول",
+    "submitting": "جاري تسجيل الدخول...",
+    "errors": {
+      "fillAll": "يرجى ملء جميع الحقول",
+      "selectCabinet": "يرجى اختيار عيادة",
+      "connectionFailed": "خطأ في تسجيل الدخول. يرجى المحاولة مرة أخرى."
+    },
+    "success": "تم تسجيل الدخول بنجاح!"
+  },
+  "signup": {
+    "title": "أنشئ عيادتك",
+    "step": "الخطوة",
+    "of": "من",
+    "steps": {
+      "cabinet": "معلومات العيادة",
+      "doctor": "معلومات الطبيب",
+      "secretary": "معلومات السكرتير"
+    },
+    "cabinet": {
+      "name": "اسم العيادة",
+      "namePlaceholder": "مثال: العيادة الطبية المركزية",
+      "address": "العنوان",
+      "addressPlaceholder": "مثال: 123 شارع الصحة",
+      "city": "المدينة",
+      "cityPlaceholder": "مثال: الرباط",
+      "zipCode": "الرمز البريدي",
+      "zipCodePlaceholder": "مثال: 10000",
+      "phone": "الهاتف",
+      "phonePlaceholder": "مثال: 0537123456+212",
+      "license": "رقم الترخيص",
+      "licensePlaceholder": "مثال: AC/2024/12345"
+    },
+    "doctor": {
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "مثال: أحمد",
+      "lastName": "الاسم الأخير",
+      "lastNamePlaceholder": "مثال: بناني",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "مثال: ahmed@cabinet.com",
+      "phone": "الهاتف",
+      "phonePlaceholder": "مثال: 0612345678+212",
+      "specialty": "التخصص",
+      "specialtyPlaceholder": "اختر تخصصًا...",
+      "specialties": {
+        "cardiology": "طب القلب",
+        "dermatology": "طب الجلدية",
+        "general": "الطب العام",
+        "orthopedics": "جراحة العظام"
+      },
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "تأكيد كلمة المرور"
+    },
+    "secretary": {
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "مثال: زينب",
+      "lastName": "الاسم الأخير",
+      "lastNamePlaceholder": "مثال: عمر",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "مثال: zineb@cabinet.com",
+      "phone": "الهاتف",
+      "phonePlaceholder": "مثال: 0612345678+212"
+    },
+    "payment": {
+      "title": "اختر خطتك",
+      "monthly": {
+        "title": "خطة شهرية",
+        "price": "99 درهم",
+        "period": "/شهر"
+      },
+      "annual": {
+        "title": "خطة سنوية",
+        "price": "950 درهم",
+        "period": "/سنة",
+        "badge": "وفر 20%"
+      }
+    },
+    "buttons": {
+      "previous": "السابق",
+      "next": "التالي",
+      "submit": "أنشئ عيادتي",
+      "submitting": "جاري الإنشاء..."
+    },
+    "errors": {
+      "required": "مطلوب",
+      "invalidEmail": "بريد إلكتروني غير صالح",
+      "passwordLength": "8 أحرف كحد أدنى",
+      "passwordMismatch": "عدم تطابق",
+      "submitError": "خطأ. حاول مرة أخرى."
+    },
+    "success": "تم التسجيل بنجاح!"
+  }
+}
