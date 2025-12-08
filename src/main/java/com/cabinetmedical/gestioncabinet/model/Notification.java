@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "Notification", indexes = {
         @Index(name = "idx_utilisateur_lu", columnList = "id_utilisateur, lu"),
-        @Index(name = "idx_date", columnList = "date_notification")
+        @Index(name = "notification_idx_date", columnList = "date_notification")
 })
 @Data
 @NoArgsConstructor
