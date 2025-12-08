@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Demande_Creation_Cabinet", indexes = {
-        @Index(name = "idx_statut", columnList = "statut"),
-        @Index(name = "idx_date", columnList = "date_demande")
+        @Index(name = "idx_demande_statut", columnList = "statut"),
+        @Index(name = "idx_demande_date", columnList = "date_demande")
 })
 @Data
 @NoArgsConstructor
@@ -88,7 +88,7 @@ public class DemandeCreationCabinet {
 
     // Informations de la demande
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'EN_ATTENTE'")
+    @Column(nullable = false, length = 20)
     private Statut statut = Statut.EN_ATTENTE;
 
     @Column(name = "date_demande", nullable = false)

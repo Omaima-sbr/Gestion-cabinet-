@@ -1,12 +1,15 @@
 package com.cabinetmedical.gestioncabinet.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "Patient", indexes = {
@@ -16,7 +19,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Patient {
+public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +71,16 @@ class Patient {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<Facture> factures;
+
+    public String getTelephone() {
+        return this.numTel;
+    }
+
+    public @NotNull(message = "Le patient est obligatoire") Integer getIdPatient() {
+        return this.id;
+    }
+
+
 
     public enum Sexe {
         HOMME, FEMME

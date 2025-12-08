@@ -1,10 +1,8 @@
 package com.cabinetmedical.gestioncabinet.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,8 +16,7 @@ import java.time.LocalDateTime;
 })
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-class RendezVous {
+public class RendezVous {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +30,11 @@ class RendezVous {
     private LocalTime heureRdv;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Motif motif;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'EN_ATTENTE'")
+    @Column(nullable = false, length = 20)
     private Statut statut = Statut.EN_ATTENTE;
 
     @Column(columnDefinition = "TEXT")

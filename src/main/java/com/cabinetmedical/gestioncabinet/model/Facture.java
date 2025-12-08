@@ -1,24 +1,23 @@
 package com.cabinetmedical.gestioncabinet.model;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "Facture", indexes = {
-        @Index(name = "idx_date", columnList = "date_emission"),
+        @Index(name = "idx_date2", columnList = "date_emission"),
         @Index(name = "idx_statut", columnList = "statut")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Facture {
+public class Facture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,11 +28,11 @@ class Facture {
     private BigDecimal montant;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "mode_paiement", nullable = false)
+    @Column(name = "mode_paiement", nullable = false, length = 20)
     private ModePaiement modePaiement;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'EN_ATTENTE'")
+    @Column(nullable = false, length = 20)
     private Statut statut = Statut.EN_ATTENTE;
 
     @Column(name = "date_emission", nullable = false)

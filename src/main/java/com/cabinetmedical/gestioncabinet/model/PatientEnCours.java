@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class PatientEnCours {
+public class PatientEnCours {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
