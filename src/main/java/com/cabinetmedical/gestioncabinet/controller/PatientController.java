@@ -1,79 +1,85 @@
 package com.cabinetmedical.gestioncabinet.controller;
 
-import com.cabinetmedical.gestioncabinet.model.Patient;
-import com.cabinetmedical.gestioncabinet.repository.PatientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cabinetmedical.gestioncabinet.dto.PatientDTO;
+import com.cabinetmedical.gestioncabinet.dto.PatientSearchDTO;
+import com.cabinetmedical.gestioncabinet.service.PatientService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/patients")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/secretaire/patients")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+//@PreAuthorize("hasRole('SECRETAIRE')")
 public class PatientController {
 
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientService patientService;
 
-    // GET : Récupérer tous les patients
-    @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
-    }
-
-    // GET : Récupérer un patient par ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
-        return patientRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GET : Rechercher par CIN
-    @GetMapping("/cin/{cin}")
-    public ResponseEntity<Patient> getPatientByCin(@PathVariable String cin) {
-        return patientRepository.findByCin(cin)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GET : Rechercher par nom ou prénom
-    @GetMapping("/search")
-    public List<Patient> searchPatients(@RequestParam String query) {
-        return patientRepository.findByNomContainingOrPrenomContaining(query, query);
-    }
-
-    // POST : Créer un nouveau patient
     @PostMapping
-    public Patient createPatient(@RequestBody Patient patient) {
-        return patientRepository.save(patient);
+    public ResponseEntity<PatientDTO> createPatient(@Valid @RequestBody PatientDTO patientDTO) {
+        PatientDTO created = patientService.createPatient(patientDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    // PUT : Modifier un patient
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patientDetails) {
-        return patientRepository.findById(id)
-                .map(patient -> {
-                    patient.setCin(patientDetails.getCin());
-                    patient.setNom(patientDetails.getNom());
-                    patient.setPrenom(patientDetails.getPrenom());
-                    patient.setDateNaissance(patientDetails.getDateNaissance());
-                    patient.setSexe(patientDetails.getSexe());
-                    patient.setNumTel(patientDetails.getNumTel());
-                    patient.setTypeMutuelle(patientDetails.getTypeMutuelle());
-                    return ResponseEntity.ok(patientRepository.save(patient));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<PatientDTO> updatePatient(
+            @PathVariable Integer id,
+            @Valid @RequestBody PatientDTO patientDTO) {
+        PatientDTO updated = patientService.updatePatient(id, patientDTO);
+        return ResponseEntity.ok(updated);
     }
 
-    // DELETE : Supprimer un patient
+    @GetMapping("/{id}")
+    public ResponseEntity<PatientDTO> getPatientById(@PathVariable Integer id) {
+        PatientDTO patient = patientService.getPatientById(id);
+        return ResponseEntity.ok(patient);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<PatientDTO>> getAllPatients(Pageable pageable) {
+        Page<PatientDTO> patients = patientService.getAllPatients(pageable);
+        return ResponseEntity.ok(patients);
+    }
+
+    @GetMapping("/search/cin/{cin}")
+    public ResponseEntity<PatientDTO> searchByCin(@PathVariable String cin) {
+        PatientDTO patient = patientService.findByCin(cin);
+        return ResponseEntity.ok(patient);
+    }
+
+    @GetMapping("/search/nom")
+    public ResponseEntity<List<PatientDTO>> searchByNom(
+            @RequestParam String nom,
+            @RequestParam(required = false) String prenom) {
+        List<PatientDTO> patients = patientService.searchByNomPrenom(nom, prenom);
+        return ResponseEntity.ok(patients);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<PatientDTO>> advancedSearch(@RequestBody PatientSearchDTO searchDTO) {
+        List<PatientDTO> patients = patientService.advancedSearch(searchDTO);
+        return ResponseEntity.ok(patients);
+    }
+
+    @PostMapping("/{patientId}/envoyer-medecin/{medecinId}")
+    public ResponseEntity<String> envoyerPatientAuMedecin(
+            @PathVariable Integer patientId,
+            @PathVariable Integer medecinId) {
+        patientService.envoyerPatientAuMedecin(patientId, medecinId);
+        return ResponseEntity.ok("Patient envoyé au médecin avec succès");
+    }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
-        if (patientRepository.existsById(id)) {
-            patientRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> deletePatient(@PathVariable Integer id) {
+        patientService.deletePatient(id);
+        return ResponseEntity.noContent().build();
     }
 }

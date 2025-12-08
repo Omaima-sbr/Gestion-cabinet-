@@ -55,4 +55,9 @@ public class Cabinet {
             actif = true;
         }
     }
+
+    public Integer getIdCabinet() {
+        return id;
+    }
+
 }

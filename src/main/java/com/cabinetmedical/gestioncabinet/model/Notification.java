@@ -10,12 +10,12 @@ import java.util.List;
 @Entity
 @Table(name = "Notification", indexes = {
         @Index(name = "idx_utilisateur_lu", columnList = "id_utilisateur, lu"),
-        @Index(name = "idx_date", columnList = "date_notification")
+        @Index(name = "idx_date5", columnList = "date_notification")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Notification {
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
