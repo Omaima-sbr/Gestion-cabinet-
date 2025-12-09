@@ -1,25 +1,24 @@
+
+// LoginResponse.java
 package com.cabinetmedical.gestioncabinet.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoginResponse {
     private String token;
-    private UserInfo user;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class UserInfo {
-        private Integer id;
-        private String login;
-        private String nom;
-        private String prenom;
-        private String role;
-        private Integer idCabinet;
-    }
+    private String type = "Bearer";
+    private Integer userId;
+    private String login;
+    private String nom;
+    private String prenom;
+    private String role;
+    private Integer cabinetId;
+    private String cabinetName;
 }

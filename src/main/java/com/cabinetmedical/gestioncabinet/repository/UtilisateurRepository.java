@@ -11,22 +11,41 @@ import java.util.Optional;
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Integer> {
 
+    /* ========================
+       AUTH / LOGIN
+       ======================== */
+
     Optional<Utilisateur> findByLogin(String login);
 
     boolean existsByLogin(String login);
 
-    List<Utilisateur> findByRoleAndCabinetAndActif(
-            Utilisateur.Role role, Cabinet cabinet, Boolean actif);
-
-    List<Utilisateur> findByCabinet(Cabinet cabinet);
-    // Trouver par login et statut actif
     Optional<Utilisateur> findByLoginAndActif(String login, Boolean actif);
 
-    // Trouver le premier utilisateur par rôle et statut actif
+    /* ========================
+       RÔLES
+       ======================== */
+
+    Optional<Utilisateur> findByLoginAndRole(String login, Utilisateur.Role role);
+
     Optional<Utilisateur> findFirstByRoleAndActif(Utilisateur.Role role, Boolean actif);
 
-
-    // Trouver par rôle et statut actif (sans filtre cabinet)
     List<Utilisateur> findByRoleAndActif(Utilisateur.Role role, Boolean actif);
 
+    /* ========================
+       CABINET
+       ======================== */
+
+    List<Utilisateur> findByCabinet(Cabinet cabinet);
+
+    List<Utilisateur> findByRoleAndCabinetAndActif(
+            Utilisateur.Role role,
+            Cabinet cabinet,
+            Boolean actif
+    );
+
+    Optional<Utilisateur> findByLoginAndRoleAndCabinetId(
+            String login,
+            Utilisateur.Role role,
+            Integer cabinetId
+    );
 }

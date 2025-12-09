@@ -8,7 +8,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Cabinet")
+// le nom du cabinet est unique
+@Table(
+        name = "Cabinet",
+        uniqueConstraints = @UniqueConstraint(columnNames = "nom", name = "uk_cabinet_nom")
+)
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

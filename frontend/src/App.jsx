@@ -1,10 +1,11 @@
-// App.jsx (version simplifiée)
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
+import Home from './pages/acceuil';
 import LoginPage from './components/pages/LoginPage';
 import SecretaryRoutes from '../routes/SecretaryRoutes';
+
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import LoadingSpinner from './components/common/LoadingSpinner';
@@ -20,26 +21,41 @@ function App() {
 
     return (
         <div className="app">
-            {user ? (
-                <>
-                    <Navbar />
-                    <div className="app-container">
-                        <Sidebar />
-                        <main className="main-content">
-                            <Routes>
-                                <Route path="/secretaire/*" element={<SecretaryRoutes />} />
-                                <Route path="/" element={<Navigate to="/secretaire" replace />} />
-                                <Route path="*" element={<Navigate to="/secretaire" replace />} />
-                            </Routes>
-                        </main>
-                    </div>
-                </>
-            ) : (
-                <Routes>
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="*" element={<Navigate to="/login" replace />} />
-                </Routes>
-            )}
+            <Routes>
+
+                {/* Page d'accueil publique */}
+                <Route path="/" element={<Home />} />
+
+                {/* Routes publiques */}
+                {!user && (
+                    <>
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="*" element={<Navigate to="/login" replace />} />
+                    </>
+                )}
+
+                {/* Routes protégées */}
+                {user && (
+                    <Route
+                        path="/*"
+                        element={
+                            <>
+                                <Navbar />
+                                <div className="app-container">
+                                    <Sidebar />
+                                    <main className="main-content">
+                                        <Routes>
+                                            <Route path="secretaire/*" element={<SecretaryRoutes />} />
+                                            <Route path="*" element={<Navigate to="/secretaire" replace />} />
+                                        </Routes>
+                                    </main>
+                                </div>
+                            </>
+                        }
+                    />
+                )}
+
+            </Routes>
         </div>
     );
 }

@@ -1,0 +1,229 @@
+{
+  "nav": {
+    "login": "Login",
+    "signup": "New Clinic"
+  },
+  "hero": {
+    "title": "Clinic Management",
+    "subtitle": "Simplified and Secure",
+    "description": "MediCore is your all-in-one platform for managing your medical clinic. Patient management, appointments, medical records and payments in one place.",
+    "loginBtn": "Login",
+    "signupBtn": "Get Started",
+    "stats": {
+      "clinics": "Partner Clinics",
+      "patients": "Managed Patients",
+      "uptime": "Uptime"
+    }
+  },
+  "features": {
+    "title": "Everything you need",
+    "subtitle": "Essential tools to manage your clinic efficiently",
+    "items": {
+      "patients": {
+        "title": "Patient Management",
+        "description": "Manage complete patient files with full medical history"
+      },
+      "appointments": {
+        "title": "Appointment Scheduling",
+        "description": "Smart appointment system with automatic reminders"
+      },
+      "records": {
+        "title": "Medical Records",
+        "description": "Secure storage of medical records with instant access"
+      },
+      "analytics": {
+        "title": "Analytics & Reports",
+        "description": "Visualize your clinic's statistics in real-time"
+      },
+      "security": {
+        "title": "GDPR Security",
+        "description": "Full compliance with data protection standards"
+      },
+      "access": {
+        "title": "Access Control",
+        "description": "Role and permission management to secure your data"
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Customer Reviews",
+    "subtitle": "Discover what doctors and secretaries who use MediCore say",
+    "items": [
+      {
+        "name": "Dr. Ahmed Bennani",
+        "role": "Cardiologist - Rabat",
+        "comment": "MediCore has revolutionized my clinic management. Time-saving and remarkable efficiency!"
+      },
+      {
+        "name": "Dr. Fatima Zahra",
+        "role": "General Practitioner - Casablanca",
+        "comment": "Intuitive interface and excellent customer support. Highly recommend!"
+      },
+      {
+        "name": "Dr. Mohamed Youssef",
+        "role": "Dermatologist - Marrakech",
+        "comment": "The security of my patients' data is my priority. MediCore meets standards!"
+      },
+      {
+        "name": "Ms. Zineb Omar",
+        "role": "Medical Secretary - Fez",
+        "comment": "Organizing appointments has become child's play with MediCore!"
+      },
+      {
+        "name": "Dr. Karim Hadj",
+        "role": "ENT - Tangier",
+        "comment": "Best investment for my clinic. Impressive ROI after 3 months!"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Ready to Transform Your Clinic?",
+    "description": "Join hundreds of medical clinics already managing their patients with MediCore. It's simple, secure and efficient.",
+    "loginBtn": "Login",
+    "signupBtn": "Sign Up Free"
+  },
+  "footer": {
+    "about": {
+      "title": "About",
+      "items": ["Who are we?", "Our Mission", "News"]
+    },
+    "product": {
+      "title": "Product",
+      "items": ["Features", "Pricing", "Security"]
+    },
+    "support": {
+      "title": "Support",
+      "items": ["Help Center", "Documentation", "Contact"]
+    },
+    "legal": {
+      "title": "Legal",
+      "items": ["Privacy Policy", "Terms of Use", "Legal Notices"]
+    },
+    "copyright": "All rights reserved. | Smart Clinic Management"
+  },
+  "login": {
+    "title": "Login",
+    "selectRole": "Select your role:",
+    "changeRole": "Change role",
+    "connectedAs": "Connected as:",
+    "roles": {
+      "admin": {
+        "label": "Administrator",
+        "description": "Admin access"
+      },
+      "doctor": {
+        "label": "Doctor",
+        "description": "Clinic access"
+      },
+      "secretary": {
+        "label": "Secretary",
+        "description": "Secretarial access"
+      }
+    },
+    "fields": {
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "cabinet": "Select your Clinic",
+      "cabinetPlaceholder": "Choose a clinic..."
+    },
+    "cabinets": {
+      "rabat": "Medical Clinic Rabat",
+      "casa": "Health Clinic Casablanca",
+      "marrakech": "Medical Center Marrakech"
+    },
+    "forgotPassword": "Forgot password?",
+    "submitBtn": "Sign In",
+    "submitting": "Signing in...",
+    "errors": {
+      "fillAll": "Please fill in all fields",
+      "selectCabinet": "Please select a clinic",
+      "connectionFailed": "Login error. Please try again."
+    },
+    "success": "Successfully logged in!"
+  },
+  "signup": {
+    "title": "Create your Clinic",
+    "step": "Step",
+    "of": "of",
+    "steps": {
+      "cabinet": "Clinic Information",
+      "doctor": "Doctor Information",
+      "secretary": "Secretary Information"
+    },
+    "cabinet": {
+      "name": "Clinic Name",
+      "namePlaceholder": "e.g.: Central Medical Clinic",
+      "address": "Address",
+      "addressPlaceholder": "e.g.: 123 Health Street",
+      "city": "City",
+      "cityPlaceholder": "e.g.: Rabat",
+      "zipCode": "Zip Code",
+      "zipCodePlaceholder": "e.g.: 10000",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g.: +212 5 37 12 34 56",
+      "license": "License Number",
+      "licensePlaceholder": "e.g.: AC/2024/12345"
+    },
+    "doctor": {
+      "firstName": "First Name",
+      "firstNamePlaceholder": "e.g.: Ahmed",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "e.g.: Bennani",
+      "email": "Email",
+      "emailPlaceholder": "e.g.: ahmed@cabinet.com",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g.: +212 6 12 34 56 78",
+      "specialty": "Specialty",
+      "specialtyPlaceholder": "Select a specialty...",
+      "specialties": {
+        "cardiology": "Cardiology",
+        "dermatology": "Dermatology",
+        "general": "General Medicine",
+        "orthopedics": "Orthopedics"
+      },
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "confirmPassword": "Confirm Password"
+    },
+    "secretary": {
+      "firstName": "First Name",
+      "firstNamePlaceholder": "e.g.: Zineb",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "e.g.: Omar",
+      "email": "Email",
+      "emailPlaceholder": "e.g.: zineb@cabinet.com",
+      "phone": "Phone",
+      "phonePlaceholder": "e.g.: +212 6 12 34 56 78"
+    },
+    "payment": {
+      "title": "Select your Plan",
+      "monthly": {
+        "title": "Monthly Plan",
+        "price": "99 MAD",
+        "period": "/month"
+      },
+      "annual": {
+        "title": "Annual Plan",
+        "price": "950 MAD",
+        "period": "/year",
+        "badge": "Save 20%"
+      }
+    },
+    "buttons": {
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Create my Clinic",
+      "submitting": "Creating..."
+    },
+    "errors": {
+      "required": "Required",
+      "invalidEmail": "Invalid email",
+      "passwordLength": "Min 8 characters",
+      "passwordMismatch": "Mismatch",
+      "submitError": "Error. Try again."
+    },
+    "success": "Successfully registered!"
+  }
+}
