@@ -56,8 +56,16 @@ public class RendezVous {
     @OneToOne(mappedBy = "rendezVous", cascade = CascadeType.ALL)
     private Consultation consultation;
 
+    public Integer getId() {
+        return idRendezVous;
+    }
+
+    public LocalDate getDateHeureDebut() {
+        return dateRdv;
+    }
+
     public enum Motif {
-        CONSULTATION, CONTROLE
+        CONSULTATION, CONTROLE,URGENCE,SUIVI
     }
 
     public enum Statut {

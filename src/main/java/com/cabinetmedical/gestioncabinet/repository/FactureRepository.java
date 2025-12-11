@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -104,11 +105,11 @@ public interface FactureRepository extends JpaRepository<Facture, Integer> {
     long countByStatut(Facture.Statut statut);
 
     /**
-     * Obtient les revenus mensuels agrégés (mois, année, total)
+     * Obtient les revenus mensuels agrégés à partir d'une date donnée
      * Retourne une liste d'Object[] où:
      * - [0] = mois (Integer)
      * - [1] = année (Integer)
-     * - [2] = total des revenus (BigDecimal)
+     * - [2] = total des revenus (BigDecimal ou Double)
      */
     @Query("SELECT MONTH(f.dateEmission), YEAR(f.dateEmission), SUM(f.montant) " +
             "FROM Facture f " +
@@ -116,4 +117,51 @@ public interface FactureRepository extends JpaRepository<Facture, Integer> {
             "GROUP BY YEAR(f.dateEmission), MONTH(f.dateEmission) " +
             "ORDER BY YEAR(f.dateEmission) DESC, MONTH(f.dateEmission) DESC")
     List<Object[]> getRevenusMensuels(@Param("startDate") LocalDate startDate);
+
+    /**
+     * Alternative : Récupère les revenus d'un mois spécifique
+     * Retourne le total des factures payées pour un mois/année donnés
+     */
+    @Query("SELECT COALESCE(SUM(f.montant), 0) " +
+            "FROM Facture f " +
+            "WHERE f.statut = 'PAYEE' " +
+            "AND YEAR(f.dateEmission) = :year " +
+            "AND MONTH(f.dateEmission) = :month")
+    BigDecimal getRevenusDuMois(@Param("year") int year, @Param("month") int month);
+
+    /**
+     * Obtient les revenus mensuels pour un cabinet spécifique
+     */
+    @Query("SELECT MONTH(f.dateEmission), YEAR(f.dateEmission), SUM(f.montant) " +
+            "FROM Facture f " +
+            "WHERE f.cabinet = :cabinet " +
+            "AND f.statut = 'PAYEE' " +
+            "AND f.dateEmission >= :startDate " +
+            "GROUP BY YEAR(f.dateEmission), MONTH(f.dateEmission) " +
+            "ORDER BY YEAR(f.dateEmission) DESC, MONTH(f.dateEmission) DESC")
+    List<Object[]> getRevenusMensuelsByCabinet(
+            @Param("cabinet") Cabinet cabinet,
+            @Param("startDate") LocalDate startDate
+    );
+
+    /**
+     * Récupère les revenus du mois courant
+     */
+    @Query("SELECT COALESCE(SUM(f.montant), 0) " +
+            "FROM Facture f " +
+            "WHERE f.statut = 'PAYEE' " +
+            "AND YEAR(f.dateEmission) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(f.dateEmission) = MONTH(CURRENT_DATE)")
+    BigDecimal getRevenusMoisCourant();
+
+    /**
+     * Récupère les revenus du mois courant pour un cabinet spécifique
+     */
+    @Query("SELECT COALESCE(SUM(f.montant), 0) " +
+            "FROM Facture f " +
+            "WHERE f.cabinet = :cabinet " +
+            "AND f.statut = 'PAYEE' " +
+            "AND YEAR(f.dateEmission) = YEAR(CURRENT_DATE) " +
+            "AND MONTH(f.dateEmission) = MONTH(CURRENT_DATE)")
+    BigDecimal getRevenusMoisCourantByCabinet(@Param("cabinet") Cabinet cabinet);
 }

@@ -79,11 +79,10 @@ public class Patient {
         return this.numTel;
     }
 
-    public @NotNull(message = "Le patient est obligatoire") Integer getIdPatient() {
+    // ✅ APRÈS
+    public Integer getIdPatient() {
         return this.id;
     }
-
-
 
     public enum Sexe {
         HOMME, FEMME

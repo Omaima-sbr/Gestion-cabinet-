@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -218,6 +219,54 @@ public class FactureController {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erreur lors de la récupération des factures"));
+        }
+    }
+    /**
+     * Modifie les informations d'une facture
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> modifierFacture(
+            @PathVariable Integer id,
+            @RequestBody FactureDTO factureDTO,
+            Authentication authentication) {
+        try {
+            log.info("✏️ Modification de la facture {}", id);
+
+            String username = authentication != null ? authentication.getName() : null;
+
+            // Validation basique
+            if (factureDTO.getMontant() == null || factureDTO.getMontant().compareTo(BigDecimal.ZERO) <= 0) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(Map.of("error", "Le montant doit être supérieur à 0"));
+            }
+
+            if (factureDTO.getModePaiement() == null) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(Map.of("error", "Le mode de paiement est requis"));
+            }
+
+            FactureDTO facture = factureService.modifierFacture(id, factureDTO, username);
+
+            log.info("✅ Facture {} modifiée avec succès", id);
+            return ResponseEntity.ok(facture);
+
+        } catch (IllegalStateException e) {
+            log.error("❌ Impossible de modifier la facture {}: {}", id, e.getMessage());
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            log.error("❌ Facture {} non trouvée", id);
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("❌ Erreur lors de la modification de la facture {}", id, e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erreur lors de la modification de la facture"));
         }
     }
 }

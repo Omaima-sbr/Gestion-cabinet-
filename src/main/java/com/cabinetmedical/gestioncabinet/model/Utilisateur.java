@@ -67,6 +67,11 @@ public class Utilisateur {
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL)
     private List<Messagerie> messagesRecus;
 
+    public Integer getIdUtilisateur() {
+        return id;
+    }
+
+
     public enum Role {
         MEDECIN, SECRETAIRE, ADMINISTRATEUR
     }

@@ -559,3 +559,10 @@
         width: 95%;
     }
 }
+.facture-btn-action.edit {
+    background-color: #3b82f6;
+}
+
+.facture-btn-action.edit:hover {
+    background-color: #2563eb;
+}

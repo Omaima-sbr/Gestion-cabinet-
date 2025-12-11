@@ -1,50 +1,91 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
 
+    // Vérifier si l'utilisateur est déjà connecté au chargement
     useEffect(() => {
-        // Ignorer le token pour le test
-        setLoading(false);
-    }, []);
+        const checkAuth = () => {
+            try {
+                const token = localStorage.getItem('token');
+                const userData = localStorage.getItem('user');
 
-    const login = async (loginData) => {
-        // Ignorer la requête réelle, créer un utilisateur fictif
-        const fakeUser = {
-            id: 1,
-            name: 'Test User',
-            email: loginData.email || 'test@example.com',
-            role: 'SECRETAIRE' // Change le rôle si nécessaire : 'MEDECIN', 'ADMINISTRATEUR'
+                if (token && userData) {
+                    const parsedUser = JSON.parse(userData);
+                    setUser(parsedUser);
+                    console.log('✅ Utilisateur restauré depuis localStorage:', parsedUser);
+                }
+            } catch (error) {
+                console.error('❌ Erreur lors de la restauration de la session:', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            } finally {
+                setLoading(false);
+            }
         };
 
-        // Stocker dans localStorage pour simuler un login
-        localStorage.setItem('token', 'fake-token');
-        localStorage.setItem('user', JSON.stringify(fakeUser));
+        checkAuth();
+    }, []);
 
-        setUser(fakeUser);
+    // Fonction de connexion
+    const login = async (userData) => {
+        try {
+            console.log('🔐 AuthContext - Mise à jour avec:', userData);
 
-        // Redirection selon le rôle
-        if (fakeUser.role === 'SECRETAIRE') {
-            navigate('/secretaire');
-        } else if (fakeUser.role === 'MEDECIN') {
-            navigate('/medecin');
-        } else if (fakeUser.role === 'ADMINISTRATEUR') {
-            navigate('/admin');
+            if (!userData || !userData.token) {
+                throw new Error('Données utilisateur invalides');
+            }
+
+            const userToSave = {
+                userId: userData.userId,
+                login: userData.login,
+                nom: userData.nom,
+                prenom: userData.prenom,
+                role: userData.role,
+                cabinetId: userData.cabinetId,
+                cabinetName: userData.cabinetName
+            };
+
+            console.log('💾 Sauvegarde dans localStorage:', userToSave);
+
+            // Sauvegarder dans localStorage
+            localStorage.setItem('token', userData.token);
+            localStorage.setItem('user', JSON.stringify(userToSave));
+
+            // Mettre à jour l'état - IMPORTANT: ceci déclenche un re-render
+            console.log('🔄 Mise à jour de l\'état user...');
+            setUser(userToSave);
+
+            console.log('✅ AuthContext - Contexte mis à jour avec succès');
+
+            // Vérification
+            const savedUser = localStorage.getItem('user');
+            console.log('✅ Vérification localStorage:', savedUser);
+
+            return userToSave;
+        } catch (error) {
+            console.error('❌ AuthContext - Erreur lors de la connexion:', error);
+            throw error;
         }
-
-        return { success: true };
     };
 
+    // Fonction de déconnexion
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         setUser(null);
-        navigate('/login');
+        console.log('🚪 Utilisateur déconnecté');
     };
 
     const value = {
@@ -54,13 +95,9 @@ export const AuthProvider = ({ children }) => {
         logout
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

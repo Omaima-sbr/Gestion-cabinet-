@@ -198,6 +198,17 @@ const apiService = {
                 return [];
             }
         },
+        search: async (query) => {
+            try {
+                const data = await request(`/secretaire/patients/search?q=${encodeURIComponent(query)}`);
+
+                return Array.isArray(data) ? data : (data ? [data] : []);
+            } catch (error) {
+                console.error('❌ Erreur search:', error);
+                return [];
+            }
+        },
+
     },
 
     // ==================== RENDEZ-VOUS ====================
@@ -221,6 +232,43 @@ const apiService = {
                 throw error;
             }
         },
+
+        getById: (id) =>
+            request(`/secretaire/rendez-vous/${id}`),
+
+        create: (rdvData) =>
+            request('/secretaire/rendez-vous', {
+                method: 'POST',
+                body: JSON.stringify(rdvData),
+            }),
+
+        update: (id, rdvData) =>
+            request(`/secretaire/rendez-vous/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify(rdvData),
+            }),
+
+        delete: (id) =>
+            request(`/secretaire/rendez-vous/${id}`, {
+                method: 'DELETE',
+            }),
+
+        updateStatut: (id, statut) =>
+            request(`/secretaire/rendez-vous/${id}/statut?statut=${statut}`, {
+                method: 'PATCH',
+            }),
+
+        getByDate: (date) =>
+            request(`/secretaire/rendez-vous/jour?date=${date}`),
+
+        getByMedecin: (medecinId, date) =>
+            request(`/secretaire/rendez-vous/medecin/${medecinId}?date=${date}`),
+
+        getByPatient: (patientId) =>
+            request(`/secretaire/rendez-vous/patient/${patientId}`),
+
+        getCreneauxDisponibles: (medecinId, date) =>
+            request(`/secretaire/rendez-vous/disponibilites?medecinId=${medecinId}&date=${date}`)
     },
 
     // ==================== FACTURES ====================
@@ -264,6 +312,20 @@ const apiService = {
         annuler: (id) => request(`/secretaire/factures/${id}/annuler`, {
             method: 'PATCH',
         }),
+        modifier: async (id, factureData) => {
+            try {
+                console.log('✏️ Modification de la facture:', id, factureData);
+                const data = await request(`/secretaire/factures/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(factureData),
+                });
+                console.log('✅ Facture modifiée:', data);
+                return data;
+            } catch (error) {
+                console.error('❌ Erreur modification facture:', error);
+                throw error;
+            }
+        },
 
         imprimer: async (id) => {
             try {
@@ -459,6 +521,7 @@ const apiService = {
                 return [];
             }
         },
+        //?  GET      [/api/secretaire/dashboard/revenus-mensuels] -> DashboardController.getRevenusMensuels()
 
         getRevenusMensuels: async () => {
             try {
@@ -470,6 +533,49 @@ const apiService = {
             }
         }
     },
+    // ==================== NOTIFICATIONS ====================
+    notifications: {
+        getMedecinsDuCabinet: async () => {
+            try {
+                const data = await request('/secretaire/notifications/medecins');
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('❌ Erreur getMedecinsDuCabinet:', error);
+                return [];
+            }
+        },
+
+        envoyer: (notificationData) => request('/secretaire/notifications', {
+            method: 'POST',
+            body: JSON.stringify(notificationData),
+        }),
+
+        getNotificationsEnvoyees: async () => {
+            try {
+                const data = await request('/secretaire/notifications/envoyees');
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('❌ Erreur getNotificationsEnvoyees:', error);
+                return [];
+            }
+        },
+    },
+
+// ==================== PARAMETRES ====================
+    parametres: {
+        getProfile: () => request('/utilisateur/profile'),
+
+        updateProfile: (profileData) => request('/utilisateur/profile', {
+            method: 'PUT',
+            body: JSON.stringify(profileData),
+        }),
+
+        changePassword: (passwordData) => request('/utilisateur/change-password', {
+            method: 'POST',
+            body: JSON.stringify(passwordData),
+        }),
+    },
+
 };
 
 export default apiService;

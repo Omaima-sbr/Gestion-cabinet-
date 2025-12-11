@@ -517,3 +517,158 @@
         font-size: 14px;
     }
 }
+/* Modal styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    color:black;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.rdv-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.rdv-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.rdv-form input,
+.rdv-form select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color:black;
+
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+/* ===== Actions changement de statut RDV ===== */
+.statut-actions {
+    margin-top: 16px;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.statut-actions p {
+    margin-bottom: 10px;
+    color: #374151;
+    font-size: 14px;
+}
+
+/* Boutons container */
+.statut-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Boutons communs */
+.btn-small {
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+/* Confirmer */
+.btn-confirme {
+    background: #22c55e;
+    color: #fff;
+}
+.btn-confirme:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+/* Terminer */
+.btn-termine {
+    background: #3b82f6;
+    color: #fff;
+}
+.btn-termine:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* Annuler */
+.btn-annule {
+    background: #ef4444;
+    color: #fff;
+}
+.btn-annule:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+/* Désactiver visuellement si besoin */
+.btn-small:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -1,5 +1,3 @@
-
-// AuthServiceImpl.java
 package com.cabinetmedical.gestioncabinet.service.impl;
 
 import com.cabinetmedical.gestioncabinet.config.JwtService;
@@ -20,7 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -70,14 +69,20 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword())
         );
 
-        // Générer le token
+        // Générer le token avec le rôle dans les claims
         UserDetails userDetails = User.builder()
                 .username(utilisateur.getLogin())
                 .password(utilisateur.getPwd())
-                .authorities(utilisateur.getRole().name())
+                .authorities("ROLE_" + utilisateur.getRole().name())
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
+        // ✅ AJOUT: Ajouter le rôle dans les claims du token
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", "ROLE_" + utilisateur.getRole().name());
+        extraClaims.put("userId", utilisateur.getId());
+        extraClaims.put("cabinetId", utilisateur.getCabinet() != null ? utilisateur.getCabinet().getId() : null);
+
+        String token = jwtService.generateToken(extraClaims, userDetails);
 
         // Construire la réponse
         return LoginResponse.builder()
@@ -130,14 +135,20 @@ public class AuthServiceImpl implements AuthService {
 
         utilisateur = utilisateurRepository.save(utilisateur);
 
-        // Générer le token
+        // Générer le token avec le rôle dans les claims
         UserDetails userDetails = User.builder()
                 .username(utilisateur.getLogin())
                 .password(utilisateur.getPwd())
-                .authorities(utilisateur.getRole().name())
+                .authorities("ROLE_" + utilisateur.getRole().name())
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
+        // ✅ AJOUT: Ajouter le rôle dans les claims du token
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", "ROLE_" + utilisateur.getRole().name());
+        extraClaims.put("userId", utilisateur.getId());
+        extraClaims.put("cabinetId", utilisateur.getCabinet() != null ? utilisateur.getCabinet().getId() : null);
+
+        String token = jwtService.generateToken(extraClaims, userDetails);
 
         // Construire la réponse
         return LoginResponse.builder()
