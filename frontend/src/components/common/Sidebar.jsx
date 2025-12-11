@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import apiService from '../../services/apiService.js';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ isMobileOpen = false, onClose }) => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -61,70 +61,94 @@ const Sidebar = () => {
             icon: "⚙️",
             description: "Configuration"
         },
+        {
+            label: "Notifications",
+            path: "/secretaire/notifications",
+            icon: "🔔",
+            description: "Notifications"
+        },
     ];
 
-    return (
-        <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-            <div className="sidebar-header">
-                <div className="sidebar-logo">
-                    <img
-                        src="/defaultLogo.png"
-                        alt="Logo"
-                        className="logo-image"
-                    />
+    const handleLinkClick = () => {
+        // Fermer la sidebar sur mobile après un clic
+        if (window.innerWidth <= 768 && onClose) {
+            onClose();
+        }
+    };
 
-                    {/* Texte affiché seulement si non-collapsé */}
+    return (
+        <>
+            {/* Overlay pour mobile */}
+            {isMobileOpen && (
+                <div
+                    className="sidebar-overlay"
+                    onClick={onClose}
+                />
+            )}
+
+            <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
+                <div className="sidebar-header">
+                    <div className="sidebar-logo">
+                        <img
+                            src="/defaultLogo.png"
+                            alt="Logo"
+                            className="logo-image"
+                        />
+
+                        {/* Texte affiché seulement si non-collapsé */}
+                        {!isCollapsed && (
+                            <span className="logo-text">Cabinet Médical</span>
+                        )}
+                    </div>
+                </div>
+
+                <button
+                    className="sidebar-toggle"
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    title={isCollapsed ? "Développer" : "Réduire"}
+                >
+                    {isCollapsed ? '→' : '←'}
+                </button>
+
+                <nav className="sidebar-menu">
+                    {menu.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.path === "/secretaire"}
+                            className={({ isActive }) =>
+                                `sidebar-link ${isActive ? 'active' : ''}`
+                            }
+                            title={isCollapsed ? item.label : ''}
+                            onClick={handleLinkClick}
+                        >
+                            <span className="sidebar-icon">{item.icon}</span>
+                            {!isCollapsed && (
+                                <div className="sidebar-content">
+                                    <span className="sidebar-label">{item.label}</span>
+                                    <span className="sidebar-description">{item.description}</span>
+                                </div>
+                            )}
+                            {item.badge > 0 && (
+                                <span className="sidebar-badge">{item.badge}</span>
+                            )}
+                        </NavLink>
+                    ))}
+                </nav>
+
+                <div className="sidebar-footer">
                     {!isCollapsed && (
-                        <span className="logo-text">Cabinet Médical</span>
+                        <div className="sidebar-user">
+                            <div className="user-avatar">👤</div>
+                            <div className="user-info">
+                                <div className="user-name">Secrétaire</div>
+                                <div className="user-role">Administrateur</div>
+                            </div>
+                        </div>
                     )}
                 </div>
-            </div>
-
-            <button
-                className="sidebar-toggle"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                title={isCollapsed ? "Développer" : "Réduire"}
-            >
-                {isCollapsed ? '→' : '←'}
-            </button>
-
-            <nav className="sidebar-menu">
-                {menu.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        end={item.path === "/secretaire"}
-                        className={({ isActive }) =>
-                            `sidebar-link ${isActive ? 'active' : ''}`
-                        }
-                        title={isCollapsed ? item.label : ''}
-                    >
-                        <span className="sidebar-icon">{item.icon}</span>
-                        {!isCollapsed && (
-                            <div className="sidebar-content">
-                                <span className="sidebar-label">{item.label}</span>
-                                <span className="sidebar-description">{item.description}</span>
-                            </div>
-                        )}
-                        {item.badge > 0 && (
-                            <span className="sidebar-badge">{item.badge}</span>
-                        )}
-                    </NavLink>
-                ))}
-            </nav>
-
-            <div className="sidebar-footer">
-                {!isCollapsed && (
-                    <div className="sidebar-user">
-                        <div className="user-avatar">👤</div>
-                        <div className="user-info">
-                            <div className="user-name">Secrétaire</div>
-                            <div className="user-role">Administrateur</div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </aside>
+            </aside>
+        </>
     );
 };
 

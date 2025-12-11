@@ -48,6 +48,11 @@ public class Notification {
         RAPPEL_RDV, PATIENT_EN_COURS, NOUVEAU_PATIENT, AUTRE
     }
 
+    // Ajouter cette relation dans votre modèle Notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_patient", foreignKey = @ForeignKey(name = "FK_Notification_Patient"))
+    private Patient patient;
+
     @PrePersist
     protected void onCreate() {
         dateNotification = LocalDateTime.now();

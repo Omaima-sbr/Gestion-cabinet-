@@ -53,11 +53,7 @@ const PatientFormModal = ({ patient, onSave, onClose }) => {
         if (!formData.dateNaissance) {
             newErrors.dateNaissance = 'La date de naissance est requise';
         }
-        if (!formData.telephone?.trim()) {
-            newErrors.telephone = 'Le téléphone est requis';
-        } else if (!/^0[5-7][0-9]{8}$/.test(formData.telephone.replace(/\s/g, ''))) {
-            newErrors.telephone = 'Format téléphone invalide (ex: 0612345678)';
-        }
+
 
         if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             newErrors.email = 'Format email invalide';

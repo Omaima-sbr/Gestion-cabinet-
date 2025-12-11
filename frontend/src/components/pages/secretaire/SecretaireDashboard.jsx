@@ -8,42 +8,9 @@ import {
     LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import apiService from '../../../services/apiService'; // ⬅️ AJOUTER CETTE LIGNE
 
-// ✅ Configuration de l'API
-const API_BASE_URL = 'http://localhost:8080/api';
 
-const request = async (endpoint) => {
-    try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error(`API Error [${endpoint}]:`, error);
-        throw error;
-    }
-};
-
-const apiService = {
-    dashboard: {
-        getStats: () => request('/secretaire/dashboard/stats'),
-        getRdvSemaine: () => request('/secretaire/dashboard/rdv-semaine'),
-        getRdvStatuts: () => request('/secretaire/dashboard/rdv-statuts'),
-        getPatientsEvolution: () => request('/secretaire/dashboard/patients-evolution'),
-        getRevenusMensuels: () => request('/secretaire/dashboard/revenus-mensuels')
-    },
-    rendezVous: {
-        getDuJour: () => request('/secretaire/rendez-vous/jour')
-    }
-};
 
 const SecretaireDashboard = () => {
     const [stats, setStats] = useState({
@@ -96,7 +63,9 @@ const SecretaireDashboard = () => {
             setRdvSemaineData(rdvSemaine || []);
             setStatutsRdvData(rdvStatuts || []);
             setPatientsParMoisData(patientsEvolution || []);
-            setRevenusMensuelData(revenusMensuels || []);
+            setRevenusMensuelData(revenusMensuels || [])
+
+            console.log('✅ Revenus mensuels reçus :', revenusMensuels);
 
             console.log('✅ Dashboard chargé avec succès');
         } catch (err) {

@@ -1,16 +1,24 @@
+
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { I18nProvider } from './i18n';
+import { ThemeProvider } from './contexts/ThemeContext'; // Ajoutez cette ligne
 import App from './App';
-import { I18nProvider } from './i18n.jsx';
-import { ThemeProvider } from './contexts/ThemeContext';
 import './pages/global.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <ThemeProvider>
-            <I18nProvider>
-                <App />
-            </I18nProvider>
-        </ThemeProvider>
+        <BrowserRouter>
+            <ThemeProvider>
+                <I18nProvider>
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
+                </I18nProvider>
+            </ThemeProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );

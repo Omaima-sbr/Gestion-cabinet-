@@ -10,6 +10,7 @@ import GestionFactures from '../src/components/pages/secretaire/GestionFactures'
 import Messagerie from '../src/components/pages/secretaire/Messagerie';
 import PatientDetails from '../src/components/pages/secretaire/PatientDetails';
 import Parametres from '../src/components/pages/secretaire/Parametres.jsx';
+import Notifications from  '../src/components/pages/secretaire/notifications.jsx';
 
 const SecretaryRoutes = () => {
     return (
@@ -21,6 +22,8 @@ const SecretaryRoutes = () => {
             <Route path="/factures" element={<GestionFactures />} />
             <Route path="/messagerie" element={<Messagerie />} />
             <Route path="/parametres" element={<Parametres />} />
+            <Route path="/notifications" element={<Notifications />} />
+
             <Route path="*" element={<Navigate to="/secretaire" replace />} />
         </Routes>
     );

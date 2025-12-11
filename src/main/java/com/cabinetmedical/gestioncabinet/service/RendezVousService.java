@@ -57,12 +57,11 @@ public class RendezVousService {
 
         RendezVous saved = rendezVousRepository.save(rendezVous);
 
-        // Créer notification pour le médecin
-        notificationService.creerNotification(
+        // ✅ CORRECTION : Utiliser 'saved' au lieu de 'rdv'
+        notificationService.creerNotificationAutomatique(
                 medecin,
                 Notification.Type.RAPPEL_RDV,
-                "Nouveau rendez-vous: " + patient.getNom() + " " + patient.getPrenom() +
-                        " le " + dto.getDateRdv() + " à " + dto.getHeureRdv(),
+                "Nouveau rendez-vous avec " + saved.getPatient().getNom() + " " + saved.getPatient().getPrenom(),
                 saved
         );
 

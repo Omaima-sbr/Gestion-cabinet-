@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     FileText, DollarSign, Check, X,
-    Printer, Filter, Calendar, User, AlertCircle, TrendingUp
+    Printer, Filter, Calendar, User, AlertCircle, TrendingUp, Edit
 } from 'lucide-react';
 import apiService from '../../../services/apiService';
 import './GestionFactures.css';
@@ -15,6 +15,15 @@ const GestionFactures = () => {
     const [selectedFacture, setSelectedFacture] = useState(null);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [modePaiement, setModePaiement] = useState('ESPECES');
+
+    // Nouveaux états pour la modification
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingFacture, setEditingFacture] = useState(null);
+    const [editFormData, setEditFormData] = useState({
+        montant: '',
+        modePaiement: '',
+        dateEmission: ''
+    });
 
     useEffect(() => {
         fetchFactures();
@@ -73,6 +82,37 @@ const GestionFactures = () => {
             console.error('Erreur annulation:', error);
             alert('Erreur lors de l\'annulation de la facture');
         }
+    };
+
+    const handleModifierFacture = async () => {
+        if (!editingFacture) return;
+
+        try {
+            const dataToSend = {
+                montant: parseFloat(editFormData.montant),
+                modePaiement: editFormData.modePaiement,
+                dateEmission: editFormData.dateEmission,
+                statut: editingFacture.statut // Conserver le statut actuel
+            };
+
+            await apiService.factures.modifier(editingFacture.idFacture, dataToSend);
+            setShowEditModal(false);
+            setEditingFacture(null);
+            fetchFactures();
+        } catch (error) {
+            console.error('Erreur modification:', error);
+            alert('Erreur lors de la modification de la facture');
+        }
+    };
+
+    const openEditModal = (facture) => {
+        setEditingFacture(facture);
+        setEditFormData({
+            montant: facture.montant,
+            modePaiement: facture.modePaiement,
+            dateEmission: facture.dateEmission
+        });
+        setShowEditModal(true);
     };
 
     const handleImprimerFacture = async (factureId) => {
@@ -267,19 +307,19 @@ const GestionFactures = () => {
                                         {new Date(facture.dateEmission).toLocaleDateString('fr-FR')}
                                     </td>
                                     <td>
-                                            <span className="facture-montant">
-                                                {parseFloat(facture.montant).toFixed(2)} DH
-                                            </span>
+                                        <span className="facture-montant">
+                                            {parseFloat(facture.montant).toFixed(2)} DH
+                                        </span>
                                     </td>
                                     <td>
-                                            <span className="facture-mode-paiement">
-                                                {facture.modePaiement}
-                                            </span>
+                                        <span className="facture-mode-paiement">
+                                            {facture.modePaiement}
+                                        </span>
                                     </td>
                                     <td>
-                                            <span className={`facture-statut-badge ${getStatutClass(facture.statut)}`}>
-                                                {getStatutLabel(facture.statut)}
-                                            </span>
+                                        <span className={`facture-statut-badge ${getStatutClass(facture.statut)}`}>
+                                            {getStatutLabel(facture.statut)}
+                                        </span>
                                     </td>
                                     <td>
                                         {facture.datePaiement
@@ -303,6 +343,13 @@ const GestionFactures = () => {
                                             )}
                                             {facture.statut !== 'ANNULEE' && (
                                                 <>
+                                                    <button
+                                                        onClick={() => openEditModal(facture)}
+                                                        className="facture-btn-action edit"
+                                                        title="Modifier"
+                                                    >
+                                                        <Edit size={16} />
+                                                    </button>
                                                     <button
                                                         onClick={() => handleImprimerFacture(facture.idFacture)}
                                                         className="facture-btn-action print"
@@ -385,6 +432,92 @@ const GestionFactures = () => {
                             >
                                 <Check size={16} />
                                 Valider le paiement
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal modification facture */}
+            {showEditModal && editingFacture && (
+                <div className="factures-modal-overlay" onClick={() => setShowEditModal(false)}>
+                    <div className="factures-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="factures-modal-header">
+                            <h3 className="factures-modal-title">Modifier la facture</h3>
+                        </div>
+
+                        <div className="factures-modal-body">
+                            <div className="factures-modal-info">
+                                <div className="factures-info-row">
+                                    <span className="factures-info-label">Facture N°:</span>
+                                    <span className="factures-info-value">#{editingFacture.idFacture}</span>
+                                </div>
+                                <div className="factures-info-row">
+                                    <span className="factures-info-label">Patient:</span>
+                                    <span className="factures-info-value">
+                                        {editingFacture.nomPatient} {editingFacture.prenomPatient}
+                                    </span>
+                                </div>
+                                <div className="factures-info-row">
+                                    <span className="factures-info-label">Statut actuel:</span>
+                                    <span className={`facture-statut-badge ${getStatutClass(editingFacture.statut)}`}>
+                                        {getStatutLabel(editingFacture.statut)}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="factures-form-group">
+                                <label className="factures-form-label">Montant (DH):</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={editFormData.montant}
+                                    onChange={(e) => setEditFormData({...editFormData, montant: e.target.value})}
+                                    className="factures-form-select"
+                                    required
+                                />
+                            </div>
+
+                            <div className="factures-form-group">
+                                <label className="factures-form-label">Mode de paiement:</label>
+                                <select
+                                    value={editFormData.modePaiement}
+                                    onChange={(e) => setEditFormData({...editFormData, modePaiement: e.target.value})}
+                                    className="factures-form-select"
+                                >
+                                    <option value="ESPECES">💵 Espèces</option>
+                                    <option value="CARTE">💳 Carte bancaire</option>
+                                    <option value="CHEQUE">📝 Chèque</option>
+                                    <option value="ASSURANCE">🏥 Assurance</option>
+                                </select>
+                            </div>
+
+                            <div className="factures-form-group">
+                                <label className="factures-form-label">Date d'émission:</label>
+                                <input
+                                    type="date"
+                                    value={editFormData.dateEmission}
+                                    onChange={(e) => setEditFormData({...editFormData, dateEmission: e.target.value})}
+                                    className="factures-form-select"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="factures-modal-footer">
+                            <button
+                                onClick={() => setShowEditModal(false)}
+                                className="factures-btn-modal cancel"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={handleModifierFacture}
+                                className="factures-btn-modal confirm"
+                            >
+                                <Check size={16} />
+                                Enregistrer
                             </button>
                         </div>
                     </div>

@@ -14,9 +14,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -31,6 +31,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final UtilisateurRepository utilisateurRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,15 +40,32 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Routes publiques
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cabinets/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+
+                        // Routes secrétaire - ORDRE IMPORTANT : spécifiques avant génériques
+                        .requestMatchers("/api/secretaire/dashboard/**").hasRole("SECRETAIRE")
+                        .requestMatchers("/api/secretaire/**").hasRole("SECRETAIRE")
+
+                        // Routes médecin
+                        .requestMatchers("/api/medecin/**").hasRole("MEDECIN")
+
+                        // Routes admin
+                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRATEUR")
+
+                        // Messagerie accessible à tous les utilisateurs authentifiés
+                        .requestMatchers("/api/messagerie/**").authenticated()
+
+                        // Toutes les autres requêtes nécessitent une authentification
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
@@ -59,6 +78,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("Authorization")); // Exposer le header Authorization
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -69,7 +89,7 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -79,15 +99,10 @@ public class SecurityConfig {
                 .map(utilisateur -> org.springframework.security.core.userdetails.User.builder()
                         .username(utilisateur.getLogin())
                         .password(utilisateur.getPwd())
-                        .authorities(utilisateur.getRole().name())
+                        .authorities("ROLE_" + utilisateur.getRole().name()) // Vérifier le préfixe ROLE_
                         .disabled(!utilisateur.getActif())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé: " + username));
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean

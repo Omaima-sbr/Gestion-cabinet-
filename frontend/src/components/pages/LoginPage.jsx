@@ -1,104 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './LoginPage.css';
+import LoginModal from '../auth/login';
 
 const LoginPage = () => {
-    const [credentials, setCredentials] = useState({
-        login: '',
-        motDePasse: ''
-    });
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(true);
 
-    const handleChange = (e) => {
-        setCredentials({
-            ...credentials,
-            [e.target.name]: e.target.value
-        });
-        setError('');
-    };
+    // Si l'utilisateur est déjà connecté, rediriger immédiatement
+    useEffect(() => {
+        if (user) {
+            console.log('👤 Utilisateur connecté détecté, redirection...');
+            const roleRoutes = {
+                'SECRETAIRE': '/secretaire',
+                'MEDECIN': '/medecin',
+                'ADMINISTRATEUR': '/admin'
+            };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+            const redirectPath = roleRoutes[user.role] || '/';
+            console.log(`🔀 Redirection vers: ${redirectPath}`);
+            navigate(redirectPath, { replace: true });
+        }
+    }, [user, navigate]);
+
+    const handleLoginSuccess = async (userData) => {
+        console.log('✅ LoginPage - Données reçues:', userData);
 
         try {
-            await login(credentials);
-            navigate('/secretaire');
-        } catch (err) {
-            setError(err.response?.data?.message || 'Identifiants incorrects');
-        } finally {
-            setLoading(false);
+            // Mettre à jour le contexte d'authentification
+            console.log('🔄 Appel de login() du contexte...');
+            const savedUser = await login(userData);
+            console.log('✅ login() terminé, user sauvegardé:', savedUser);
+
+            // ✅ REDIRECTION IMMÉDIATE ICI (ne pas attendre le useEffect)
+            const roleRoutes = {
+                'SECRETAIRE': '/secretaire',
+                'MEDECIN': '/medecin',
+                'ADMINISTRATEUR': '/admin'
+            };
+
+            const redirectPath = roleRoutes[savedUser.role] || '/';
+            console.log(`🔀 Redirection immédiate vers: ${redirectPath}`);
+            navigate(redirectPath, { replace: true });
+
+        } catch (error) {
+            console.error('❌ Erreur lors de la mise à jour du contexte:', error);
+            alert('Erreur lors de la connexion. Veuillez réessayer.');
         }
     };
 
+    const handleClose = () => {
+        console.log('❌ Fermeture du modal');
+        setShowModal(false);
+        navigate('/');
+    };
+
     return (
-        <div className="login-page">
-            <div className="login-container">
-                <div className="login-header">
-                    <div className="logo">🏥</div>
-                    <h1>Cabinet Médical</h1>
-                    <p>Connectez-vous à votre espace</p>
-                </div>
-
-                <form className="login-form" onSubmit={handleSubmit}>
-                    {error && (
-                        <div className="error-message">
-                            <span>⚠️</span> {error}
-                        </div>
-                    )}
-
-                    <div className="form-group">
-                        <label htmlFor="login">Identifiant</label>
-                        <input
-                            type="text"
-                            id="login"
-                            name="login"
-                            value={credentials.login}
-                            onChange={handleChange}
-                            placeholder="Votre identifiant"
-                            required
-                            autoFocus
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="motDePasse">Mot de passe</label>
-                        <input
-                            type="password"
-                            id="motDePasse"
-                            name="motDePasse"
-                            value={credentials.motDePasse}
-                            onChange={handleChange}
-                            placeholder="Votre mot de passe"
-                            required
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="btn-login"
-                        disabled={loading}
-                    >
-                        {loading ? 'Connexion...' : 'Se connecter'}
-                    </button>
-                </form>
-
-                <div className="login-footer">
-                    <p>Mot de passe oublié ? Contactez l'administrateur</p>
-                </div>
-            </div>
-
-            <div className="login-background">
-                <div className="shape shape-1"></div>
-                <div className="shape shape-2"></div>
-                <div className="shape shape-3"></div>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+            {showModal && (
+                <LoginModal
+                    onClose={handleClose}
+                    onLoginSuccess={handleLoginSuccess}
+                />
+            )}
         </div>
     );
 };

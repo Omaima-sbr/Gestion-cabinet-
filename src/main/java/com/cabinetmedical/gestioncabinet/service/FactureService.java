@@ -219,7 +219,71 @@ public class FactureService {
 
         return convertToDTO(savedFacture);
     }
+    @Transactional
+    public FactureDTO modifierFacture(Integer id, FactureDTO factureDTO, String username) {
+        log.info("✏️ Modification de la facture {}", id);
 
+        Facture facture = factureRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Facture non trouvée"));
+
+        // Vérifier l'appartenance au cabinet si username fourni
+        if (username != null) {
+            verifierAppartenanceCabinet(facture, username);
+        }
+
+        // Vérifier que la facture peut être modifiée
+        if (facture.getStatut() == Facture.Statut.ANNULEE) {
+            throw new IllegalStateException("Impossible de modifier une facture annulée");
+        }
+
+        // Mise à jour des champs modifiables
+        if (factureDTO.getMontant() != null) {
+            facture.setMontant(factureDTO.getMontant());
+        }
+
+        if (factureDTO.getModePaiement() != null) {
+            facture.setModePaiement(Facture.ModePaiement.valueOf(factureDTO.getModePaiement()));
+        }
+
+        if (factureDTO.getDateEmission() != null) {
+            facture.setDateEmission(factureDTO.getDateEmission());
+        }
+
+        // Ne permettre la modification du statut que si c'est cohérent
+        if (factureDTO.getStatut() != null && !factureDTO.getStatut().equals(facture.getStatut().name())) {
+            Facture.Statut nouveauStatut = Facture.Statut.valueOf(factureDTO.getStatut());
+
+            // Si on passe à PAYEE, définir la date de paiement
+            if (nouveauStatut == Facture.Statut.PAYEE && facture.getDatePaiement() == null) {
+                facture.setDatePaiement(LocalDate.now());
+            }
+
+            facture.setStatut(nouveauStatut);
+        }
+
+        Facture factureSauvegardee = factureRepository.save(facture);
+        log.info("✅ Facture {} modifiée", id);
+
+        return convertToDTO(factureSauvegardee);
+    }
+
+    private void verifierAppartenanceCabinet(Facture facture, String username) {
+        log.debug("🔒 Vérification appartenance cabinet pour l'utilisateur: {}", username);
+
+        // Utilisez findByLogin au lieu de findByUsername
+        Utilisateur utilisateur = utilisateurRepository.findByLogin(username)  // ← CHANGÉ ICI
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        if (utilisateur.getCabinet() == null) {
+            throw new RuntimeException("Utilisateur sans cabinet associé");
+        }
+
+        if (!facture.getCabinet().getIdCabinet().equals(utilisateur.getCabinet().getIdCabinet())) {
+            throw new RuntimeException("Accès non autorisé à cette facture");
+        }
+
+        log.debug("✅ Vérification réussie - Facture appartient au cabinet");
+    }
     /**
      * Génère le PDF d'une facture
      */

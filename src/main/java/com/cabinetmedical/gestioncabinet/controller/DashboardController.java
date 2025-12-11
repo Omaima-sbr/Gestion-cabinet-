@@ -4,6 +4,7 @@ import com.cabinetmedical.gestioncabinet.model.Patient;
 import com.cabinetmedical.gestioncabinet.model.RendezVous;
 import com.cabinetmedical.gestioncabinet.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/secretaire/dashboard")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Slf4j
 public class DashboardController {
 
     private final PatientRepository patientRepository;
@@ -202,53 +204,75 @@ public class DashboardController {
     }
 
     /**
-     * Revenus mensuels (6 derniers mois)
+     * Revenus mensuels - Retourne UNIQUEMENT le mois dernier
+     * Route : GET /api/secretaire/dashboard/revenus-mensuels
      */
     @GetMapping("/revenus-mensuels")
     public ResponseEntity<List<Map<String, Object>>> getRevenusMensuels() {
+        log.info("💰 GET /api/secretaire/dashboard/revenus-mensuels");
+
         try {
             LocalDate today = LocalDate.now();
-            LocalDate startDate = today.minusMonths(6);
+            // Premier jour du mois dernier
+            LocalDate startDate = today.minusMonths(1).withDayOfMonth(1);
 
+            log.info("📅 Période de recherche : depuis {}", startDate);
+
+            // Récupérer les données depuis la base
             List<Object[]> results = factureRepository.getRevenusMensuels(startDate);
 
-            // Créer une map avec tous les mois (initialiser à 0)
-            Map<String, BigDecimal> revenusByMonth = new LinkedHashMap<>();
-            for (int i = 5; i >= 0; i--) {
-                LocalDate month = today.minusMonths(i);
-                String monthKey = String.format("%04d-%02d", month.getYear(), month.getMonthValue());
-                revenusByMonth.put(monthKey, BigDecimal.ZERO);
+            log.info("✅ Résultats DB : {} ligne(s)", results.size());
+
+            // Construire la réponse
+            List<Map<String, Object>> data = new ArrayList<>();
+
+            if (results.isEmpty()) {
+                // Aucune donnée trouvée -> retourner le mois dernier avec montant = 0
+                log.warn("⚠️ Aucun revenu trouvé dans la DB");
+
+                Map<String, Object> defaultMonth = new HashMap<>();
+                String moisNom = startDate.getMonth()
+                        .getDisplayName(TextStyle.SHORT, Locale.FRENCH);
+                defaultMonth.put("mois", moisNom);
+                defaultMonth.put("montant", 0.0);
+                data.add(defaultMonth);
+
+            } else {
+                // Traiter chaque ligne retournée par la requête
+                for (Object[] row : results) {
+                    Integer mois = (Integer) row[0];      // MONTH(date_emission)
+                    Integer annee = (Integer) row[1];     // YEAR(date_emission)
+
+                    // Gérer BigDecimal ou Double selon votre entité Facture
+                    Number montantNumber = (Number) row[2];
+                    Double montant = montantNumber.doubleValue();
+
+                    // Convertir le numéro de mois en nom court (Jan, Fév, Mar...)
+                    LocalDate date = LocalDate.of(annee, mois, 1);
+                    String moisNom = date.getMonth()
+                            .getDisplayName(TextStyle.SHORT, Locale.FRENCH);
+
+                    Map<String, Object> monthData = new HashMap<>();
+                    monthData.put("mois", moisNom);
+                    monthData.put("montant", montant);
+
+                    data.add(monthData);
+
+                    log.debug("📊 Ligne traitée : {} {} -> {} MAD", moisNom, annee, montant);
+                }
             }
 
-            // Remplir avec les vraies données
-            for (Object[] result : results) {
-                String monthKey = (String) result[0];
-                BigDecimal total = (BigDecimal) result[1];
-                revenusByMonth.put(monthKey, total);
-            }
-
-            // Formater pour le frontend
-            List<Map<String, Object>> data = revenusByMonth.entrySet().stream()
-                    .map(entry -> {
-                        Map<String, Object> monthData = new HashMap<>();
-                        String[] parts = entry.getKey().split("-");
-                        int year = Integer.parseInt(parts[0]);
-                        int month = Integer.parseInt(parts[1]);
-                        LocalDate date = LocalDate.of(year, month, 1);
-
-                        String moisNom = date.getMonth()
-                                .getDisplayName(TextStyle.SHORT, Locale.FRENCH);
-
-                        monthData.put("mois", moisNom);
-                        monthData.put("montant", entry.getValue().doubleValue());
-                        return monthData;
-                    })
-                    .collect(Collectors.toList());
+            log.info("✅ Réponse finale : {} mois retourné(s)", data.size());
+            log.debug("📋 Data complète : {}", data);
 
             return ResponseEntity.ok(data);
+
         } catch (Exception e) {
-            System.err.println("❌ Erreur getRevenusMensuels: " + e.getMessage());
-            e.printStackTrace();
+            log.error("❌ ERREUR dans getRevenusMensuels", e);
+            log.error("❌ Message : {}", e.getMessage());
+            log.error("❌ Cause : {}", e.getCause());
+
+            // En cas d'erreur, retourner un tableau vide plutôt que null
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
