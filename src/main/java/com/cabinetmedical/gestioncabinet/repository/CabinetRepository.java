@@ -14,5 +14,5 @@ public interface CabinetRepository extends JpaRepository<Cabinet, Integer> {
 
     boolean existsByNom(String nom);
     List<Cabinet> findByActifTrue();
-
+    boolean existsByIdAndActifTrue(Integer id);
 }

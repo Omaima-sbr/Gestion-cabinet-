@@ -1,26 +1,36 @@
+// UtilisateurRepository.java
 package com.cabinetmedical.gestioncabinet.repository;
 
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query; // Import nécessaire
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Integer> {
 
-    // 1 - Trouver par login
+    // Méthodes existantes (gardez-les si vous les utilisez ailleurs)
     Optional<Utilisateur> findByLogin(String login);
-
-    // 2 - Vérifier si login existe
     boolean existsByLogin(String login);
+    boolean existsByEmail(String email);
 
-    // 3 - Trouver par login + role ( admin  )
-    Optional<Utilisateur> findByLoginAndRole(String login, Utilisateur.Role role);
+    // --- NOUVELLES MÉTHODES POUR LE LOGIN HYBRIDE (Login OU Email) ---
 
-    // 4 - Trouver par login + role + cabinetId (med + sec )
-    Optional<Utilisateur> findByLoginAndRoleAndCabinetId(
-            String login,
-            Utilisateur.Role role,
-            Integer cabinetId
+    // 1. Pour ADMINISTRATEUR
+    @Query("SELECT u FROM Utilisateur u WHERE (u.login = :identifiant OR u.email = :identifiant) AND u.role = :role")
+    Optional<Utilisateur> findByIdentifiantAndRole(
+            @Param("identifiant") String identifiant,
+            @Param("role") Utilisateur.Role role
+    );
+
+    // 2. Pour MEDECIN et SECRETAIRE
+    @Query("SELECT u FROM Utilisateur u WHERE (u.login = :identifiant OR u.email = :identifiant) AND u.role = :role AND u.cabinet.id = :cabinetId")
+    Optional<Utilisateur> findByIdentifiantAndRoleAndCabinet(
+            @Param("identifiant") String identifiant,
+            @Param("role") Utilisateur.Role role,
+            @Param("cabinetId") Integer cabinetId
     );
 }
