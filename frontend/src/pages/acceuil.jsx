@@ -8,8 +8,10 @@ import TestimonialsCarousel from '../components/acceuil/testimonials';
 import CTA from '../components/acceuil/cta';
 import Footer from '../components/acceuil/footer';
 import LoginModal from '../components/auth/login';
-import SignupModal from '../components/auth/signup';
+import Form from './Form.jsx'
 import ForgotPassword from '../components/auth/forgot-password';
+import { useNavigate } from "react-router-dom";
+
 import './global.css';
 
 /**
@@ -20,6 +22,7 @@ export default function Home() {
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const navigate = useNavigate();
 
     const handleForgotPassword = () => {
         setShowLogin(false);
@@ -33,7 +36,7 @@ export default function Home() {
         >
             <Navbar
                 onLoginClick={() => setShowLogin(true)}
-                onSignupClick={() => setShowSignup(true)}
+                onSignupClick={() => navigate('/inscription')}
             />
             <Hero
                 onLoginClick={() => setShowLogin(true)}
@@ -53,7 +56,7 @@ export default function Home() {
                     onForgotPassword={handleForgotPassword}
                 />
             )}
-            {showSignup && <SignupModal onClose={() => setShowSignup(false)} />}
+            {showSignup && <Form onClose={() => setShowSignup(false)} />}
             {showForgotPassword && <ForgotPassword onClose={() => setShowForgotPassword(false)} />}
         </main>
     );

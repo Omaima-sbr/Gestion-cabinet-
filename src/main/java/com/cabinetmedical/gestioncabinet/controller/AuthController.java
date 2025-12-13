@@ -2,7 +2,6 @@ package com.cabinetmedical.gestioncabinet.controller;
 
 import com.cabinetmedical.gestioncabinet.dto.LoginRequest;
 import com.cabinetmedical.gestioncabinet.dto.LoginResponse;
-import com.cabinetmedical.gestioncabinet.dto.RegisterRequest;
 import com.cabinetmedical.gestioncabinet.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,24 +29,6 @@ public class AuthController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
-    }
-
-    /**
-     * Endpoint d'inscription
-     * POST /api/auth/register
-     */
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            LoginResponse response = authService.register(request);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(response);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
         }
     }
