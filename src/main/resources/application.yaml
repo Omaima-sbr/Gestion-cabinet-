@@ -2,9 +2,9 @@ spring:
   application:
     name: gestioncabinet
   datasource:
-    url: jdbc:postgresql://localhost:5432/cabinet_medical
+    url: jdbc:postgresql://localhost:5433/cabinet_medical
     username: postgres
-    password: "assia2004"
+    password: "Aya2005"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -15,6 +15,17 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ayaazzouzi39@gmail.com
+    password: "zunzcyhrxiiyfflv"   # mot de passe d'application
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: 8080

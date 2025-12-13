@@ -1,5 +1,6 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,10 @@ public class Cabinet {
     private String nom;
 
     @Column(length = 100)
+    private String email;
+
+
+    @Column(length = 100)
     private String specialite;
 
     @Column(length = 255)
@@ -47,6 +52,11 @@ public class Cabinet {
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
     private List<Facture> factures;
+
+    @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonManagedReference  // <- ajoute cette annotation ici
+    private List<AdminFacture> adminFactures;
+
 
     @PrePersist
     protected void onCreate() {

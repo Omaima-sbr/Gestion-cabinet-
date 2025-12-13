@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Medicament {
+public class Medicament {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
