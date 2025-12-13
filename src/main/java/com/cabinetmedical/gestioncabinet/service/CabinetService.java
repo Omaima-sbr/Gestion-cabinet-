@@ -13,8 +13,8 @@ public class CabinetService {
 
     private final CabinetRepository cabinetRepository;
 
-    // Récupérer tous les cabinets actifs
-    public List<Cabinet> getAllActiveCabinets() {
-        return cabinetRepository.findByActifTrue();
+    // Une seule méthode suffit. Elle renvoie TOUT (actifs et inactifs)
+    public List<Cabinet> getAllCabinets() {
+        return cabinetRepository.findAll();
     }
 }
