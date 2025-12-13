@@ -22,6 +22,6 @@ public class CabinetController {
      */
     @GetMapping
     public List<Cabinet> getAllCabinets() {
-        return cabinetService.getAllActiveCabinets();
+        return cabinetService.getAllCabinets();
     }
 }

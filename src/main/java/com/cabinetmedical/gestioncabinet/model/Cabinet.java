@@ -60,4 +60,8 @@ public class Cabinet {
             actif = true;
         }
     }
+
+    public boolean isActif() {
+        return Boolean.TRUE.equals(this.actif);
+    }
 }
