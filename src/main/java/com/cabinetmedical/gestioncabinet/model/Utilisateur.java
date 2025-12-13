@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Utilisateur")
+@Table(name = "utilisateur")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,8 +40,14 @@ public class Utilisateur {
     @Column(nullable = false)
     private Role role;
 
+    // Pour la suppression soft delete
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean actif = true;
+
+    // Pour le statut (ACTIF / INACTIF)
+    @Column(nullable = false, length = 20)
+    private String statut = "ACTIF";
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Utilisateur_Cabinet"))
@@ -74,6 +80,9 @@ public class Utilisateur {
         dateCreation = LocalDateTime.now();
         if (actif == null) {
             actif = true;
+        }
+        if (statut == null) {
+            statut = "ACTIF";
         }
     }
 }
