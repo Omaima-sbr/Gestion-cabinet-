@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class DocumentMedical {
+public class DocumentMedical {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

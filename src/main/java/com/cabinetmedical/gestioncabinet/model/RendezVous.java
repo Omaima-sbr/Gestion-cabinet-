@@ -1,6 +1,6 @@
 package com.cabinetmedical.gestioncabinet.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class RendezVous {
+public class RendezVous {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,6 +57,7 @@ class RendezVous {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToOne(mappedBy = "rendezVous", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Consultation consultation;
 
     public enum Motif {
@@ -64,7 +65,7 @@ class RendezVous {
     }
 
     public enum Statut {
-        CONFIRME, ANNULE, EN_ATTENTE, TERMINE
+        CONFIRME, ANNULE, EN_ATTENTE, TERMINE,EN_COURS
     }
 
     @PrePersist

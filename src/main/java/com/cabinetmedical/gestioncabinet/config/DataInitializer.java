@@ -1,5 +1,5 @@
-package com.cabinetmedical.gestioncabinet.config;
-/*
+/*package com.cabinetmedical.gestioncabinet.config;
+
 import com.cabinetmedical.gestioncabinet.model.Cabinet;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.CabinetRepository;
@@ -74,4 +74,5 @@ public class DataInitializer implements CommandLineRunner {
 
         System.out.println("✅ Cabinets et utilisateurs créés avec BCrypt et rôles différents");
     }
-} */
+}
+*/

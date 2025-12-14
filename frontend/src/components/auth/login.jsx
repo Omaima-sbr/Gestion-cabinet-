@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../../i18n';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:8080/api';
 
@@ -21,6 +22,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
   const [error, setError] = useState('');
   const modalRef = useRef(null);
   const [cabinets, setCabinets] = useState([]);
+  const navigate = useNavigate();
 
   // Rôles backend (ATTENTION: utiliser les valeurs exactes du backend)
   const roles = [
@@ -116,13 +118,28 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
         cabinetName: response.data.cabinetName
       }));
 
-      // Callback de succès (pour redirection, etc.)
-      if (onLoginSuccess) {
-        onLoginSuccess(response.data);
-      }
+         if (onLoginSuccess) {
+            onLoginSuccess(response.data);
+        }
 
-      alert(t('login.success'));
-      onClose();
+        // Fermer le modal
+        onClose();
+        
+        // REDIRECTION SELON RÔLE
+        switch (response.data.role) {
+            case 'ADMINISTRATEUR':
+                navigate('/admin/dashboard');
+                break;
+            case 'MEDECIN':
+                navigate('/medecin/dashboard');
+                break;
+            case 'SECRETAIRE':
+                navigate('/secretaire/patients');
+                break;
+            default:
+                navigate('/');
+        }
+
 
     } catch (err) {
       console.error('❌ Erreur de connexion:', err);
