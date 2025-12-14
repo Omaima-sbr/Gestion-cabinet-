@@ -1,71 +1,101 @@
 package com.cabinetmedical.gestioncabinet.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.cabinetmedical.gestioncabinet.repository.admin.UtilisateurRepository;
 
-
-
-import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UtilisateurRepository utilisateurRepository;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // ✅ Active CORS avec la configuration ci-dessous
-                // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .cors(cors -> cors.disable())
-                // Désactive CSRF
-                .csrf(csrf -> csrf.disable())
-
-                // Autorise toutes les requêtes
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/cabinets/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+                       // .anyRequest().authenticated()
+                        // ✅ autoriser tout pour les tests
                         .anyRequest().permitAll()
-                );
+                )
+                // .sessionManagement(session -> session
+                       // .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // )
+                // .authenticationProvider(authenticationProvider())
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }
 
-    /**
-     * Configuration CORS pour autoriser les requêtes depuis React
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // ✅ Origines autorisées (React dev servers)
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",  // Create React App
-                "http://localhost:5173"   // Vite
-        ));
-
-        // ✅ Méthodes HTTP autorisées
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // ✅ Headers autorisés
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // ✅ Autorise les credentials
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
         return source;
     }
-    // ✅ Ajouter ceci pour PasswordEncoder
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> utilisateurRepository.findByLogin(username)
+                .map(utilisateur -> org.springframework.security.core.userdetails.User.builder()
+                        .username(utilisateur.getLogin())
+                        .password(utilisateur.getPwd()) // BCrypt
+                        .authorities("ROLE_" + utilisateur.getRole().name())
+                        .disabled(!utilisateur.getActif())
+                        .build())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Utilisateur non trouvé"));
+    }
+
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

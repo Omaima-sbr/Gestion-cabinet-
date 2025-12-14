@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom'
-import AdminLayout from '../src/components/Admin/layouts/AdminLayout'
-import Dashbord from "../src/components/Admin/pages/Dashbord"
-import MedicalRequests from "../src/components/Admin/pages/MedicalRequests"
-import MedicalManagement from "../src/components/Admin/pages/MedicalManagement"
-import UserManagement from "../src/components/Admin/pages/UserManagement"
-import MedecinManagement from "../src/components/Admin/pages/MedecinManagement"
-import InvoicesManagement from "../src/components/Admin/pages/InvoicesManagement"
+import AdminLayout from '../components/Admin/layouts/AdminLayout'
+import Dashbord from "../components/Admin/pages/Dashbord"
+import MedicalRequests from "../components/Admin/pages/MedicalRequests"
+import MedicalManagement from "../components/Admin/pages/MedicalManagement"
+import UserManagement from "../components/Admin/pages/UserManagement"
+import MedecinManagement from "../components/Admin/pages/MedecinManagement"
+import InvoicesManagement from "../components/Admin/pages/InvoicesManagement"
 
 export default function AdminRoutes() {
   return (
