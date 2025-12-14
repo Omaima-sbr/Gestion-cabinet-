@@ -19,7 +19,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 1️⃣ Créer plusieurs cabinets
+       /* // 1️⃣ Créer plusieurs cabinets
         Cabinet cabinet1 = new Cabinet();
         cabinet1.setNom("Cabinet Rabat");
         cabinetRepository.save(cabinet1);
@@ -35,17 +35,17 @@ public class DataInitializer implements CommandLineRunner {
         // 2️⃣ Créer les utilisateurs avec BCrypt et rôles différents
 
         // ADMINISTRATEUR (pas de cabinet)
-        if (!utilisateurRepository.existsByLogin("admin@gmail.com")) {
+        if (!utilisateurRepository.existsByLogin("sabriomaima24@gmail.com")) {
             Utilisateur admin = new Utilisateur();
-            admin.setLogin("admin@gmail.com");
+            admin.setLogin("sabriomaima24@gmail.com");
             admin.setPwd(passwordEncoder.encode("admin123"));
-            admin.setNom("Admin");
-            admin.setPrenom("Super");
+            admin.setNom("Sabri");
+            admin.setPrenom("Omaima");
             admin.setRole(Utilisateur.Role.ADMINISTRATEUR);
             admin.setActif(true);
             utilisateurRepository.save(admin);
         }
-
+/*
         // MEDECIN (lié au cabinet1)
         if (!utilisateurRepository.existsByLogin("med@gmail.com")) {
             Utilisateur medecin = new Utilisateur();
@@ -74,4 +74,4 @@ public class DataInitializer implements CommandLineRunner {
 
         System.out.println("✅ Cabinets et utilisateurs créés avec BCrypt et rôles différents");
     }
-} */
+ */
