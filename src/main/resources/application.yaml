@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/cabinet_medical
     username: postgres
-    password: "2004"
+    password: "Salma #@/#2025"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -28,3 +28,4 @@ logging:
           descriptor:
             sql:
               BasicBinder: TRACE
+

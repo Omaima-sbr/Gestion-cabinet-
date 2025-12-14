@@ -7,16 +7,18 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "Consultation", indexes = {
         @Index(name = "idx_patient", columnList = "id_patient"),
-        @Index(name = "consultation_idx_date", columnList = "date_consultation")
+        @Index(name = "idx_date", columnList = "date_consultation")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Consultation {
+public class Consultation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,30 +50,36 @@ class Consultation {
     @OneToOne
     @JoinColumn(name = "id_rendez_vous", unique = true,
             foreignKey = @ForeignKey(name = "FK_Consultation_RendezVous"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private RendezVous rendezVous;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_patient", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Patient"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_medecin", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Medecin"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Utilisateur medecin;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_dossier", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Dossier"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private DossierMedical dossier;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToMany(mappedBy = "consultation", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private List<Ordonnance> ordonnances;
 
     @OneToOne(mappedBy = "consultation", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Facture facture;
 
     public enum Type {

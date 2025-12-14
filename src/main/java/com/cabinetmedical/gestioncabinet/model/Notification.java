@@ -10,12 +10,12 @@ import java.util.List;
 @Entity
 @Table(name = "Notification", indexes = {
         @Index(name = "idx_utilisateur_lu", columnList = "id_utilisateur, lu"),
-        @Index(name = "notification_idx_date", columnList = "date_notification")
+        @Index(name = "idx_date", columnList = "date_notification")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Notification {
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +47,11 @@ class Notification {
     public enum Type {
         RAPPEL_RDV, PATIENT_EN_COURS, NOUVEAU_PATIENT, AUTRE
     }
+
+    // Ajouter cette relation dans votre modèle Notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_patient", foreignKey = @ForeignKey(name = "FK_Notification_Patient"))
+    private Patient patient;
 
     @PrePersist
     protected void onCreate() {

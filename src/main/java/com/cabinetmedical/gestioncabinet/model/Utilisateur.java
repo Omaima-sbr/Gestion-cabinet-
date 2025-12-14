@@ -1,6 +1,7 @@
 package com.cabinetmedical.gestioncabinet.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;  // ✅ AJOUTEZ CET IMPORT
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,27 +45,36 @@ public class Utilisateur {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean actif = true;
 
+    @Column(nullable = false, length = 20)
+    private String statut = "ACTIF";
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Utilisateur_Cabinet"))
-    @JsonIgnore
-    Cabinet cabinet;
+    @JsonBackReference("cabinet-users")
+    private Cabinet cabinet;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
+    // ✅ AJOUTEZ @JsonIgnore SUR TOUTES CES LISTES
     @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RendezVous> rendezVous;
 
     @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Consultation> consultations;
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Messagerie> messagesEnvoyes;
 
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Messagerie> messagesRecus;
 
     public enum Role {
@@ -76,6 +86,9 @@ public class Utilisateur {
         dateCreation = LocalDateTime.now();
         if (actif == null) {
             actif = true;
+        }
+        if (statut == null) {
+            statut = "ACTIF";
         }
     }
 }

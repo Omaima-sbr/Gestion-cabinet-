@@ -5,22 +5,20 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal; // pour BigDecimal
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "Facture", indexes = {
-        @Index(name = "facture_idx_date", columnList = "date_emission"),
-        @Index(name = "facture_idx_statut", columnList = "statut")
+        @Index(name = "idx_date", columnList = "date_emission"),
+        @Index(name = "idx_statut", columnList = "statut")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Facture {
+public class Facture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
