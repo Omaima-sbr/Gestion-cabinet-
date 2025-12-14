@@ -297,5 +297,46 @@
       "acceptAndClose": "Accept and Close",
       "termsContent": "<h3>Terms of Service</h3><ol><li><strong>Acceptance of Terms:</strong> By registering, you agree to abide by all terms and conditions set forth below.</li><li><strong>Confidentiality:</strong> Your medical and personal data are treated with the utmost confidentiality, in accordance with applicable laws (GDPR, etc.).</li><li><strong>Usage License:</strong> Access to the platform is subject to an annual/monthly license.</li><li><strong>Medical Liability:</strong> The platform is merely a management tool; full responsibility for medical acts remains with the practitioner.</li><li><strong>Cancellation:</strong> You may cancel your registration with 30 days notice, subject to conditions.</li></ol><p>Please read the full document available at the dedicated URL.</p>"
     }
+  },
+  "forgotPassword": {
+    "title": "Forgot Password?",
+    "subtitle": "Enter your email address and we'll send you a link to reset your password.",
+    "fields": {
+      "email": "Professional Email",
+      "emailPlaceholder": "doctor@clinic.com"
+    },
+    "submitBtn": "Send Reset Link",
+    "submitting": "Sending...",
+    "backToLogin": "Back to Login",
+    "success": {
+      "title": "Email Sent Successfully!",
+      "message": "If an account exists with this email, you will receive a reset link in a few moments."
+    },
+    "errors": {
+      "networkError": "Unable to contact the server. Please try again."
+    }
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Choose a new secure password for your account.",
+    "fields": {
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Minimum 8 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter password"
+    },
+    "submitBtn": "Reset Password",
+    "submitting": "Resetting...",
+    "backToLogin": "Back to Login",
+    "success": {
+      "title": "Password Changed!",
+      "message": "Your password has been successfully reset. You can now log in."
+    },
+    "errors": {
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "invalidToken": "Invalid or expired link. Please request a new link.",
+      "networkError": "Unable to contact the server. Please try again."
+    }
   }
 }
