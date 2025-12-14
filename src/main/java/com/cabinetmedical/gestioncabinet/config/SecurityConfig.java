@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cabinets/**").permitAll()
                         .requestMatchers("/api/inscription/**").permitAll()
+                        .requestMatchers("/api/auth/forgot-password/**").permitAll()
+                        .requestMatchers("/api/auth/reset-password/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated()

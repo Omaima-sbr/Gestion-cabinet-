@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../../i18n';
 import axios from 'axios';
+import { Link } from 'react-router-dom'; // À ajouter en haut du fichier
 
 const API_URL = 'http://localhost:8080/api';
 
@@ -277,12 +278,13 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
                   {/* Mot de passe oublié */}
                   <div className="text-right">
-                    <button
-                        type="button"
-                        className="text-sm text-[hsl(var(--color-primary))] hover:text-[hsl(var(--color-primary-foreground))] font-medium"
+                    <Link
+                        to="/forgot-password"
+                        onClick={onClose} // Ferme la modal avant la navigation
+                        className="text-sm text-[hsl(var(--color-primary))] hover:text-[hsl(var(--color-primary-foreground))] font-medium transition-colors"
                     >
                       {t('login.forgotPassword')}
-                    </button>
+                    </Link>
                   </div>
 
                   {/* Submit */}

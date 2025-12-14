@@ -297,5 +297,47 @@
       "acceptAndClose": "Accepter et Fermer",
       "termsContent": "<h3>Conditions Générales d'Utilisation</h3><ol><li><strong>Acceptation des Termes:</strong> En vous inscrivant, vous acceptez de respecter tous les termes et conditions énoncés ci-dessous.</li><li><strong>Confidentialité:</strong> Vos données médicales et personnelles sont traitées avec la plus grande confidentialité, conformément aux lois en vigueur (RGPD, etc.).</li><li><strong>Licence d'utilisation:</strong> L'accès à la plateforme est soumis à une licence annuelle/mensuelle.</li><li><strong>Responsabilité Médicale:</strong> La plateforme n'est qu'un outil de gestion; la responsabilité des actes médicaux reste entière au praticien.</li><li><strong>Annulation:</strong> Vous pouvez annuler votre inscription avec un préavis de 30 jours, sous conditions.</li></ol><p>Veuillez lire le document complet disponible à l'URL dédiée.</p>"
     }
+  },
+  "forgotPassword": {
+    "title": "Mot de passe oublié ?",
+    "subtitle": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "fields": {
+      "email": "Email professionnel",
+      "emailPlaceholder": "medecin@cabinet.com"
+    },
+    "submitBtn": "Envoyer le lien",
+    "submitting": "Envoi en cours...",
+    "backToLogin": "Retour à la connexion",
+    "success": {
+      "title": "Email envoyé avec succès !",
+      "message": "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation dans quelques instants."
+    },
+    "errors": {
+      "networkError": "Impossible de contacter le serveur. Veuillez réessayer."
+    }
+  },
+  "resetPassword": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Choisissez un nouveau mot de passe sécurisé pour votre compte.",
+    "fields": {
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Minimum 8 caractères",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Saisir à nouveau le mot de passe"
+    },
+    "submitBtn": "Réinitialiser le mot de passe",
+    "submitting": "Réinitialisation...",
+    "backToLogin": "Retour à la connexion",
+    "success": {
+      "title": "Mot de passe modifié !",
+      "message": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter."
+    },
+    "errors": {
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "invalidToken": "Lien invalide ou expiré. Veuillez demander un nouveau lien.",
+      "networkError": "Impossible de contacter le serveur. Veuillez réessayer."
+    }
   }
+
 }

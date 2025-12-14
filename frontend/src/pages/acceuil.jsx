@@ -9,7 +9,7 @@ import CTA from '../components/acceuil/cta';
 import Footer from '../components/acceuil/footer';
 import LoginModal from '../components/auth/login';
 import Form from './Form.jsx'
-import ForgotPassword from '../components/auth/forgot-password';
+import ForgotPassword from '../components/auth/ForgotPassword.jsx';
 import { useNavigate } from "react-router-dom";
 
 import './global.css';
@@ -40,13 +40,13 @@ export default function Home() {
             />
             <Hero
                 onLoginClick={() => setShowLogin(true)}
-                onSignupClick={() => setShowSignup(true)}
+                onSignupClick={() => navigate('/inscription')}
             />
             <Features />
             <TestimonialsCarousel />
             <CTA
                 onLoginClick={() => setShowLogin(true)}
-                onSignupClick={() => setShowSignup(true)}
+                onSignupClick={() => navigate('/inscription')}
             />
             <Footer />
 

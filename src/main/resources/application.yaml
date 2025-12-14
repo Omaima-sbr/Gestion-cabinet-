@@ -1,14 +1,15 @@
 spring:
   application:
-    name: cabinet_medical
+    name: cabinet-medical
   datasource:
     # ⚠️ Changement 1 : URL du Pooler (port 6543) + prepareThreshold=0 (OBLIGATOIRE)
-    url: jdbc:postgresql://aws-1-eu-west-1.pooler.supabase.com:6543/postgres?prepareThreshold=0&sslmode=require
+    url: jdbc:postgresql://aws-1-eu-west-2.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+
 
     # ⚠️ Changement 2 : Ton username complet fourni par Supabase
-    username: postgres.jajzouqlzddoifzuztyl
+    username: postgres.pwkmrsizrxlhnvtihazs
 
-    password: "Omaima2004"
+    password: "cabinet2026"
     driver-class-name: org.postgresql.Driver
 
   jpa:
