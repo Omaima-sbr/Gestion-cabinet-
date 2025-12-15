@@ -6,16 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;  // ✅ AJOUTEZ CET IMPORT
 
 @Entity
 @Table(name = "Ordonnance")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Ordonnance {
+public class Ordonnance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +32,7 @@ class Ordonnance {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_consultation", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Ordonnance_Consultation"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Consultation consultation;
 
     public enum Type {
