@@ -50,17 +50,10 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Integer>
     /**
      * Trouver les RDV actifs d'un médecin à une date (non annulés)
      */
-    @Query("""
-        SELECT r FROM RendezVous r 
-        WHERE r.medecin = :medecin 
-        AND r.dateRdv = :date 
-        AND r.statut != com.cabinetmedical.gestioncabinet.model.RendezVous.Statut.ANNULE
-        ORDER BY r.heureRdv
-        """)
-    List<RendezVous> findActiveRendezVousByMedecinAndDate(
-            @Param("medecin") Utilisateur medecin,
-            @Param("date") LocalDate date
-    );
+
+    @Query("SELECT r FROM RendezVous r WHERE r.medecin = :medecin AND r.dateRdv = :date AND r.statut != 'ANNULE'")
+    List<RendezVous> findActiveRendezVousByMedecinAndDate(@Param("medecin") Utilisateur medecin, @Param("date") LocalDate date);
+
 
     // ==================== NOUVELLES MÉTHODES POUR DASHBOARD ====================
 
@@ -100,4 +93,6 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Integer>
         ORDER BY r.dateRdv DESC, r.heureRdv DESC
         """)
     List<RendezVous> findRecentRdv(@Param("startDate") LocalDate startDate);
+
+
 }

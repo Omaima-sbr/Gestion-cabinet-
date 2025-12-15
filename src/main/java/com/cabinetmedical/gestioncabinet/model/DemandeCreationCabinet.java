@@ -119,6 +119,7 @@ public class DemandeCreationCabinet {
         EN_ATTENTE, APPROUVEE, REJETEE
     }
 
+
     @PrePersist
     protected void onCreate() {
         dateDemande = LocalDateTime.now();

@@ -121,7 +121,7 @@
       }
     },
     "fields": {
-      "email": "البريد الإلكتروني",
+      "email": "البريد الإلكتروني او اسم المستخدم ",
       "emailPlaceholder": "your@email.com",
       "password": "كلمة المرور",
       "passwordPlaceholder": "••••••••",
@@ -144,86 +144,199 @@
     "success": "تم تسجيل الدخول بنجاح!"
   },
   "signup": {
-    "title": "أنشئ عيادتك",
-    "step": "الخطوة",
-    "of": "من",
+    "title": "تسجيل العيادة الطبية",
+    "subtitle": "إدارة مبسطة وآمنة",
+
     "steps": {
-      "cabinet": "معلومات العيادة",
-      "doctor": "معلومات الطبيب",
-      "secretary": "معلومات السكرتير"
+      "cabinet": "العيادة",
+      "medecin": "الطبيب",
+      "secretaire": "السكرتير",
+      "confirmation": "التأكيد"
+    },
+
+    "home": "الرئيسية",
+    "previous": "السابق",
+    "next": "التالي",
+    "submit": "إرسال",
+    "errors": {
+      "validationFailed": "فشل التحقق، يرجى ملء الحقول الإجبارية."
+    },
+    "alert": {
+      "success": "سيتم إرسال بريد إلكتروني لإبلاغك بما إذا تم قبول طلبك أو رفضه.",
+      "error": "حدث خطأ أثناء إرسال النموذج."
     },
     "cabinet": {
+      "title": "معلومات العيادة",
       "name": "اسم العيادة",
-      "namePlaceholder": "مثال: العيادة الطبية المركزية",
-      "address": "العنوان",
-      "addressPlaceholder": "مثال: 123 شارع الصحة",
-      "city": "المدينة",
-      "cityPlaceholder": "مثال: الرباط",
-      "zipCode": "الرمز البريدي",
-      "zipCodePlaceholder": "مثال: 10000",
-      "phone": "الهاتف",
-      "phonePlaceholder": "مثال: 0537123456+212",
-      "license": "رقم الترخيص",
-      "licensePlaceholder": "مثال: AC/2024/12345"
+      "namePlaceholder": "مثال: عيادة الشفاء الطبية",
+      "specialty": "التخصص",
+      "specialtyPlaceholder": "اختر التخصص",
+      "specialties": {
+        "general": "الطب العام",
+        "cardiology": "طب القلب والشرايين",
+        "dermatology": "طب الجلد",
+        "orthopedics": "جراحة العظام والمفاصل",
+        "pediatrics": "طب الأطفال",
+        "gynecology": "طب النساء والتوليد",
+        "ophthalmology": "طب العيون",
+        "ent": "طب الأنف والأذن والحنجرة",
+        "neurology": "طب الأعصاب",
+        "psychiatry": "الطب النفسي",
+        "gastroenterology": "أمراض الجهاز الهضمي",
+        "pulmonology": "أمراض الجهاز التنفسي",
+        "urology": "جراحة المسالك البولية",
+        "nephrology": "طب الكلي",
+        "endocrinology": "الغدد الصماء والسكري",
+        "rheumatology": "أمرض المفاصل والروماتيزم",
+        "oncology": "طب الأورام",
+        "surgery": "الجراحة العامة",
+        "plastic_surgery": "جراحة التجميل",
+        "radiology": "الأشعة",
+        "anesthesiology": "الإنعاش والتخدير",
+        "dentistry": "طب الأسنان",
+        "physiotherapy": "الترويض الطبي",
+        "nutrition": "التغذية والحمية",
+        "biology": "التحاليل الطبية"
+      },
+      "mandatoryFields": "الحقول التي تحمل علامة (*) إجبارية.",
+      "errors": {
+        "required": "هذا الحقل مطلوب",
+        "invalidEmail": "البريد الإلكتروني غير صالح",
+        "invalidPhone": "رقم الهاتف غير صالح"
+      },
+      "phone": "هاتف العيادة",
+      "phonePlaceholder": "05 XX XX XX XX",
+      "email": "البريد الإلكتروني للعيادة",
+      "emailPlaceholder": "contact@clinic.com",
+      "address": "عنوان العيادة",
+      "addressPlaceholder": "العنوان الكامل للعيادة",
+      "logo": "شعار العيادة",
+      "logoPlaceholder": "اختر ملفاً",
+      "logoHelp": "الصيغة الموصى بها: PNG أو JPEG (الحد الأقصى 2 ميجابايت)",
+      "optional": "اختياري"
     },
     "doctor": {
-      "firstName": "الاسم الأول",
-      "firstNamePlaceholder": "مثال: أحمد",
-      "lastName": "الاسم الأخير",
-      "lastNamePlaceholder": "مثال: بناني",
-      "email": "البريد الإلكتروني",
-      "emailPlaceholder": "مثال: ahmed@cabinet.com",
+      "title": "معلومات الطبيب",
+      "lastName": "الاسم العائلي",
+      "lastNamePlaceholder": "الاسم العائلي",
+      "firstName": "الاسم الشخصي",
+      "firstNamePlaceholder": "الاسم الشخصي",
+      "cin": "رقم البطاقة الوطنية",
+      "cinPlaceholder": "رقم البطاقة الوطنية",
       "phone": "الهاتف",
-      "phonePlaceholder": "مثال: 0612345678+212",
-      "specialty": "التخصص",
-      "specialtyPlaceholder": "اختر تخصصًا...",
-      "specialties": {
-        "cardiology": "طب القلب",
-        "dermatology": "طب الجلدية",
-        "general": "الطب العام",
-        "orthopedics": "جراحة العظام"
-      },
+      "phonePlaceholder": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "example@domain.com",
+      "login": "اسم المستخدم",
+      "loginPlaceholder": "اسم المستخدم",
       "password": "كلمة المرور",
-      "passwordPlaceholder": "••••••••",
-      "confirmPassword": "تأكيد كلمة المرور"
-    },
-    "secretary": {
-      "firstName": "الاسم الأول",
-      "firstNamePlaceholder": "مثال: زينب",
-      "lastName": "الاسم الأخير",
-      "lastNamePlaceholder": "مثال: عمر",
-      "email": "البريد الإلكتروني",
-      "emailPlaceholder": "مثال: zineb@cabinet.com",
-      "phone": "الهاتف",
-      "phonePlaceholder": "مثال: 0612345678+212"
-    },
-    "payment": {
-      "title": "اختر خطتك",
-      "monthly": {
-        "title": "خطة شهرية",
-        "price": "99 درهم",
-        "period": "/شهر"
-      },
-      "annual": {
-        "title": "خطة سنوية",
-        "price": "950 درهم",
-        "period": "/سنة",
-        "badge": "وفر 20%"
+      "passwordPlaceholder": "كلمة المرور",
+      "diploma": "دبلوم الطبيب",
+      "chooseFile": "اختر ملفاً",
+      "fileHelp": "الصيغة الموصى بها: PDF أو صورة (PNG/JPG)، الحد الأقصى 2 ميجابايت",
+      "optional": "اختياري",
+      "cinCopy": "نسخة من بطاقة التعريف",
+      "license": "رخصة المزاولة",
+      "mandatoryFields": "الحقول التي تحمل علامة (*) إجبارية.",
+      "errors": {
+        "required": "هذا الحقل مطلوب",
+        "invalidEmail": "البريد الإلكتروني غير صالح",
+        "fileRequired": "الوثيقة مطلوبة"
       }
     },
-    "buttons": {
-      "previous": "السابق",
-      "next": "التالي",
-      "submit": "أنشئ عيادتي",
-      "submitting": "جاري الإنشاء..."
+    "secretary": {
+      "title": "معلومات السكرتير(ة) (اختياري)",
+      "checkbox": "نعم، لدي سكرتير(ة) لإضافته(ا)",
+      "details": "تفاصيل السكرتير(ة)",
+      "lastName": "الاسم العائلي",
+      "lastNamePlaceholder": "الاسم العائلي",
+      "firstName": "الاسم الشخصي",
+      "firstNamePlaceholder": "الاسم الشخصي",
+      "cin": "رقم البطاقة الوطنية",
+      "cinPlaceholder": "رقم البطاقة الوطنية",
+      "phone": "الهاتف",
+      "phonePlaceholder": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "البريد الإلكتروني",
+      "login": "اسم المستخدم",
+      "loginPlaceholder": "اسم مستخدم السكرتير(ة)",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "كلمة مرور السكرتير(ة)"
+    },
+      "confirmation": {
+        "title": "التحقق والتأكيد",
+        "subtitle": "يرجى مراجعة جميع المعلومات المقدمة بعناية قبل إرسال طلب التسجيل الخاص بك.",
+        "doctorInfo": "معلومات الطبيب",
+        "cabinetInfo": "معلومات العيادة",
+        "secretaryInfo": "معلومات السكرتير(ة)",
+        "documents": "المستندات المقدمة",
+        "signature": "توقيع الطبيب",
+        "signatureHelp": "يرجى التوقيع في المربع أدناه باستخدام الماوس أو إصبعك.",
+        "notProvided": "غير مقدم",
+        "mandatorySignature": "التوقيع مطلوب لتأكيد التسجيل.",
+        "errors": {
+          "signatureRequired": "يرجى التوقيع في الخانة أعلاه",
+          "termsRequired": "يجب قبول الشروط والأحكام"
+        },
+        "labels": {
+          "name": "الاسم الكامل",
+          "cin": "رقم الهوية الوطنية",
+          "phone": "الهاتف",
+          "email": "البريد الإلكتروني",
+          "login": "اسم المستخدم",
+          "cabinetName": "اسم العيادة",
+          "specialty": "التخصص",
+          "address": "العنوان",
+          "diploma": "الدبلوم",
+          "license": "الرخصة",
+          "copyCin": "نسخة من الهوية"
+        },
+        "acceptTerms": "لقد قرأت ووافقت على شروط الاستخدام.",
+        "readTerms": "قراءة الشروط",
+        "termsTitle": "شروط الاستخدام العامة",
+        "acceptAndClose": "قبول وإغلاق",
+        "termsContent": "<h3>شروط الاستخدام العامة</h3><ol><li><strong>قبول الشروط:</strong> بالتسجيل، فإنك توافق على الالتزام بجميع الشروط والأحكام الموضحة أدناه.</li><li><strong>السرية:</strong> تتم معالجة بياناتك الطبية والشخصية بسرية تامة، وفقًا للقوانين المعمول بها.</li><li><strong>رخصة الاستخدام:</strong> يخضع الوصول إلى المنصة لرخصة سنوية/شهرية.</li><li><strong>المسؤولية الطبية:</strong> المنصة مجرد أداة إدارية؛ تظل المسؤولية الكاملة عن الأعمال الطبية على عاتق الطبيب.</li><li><strong>الإلغاء:</strong> يمكنك إلغاء تسجيلك بإشعار مدته 30 يومًا، وفقًا للشروط.</li></ol><p>يرجى قراءة المستند الكامل المتاح على الرابط المخصص.</p>"
+      }
+    },
+  "forgotPassword": {
+    "title": "نسيت كلمة المرور؟",
+    "subtitle": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+    "fields": {
+      "email": "البريد الإلكتروني المهني",
+      "emailPlaceholder": "doctor@clinic.com"
+    },
+    "submitBtn": "إرسال رابط إعادة التعيين",
+    "submitting": "جاري الإرسال...",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "success": {
+      "title": "تم إرسال البريد الإلكتروني بنجاح!",
+      "message": "إذا كان هناك حساب مسجل بهذا البريد الإلكتروني، ستتلقى رابط إعادة التعيين في غضون لحظات."
     },
     "errors": {
-      "required": "مطلوب",
-      "invalidEmail": "بريد إلكتروني غير صالح",
-      "passwordLength": "8 أحرف كحد أدنى",
-      "passwordMismatch": "عدم تطابق",
-      "submitError": "خطأ. حاول مرة أخرى."
+      "networkError": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى."
+    }
+  },
+  "resetPassword": {
+    "title": "إعادة تعيين كلمة المرور",
+    "subtitle": "اختر كلمة مرور آمنة جديدة لحسابك.",
+    "fields": {
+      "newPassword": "كلمة المرور الجديدة",
+      "newPasswordPlaceholder": "8 أحرف على الأقل",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أعد إدخال كلمة المرور"
     },
-    "success": "تم التسجيل بنجاح!"
+    "submitBtn": "إعادة تعيين كلمة المرور",
+    "submitting": "جاري إعادة التعيين...",
+    "backToLogin": "العودة إلى تسجيل الدخول",
+    "success": {
+      "title": "تم تغيير كلمة المرور!",
+      "message": "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول."
+    },
+    "errors": {
+      "passwordMismatch": "كلمات المرور غير متطابقة",
+      "passwordTooShort": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+      "invalidToken": "الرابط غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد.",
+      "networkError": "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى."
+    }
   }
-}
+  }

@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,10 +25,8 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
     private final UtilisateurRepository utilisateurRepository;
+    private final JwtService jwtService;
 
     @Override
     protected void doFilterInternal(
@@ -50,12 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Extraire le token
             final String jwt = authHeader.substring(7);
 
-            // Décoder la clé Base64
-            byte[] keyBytes = java.util.Base64.getDecoder().decode(jwtSecret);
-
             // Valider et extraire les informations du token
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(keyBytes)
+                    .setSigningKey(jwtService.getSignInKey())
                     .build()
                     .parseClaimsJws(jwt)
                     .getBody();
@@ -65,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             System.out.println("🔍 Username du token: " + username);
             System.out.println("🔍 Role du token: " + role);
-            System.out.println("🔍 Claims complets: " + claims);
 
             // Si l'utilisateur n'est pas déjà authentifié
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -81,10 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String authorityString;
 
                         if (role != null && !role.isEmpty()) {
-                            // Utiliser le role du token
                             authorityString = role.startsWith("ROLE_") ? role : "ROLE_" + role;
                         } else {
-                            // Fallback: utiliser le role de la base de données
                             authorityString = "ROLE_" + utilisateur.getRole().name();
                         }
 
