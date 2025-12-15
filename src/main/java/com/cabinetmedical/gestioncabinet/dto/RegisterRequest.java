@@ -29,4 +29,8 @@ public class RegisterRequest {
     private String signature;
 
     private Integer cabinetId; // Pour MEDECIN et SECRETAIRE
+
+    public String getEmail() {
+        return login;
+    }
 }

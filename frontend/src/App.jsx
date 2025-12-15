@@ -3,6 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Home from './pages/acceuil';
 import LoginPage from './components/pages/LoginPage';
+import Form from './pages/Form';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
 import SecretaryRoutes from '../routes/SecretaryRoutes';
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
@@ -10,7 +13,7 @@ import LoadingSpinner from './components/common/LoadingSpinner';
 import DebugAuth from './components/debug/DebugAuth';
 
 import './App.css';
-import './ProtectedLayout.css'; // CSS séparé pour les routes protégées
+import './ProtectedLayout.css';
 
 function App() {
     const { user, loading } = useAuth();
@@ -56,7 +59,9 @@ function App() {
         <div className="app">
             <DebugAuth />
             <Routes>
-                {/* Page d'accueil publique - SANS layout protégé */}
+                {/* ========== ROUTES PUBLIQUES (SANS LAYOUT PROTÉGÉ) ========== */}
+
+                {/* Page d'accueil */}
                 <Route
                     path="/"
                     element={
@@ -68,7 +73,7 @@ function App() {
                     }
                 />
 
-                {/* Page de login - SANS layout protégé */}
+                {/* Page de login */}
                 <Route
                     path="/login"
                     element={
@@ -80,7 +85,44 @@ function App() {
                     }
                 />
 
-                {/* Routes protégées - AVEC layout protégé */}
+                {/* Page d'inscription */}
+                <Route
+                    path="/inscription"
+                    element={
+                        user ? (
+                            <Navigate to={`/${user.role.toLowerCase()}`} replace />
+                        ) : (
+                            <Form />
+                        )
+                    }
+                />
+
+                {/* Page mot de passe oublié */}
+                <Route
+                    path="/forgot-password"
+                    element={
+                        user ? (
+                            <Navigate to={`/${user.role.toLowerCase()}`} replace />
+                        ) : (
+                            <ForgotPassword />
+                        )
+                    }
+                />
+
+                {/* Page réinitialisation mot de passe */}
+                <Route
+                    path="/reset-password"
+                    element={
+                        user ? (
+                            <Navigate to={`/${user.role.toLowerCase()}`} replace />
+                        ) : (
+                            <ResetPassword />
+                        )
+                    }
+                />
+
+                {/* ========== ROUTES PROTÉGÉES (AVEC LAYOUT) ========== */}
+
                 {user ? (
                     <>
                         {/* Routes Secrétaire */}
@@ -116,9 +158,9 @@ function App() {
                             }
                         />
 
-                        {/* Routes Admin */}
+                        {/* Routes Administrateur */}
                         <Route
-                            path="/admin/*"
+                            path="/administrateur/*"
                             element={
                                 user.role === 'ADMINISTRATEUR' ? (
                                     <ProtectedLayout role="ADMINISTRATEUR">
@@ -135,15 +177,15 @@ function App() {
                             }
                         />
 
-                        {/* Redirection par défaut */}
+                        {/* Redirection par défaut pour utilisateurs connectés */}
                         <Route
                             path="*"
                             element={<Navigate to={`/${user.role.toLowerCase()}`} replace />}
                         />
                     </>
                 ) : (
-                    // Rediriger vers login si non authentifié
-                    <Route path="*" element={<Navigate to="/login" replace />} />
+                    /* Rediriger vers l'accueil si non authentifié et route inconnue */
+                    <Route path="*" element={<Navigate to="/" replace />} />
                 )}
             </Routes>
         </div>

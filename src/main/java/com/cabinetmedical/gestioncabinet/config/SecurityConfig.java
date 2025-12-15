@@ -43,6 +43,10 @@ public class SecurityConfig {
                         // Routes publiques
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/cabinets/**").permitAll()
+                        .requestMatchers("/api/inscription/**").permitAll()
+                        .requestMatchers("/api/auth/forgot-password/**").permitAll()
+                        .requestMatchers("/api/auth/reset-password/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // Routes secrétaire - ORDRE IMPORTANT : spécifiques avant génériques
@@ -60,6 +64,7 @@ public class SecurityConfig {
 
                         // Toutes les autres requêtes nécessitent une authentification
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -77,6 +82,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of("Authorization")); // Exposer le header Authorization
 
@@ -84,6 +90,7 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

@@ -1,10 +1,10 @@
 spring:
   application:
-    name: cabinet_medical
+    name: cabinet-medical
   datasource:
-    url: jdbc:postgresql://localhost:5432/cabinet_medical
-    username: postgres
-    password: "assia2004"
+    url: jdbc:postgresql://aws-1-eu-west-2.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+    username: postgres.pwkmrsizrxlhnvtihazs
+    password: "cabinet2026"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -14,10 +14,34 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: equipemedicore@gmail.com
+    password: gvtbxranpaegteov
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
 server:
   port: 8080
+
+jwt:
+  expiration: 14400000
 
 logging:
   level:

@@ -21,9 +21,19 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
     Optional<Utilisateur> findByLogin(String login);
 
     /**
+     * Trouve un utilisateur par son email
+     */
+    Optional<Utilisateur> findByEmail(String email);
+
+    /**
      * Vérifie si un login existe
      */
     boolean existsByLogin(String login);
+
+    /**
+     * Vérifie si un email existe
+     */
+    boolean existsByEmail(String email);
 
     /**
      * Trouve tous les utilisateurs actifs
@@ -47,7 +57,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
      */
     List<Utilisateur> findByRoleAndActifTrue(Utilisateur.Role role);
 
-    // ========== NOUVELLES MÉTHODES POUR AuthServiceImpl ==========
+    // ========== MÉTHODES POUR AuthServiceImpl ==========
 
     /**
      * Trouve un utilisateur par login et rôle
@@ -59,7 +69,7 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
      */
     Optional<Utilisateur> findByLoginAndRoleAndCabinetId(String login, Utilisateur.Role role, Integer cabinetId);
 
-    // ========== NOUVELLES MÉTHODES POUR MessagerieServiceImpl ==========
+    // ========== MÉTHODES POUR MessagerieServiceImpl ==========
 
     /**
      * Trouve un utilisateur par login et statut actif
@@ -177,6 +187,27 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Intege
             "FROM Utilisateur u WHERE u.id = :utilisateurId AND u.cabinet.id = :cabinetId")
     boolean existsByIdAndCabinetId(
             @Param("utilisateurId") Integer utilisateurId,
+            @Param("cabinetId") Integer cabinetId
+    );
+
+    // ========== LOGIN HYBRIDE (LOGIN OU EMAIL) ==========
+
+    /**
+     * Trouve un utilisateur par identifiant (login ou email) et rôle
+     */
+    @Query("SELECT u FROM Utilisateur u WHERE (u.login = :identifiant OR u.email = :identifiant) AND u.role = :role")
+    Optional<Utilisateur> findByIdentifiantAndRole(
+            @Param("identifiant") String identifiant,
+            @Param("role") Utilisateur.Role role
+    );
+
+    /**
+     * Trouve un utilisateur par identifiant (login ou email), rôle et cabinet
+     */
+    @Query("SELECT u FROM Utilisateur u WHERE (u.login = :identifiant OR u.email = :identifiant) AND u.role = :role AND u.cabinet.id = :cabinetId")
+    Optional<Utilisateur> findByIdentifiantAndRoleAndCabinet(
+            @Param("identifiant") String identifiant,
+            @Param("role") Utilisateur.Role role,
             @Param("cabinetId") Integer cabinetId
     );
 }

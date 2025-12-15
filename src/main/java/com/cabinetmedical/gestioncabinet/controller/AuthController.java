@@ -2,13 +2,15 @@ package com.cabinetmedical.gestioncabinet.controller;
 
 import com.cabinetmedical.gestioncabinet.dto.LoginRequest;
 import com.cabinetmedical.gestioncabinet.dto.LoginResponse;
-import com.cabinetmedical.gestioncabinet.dto.RegisterRequest;
 import com.cabinetmedical.gestioncabinet.service.AuthService;
+import com.cabinetmedical.gestioncabinet.service.PasswordResetService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-
+    private final PasswordResetService passwordResetService;
     /**
      * Endpoint de connexion
      * POST /api/auth/login
@@ -35,24 +37,6 @@ public class AuthController {
     }
 
     /**
-     * Endpoint d'inscription
-     * POST /api/auth/register
-     */
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        try {
-            LoginResponse response = authService.register(request);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(response);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(e.getMessage()));
-        }
-    }
-
-    /**
      * Endpoint de vérification du token
      * GET /api/auth/verify
      */
@@ -65,4 +49,25 @@ public class AuthController {
     // Classes internes pour les réponses
     record ErrorResponse(String message) {}
     record MessageResponse(String message) {}
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        passwordResetService.processForgotPassword(email);
+        // On répond toujours OK pour la sécurité
+        return ResponseEntity.ok(Map.of("message", "Si cet email existe, un lien a été envoyé."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+
+        try {
+            passwordResetService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Mot de passe modifié avec succès"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Erreur : " + e.getMessage()));
+        }
+    }
 }

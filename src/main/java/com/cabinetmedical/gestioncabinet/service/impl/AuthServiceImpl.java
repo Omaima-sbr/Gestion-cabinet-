@@ -9,6 +9,7 @@ import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.CabinetRepository;
 import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
 import com.cabinetmedical.gestioncabinet.service.AuthService;
+import com.cabinetmedical.gestioncabinet.service.LoginAttemptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,13 +31,19 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LoginAttemptService loginAttemptService;
 
     @Override
     @Transactional
     public LoginResponse login(LoginRequest request) {
+        // 🔥 VÉRIFICATION RATE LIMITING : EST-CE QUE L'UTILISATEUR EST BLOQUÉ ?
+        if (loginAttemptService.isBlocked(request.getLogin())) {
+            throw new RuntimeException("Trop de tentatives échouées. Veuillez patienter 1 minute.");
+        }
+
         Utilisateur utilisateur;
 
-        // Convertir le rôle string en enum
+        // 1. Conversion du rôle string en enum
         Utilisateur.Role roleEnum;
         try {
             roleEnum = Utilisateur.Role.valueOf(request.getRole().toUpperCase());
@@ -44,9 +51,10 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Rôle invalide: " + request.getRole());
         }
 
-        // Pour ADMINISTRATEUR, pas besoin de cabinet
+        // 2. Récupération de l'utilisateur (Support Login OU Email)
         if (roleEnum == Utilisateur.Role.ADMINISTRATEUR) {
-            utilisateur = utilisateurRepository.findByLoginAndRole(request.getLogin(), roleEnum)
+            // Pour ADMINISTRATEUR, pas besoin de cabinet
+            utilisateur = utilisateurRepository.findByIdentifiantAndRole(request.getLogin(), roleEnum)
                     .orElseThrow(() -> new RuntimeException("Identifiants invalides"));
         } else {
             // Pour MEDECIN et SECRETAIRE, le cabinet est obligatoire
@@ -54,29 +62,46 @@ public class AuthServiceImpl implements AuthService {
                 throw new RuntimeException("Le cabinet est obligatoire pour ce rôle");
             }
 
-            utilisateur = utilisateurRepository.findByLoginAndRoleAndCabinetId(
+            // Nouvelle méthode qui cherche par Login OU Email dans le cabinet spécifié
+            utilisateur = utilisateurRepository.findByIdentifiantAndRoleAndCabinet(
                             request.getLogin(), roleEnum, request.getCabinetId())
                     .orElseThrow(() -> new RuntimeException("Identifiants invalides ou cabinet incorrect"));
         }
 
-        // Vérifier si l'utilisateur est actif
+        // 3. Vérifier si l'utilisateur est actif
         if (!utilisateur.getActif()) {
-            throw new RuntimeException("Ce compte est désactivé");
+            throw new RuntimeException("Votre demande est en cours de traitement par l'administrateur.");
         }
 
-        // Authentifier
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword())
-        );
+        // 4. Vérifier si le cabinet est actif (Pour médecins et secrétaires)
+        if (utilisateur.getCabinet() != null) {
+            if (!utilisateur.getCabinet().isActif()) {
+                throw new RuntimeException("Accès restreint. Veuillez régulariser votre abonnement pour accéder à la plateforme.");
+            }
+        }
 
-        // Générer le token avec le rôle dans les claims
+        // 5. Authentification Spring Security
+        // Note: On utilise le vrai login récupéré de la BDD car request.getLogin() pourrait être un email
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(utilisateur.getLogin(), request.getPassword())
+            );
+            // ✅ Authentification réussie : réinitialiser le compteur d'échecs
+            loginAttemptService.loginSucceeded(request.getLogin());
+        } catch (Exception e) {
+            // ❌ Authentification échouée : enregistrer la tentative
+            loginAttemptService.loginFailed(request.getLogin());
+            throw new RuntimeException("Mot de passe incorrect");
+        }
+
+        // 6. Générer le token avec le rôle dans les claims
         UserDetails userDetails = User.builder()
                 .username(utilisateur.getLogin())
                 .password(utilisateur.getPwd())
                 .authorities("ROLE_" + utilisateur.getRole().name())
                 .build();
 
-        // ✅ AJOUT: Ajouter le rôle dans les claims du token
+        // ✅ AJOUT: Ajouter le rôle et autres infos dans les claims du token
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", "ROLE_" + utilisateur.getRole().name());
         extraClaims.put("userId", utilisateur.getId());
@@ -84,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtService.generateToken(extraClaims, userDetails);
 
-        // Construire la réponse
+        // 7. Construire la réponse
         return LoginResponse.builder()
                 .token(token)
                 .userId(utilisateur.getId())
@@ -100,12 +125,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse register(RegisterRequest request) {
-        // Vérifier si le login existe déjà
+        // 1. Vérifier si le login existe déjà
         if (utilisateurRepository.existsByLogin(request.getLogin())) {
             throw new RuntimeException("Ce login est déjà utilisé");
         }
 
-        // Convertir le rôle string en enum
+        // 2. Vérifier si l'email existe déjà (si fourni)
+        if (request.getEmail() != null && utilisateurRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Cet email est déjà utilisé");
+        }
+
+        // 3. Convertir le rôle string en enum
         Utilisateur.Role roleEnum;
         try {
             roleEnum = Utilisateur.Role.valueOf(request.getRole().toUpperCase());
@@ -113,18 +143,26 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Rôle invalide: " + request.getRole());
         }
 
-        // Créer l'utilisateur
+        // 4. Créer l'utilisateur
         Utilisateur utilisateur = new Utilisateur();
         utilisateur.setNom(request.getNom());
         utilisateur.setPrenom(request.getPrenom());
         utilisateur.setLogin(request.getLogin());
+
+        // Ajouter l'email s'il est fourni dans la request
+        if (request.getEmail() != null) {
+            utilisateur.setEmail(request.getEmail());
+        }
+
         utilisateur.setPwd(passwordEncoder.encode(request.getPassword()));
         utilisateur.setRole(roleEnum);
         utilisateur.setNumTel(request.getNumTel());
         utilisateur.setSignature(request.getSignature());
-        utilisateur.setActif(true);
 
-        // Associer le cabinet si nécessaire
+        // IMPORTANT : Inscription = Compte inactif par défaut (en attente validation)
+        utilisateur.setActif(false);
+
+        // 5. Associer le cabinet si nécessaire
         if (request.getCabinetId() != null) {
             Cabinet cabinet = cabinetRepository.findById(request.getCabinetId())
                     .orElseThrow(() -> new RuntimeException("Cabinet non trouvé"));
@@ -135,24 +173,9 @@ public class AuthServiceImpl implements AuthService {
 
         utilisateur = utilisateurRepository.save(utilisateur);
 
-        // Générer le token avec le rôle dans les claims
-        UserDetails userDetails = User.builder()
-                .username(utilisateur.getLogin())
-                .password(utilisateur.getPwd())
-                .authorities("ROLE_" + utilisateur.getRole().name())
-                .build();
-
-        // ✅ AJOUT: Ajouter le rôle dans les claims du token
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("role", "ROLE_" + utilisateur.getRole().name());
-        extraClaims.put("userId", utilisateur.getId());
-        extraClaims.put("cabinetId", utilisateur.getCabinet() != null ? utilisateur.getCabinet().getId() : null);
-
-        String token = jwtService.generateToken(extraClaims, userDetails);
-
-        // Construire la réponse
+        // 6. Construire la réponse SANS token car le compte n'est pas encore actif
+        // (L'utilisateur devra attendre la validation par l'administrateur)
         return LoginResponse.builder()
-                .token(token)
                 .userId(utilisateur.getId())
                 .login(utilisateur.getLogin())
                 .nom(utilisateur.getNom())

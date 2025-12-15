@@ -65,4 +65,8 @@ public class Cabinet {
         return id;
     }
 
+    public boolean isActif() {
+        return Boolean.TRUE.equals(this.actif);
+    }
+
 }

@@ -22,6 +22,10 @@ public class Utilisateur {
     @Column(unique = true, nullable = false, length = 50)
     private String login;
 
+    // 🔥 AJOUT DU CHAMP EMAIL POUR LA CONNEXION HYBRIDE
+    @Column(unique = true, length = 100)
+    private String email;
+
     @Column(nullable = false, length = 255)
     private String pwd;
 
