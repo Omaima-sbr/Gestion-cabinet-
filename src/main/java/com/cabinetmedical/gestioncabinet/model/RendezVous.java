@@ -69,7 +69,7 @@ public class RendezVous {
     }
 
     public enum Statut {
-        CONFIRME, ANNULE, EN_ATTENTE, TERMINE
+        CONFIRME, ANNULE, EN_ATTENTE, TERMINE,EN_COURS
     }
 
     @PrePersist
