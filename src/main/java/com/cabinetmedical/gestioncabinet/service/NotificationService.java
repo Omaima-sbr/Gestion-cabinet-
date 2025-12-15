@@ -54,7 +54,6 @@ public class NotificationService {
                     .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
             notification.setPatient(patient);
         }
-
         // Associer le rendez-vous si présent
         if (dto.getIdRendezVous() != null) {
             RendezVous rdv = rendezVousRepository.findById(dto.getIdRendezVous())

@@ -247,7 +247,8 @@ const GestionRendezVous = () => {
             'CONFIRME': { label: 'Confirmé', class: 'status-confirme' },
             'EN_ATTENTE': { label: 'En attente', class: 'status-attente' },
             'ANNULE': { label: 'Annulé', class: 'status-annule' },
-            'TERMINE': { label: 'Terminé', class: 'status-termine' }
+            'TERMINE': { label: 'Terminé', class: 'status-termine' },
+            'EN_COURS': {label:'En Cours', class:'status-cours'}
         };
         return statuts[statut] || { label: statut, class: 'status-default' };
     };
@@ -468,6 +469,8 @@ const GestionRendezVous = () => {
                                     <option value="CONFIRME">Confirmé</option>
                                     <option value="ANNULE">Annulé</option>
                                     <option value="TERMINE">Terminé</option>
+                                    <option value="EN_COURS">En cours</option>
+
                                 </select>
                             </div>
 
@@ -569,6 +572,14 @@ const GestionRendezVous = () => {
                                                 onClick={() => handleUpdateStatut(selectedRdv.id, 'TERMINE')}
                                             >
                                                 ✓ Terminer
+                                            </button>
+                                        )}
+                                        {selectedRdv.statut !== 'EN_COURS' && (
+                                            <button
+                                                className="btn-small btn-termine"
+                                                onClick={() => handleUpdateStatut(selectedRdv.id, 'EN_COURS')}
+                                            >
+                                                ✓ EN COURS
                                             </button>
                                         )}
                                         <button
