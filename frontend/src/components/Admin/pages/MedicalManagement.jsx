@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdAdd, MdEdit, MdSearch, MdClose } from "react-icons/md";
+import { MdAdd, MdEdit, MdClose, MdCheckCircle, MdCancel, MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
 import CabinetService from "../services/CabinetService";
 
 export default function MedicalManagement() {
@@ -15,42 +15,34 @@ export default function MedicalManagement() {
     actif: true,
   });
   const [editingId, setEditingId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // ----------------------------
-  // Charger Cabinets depuis backend
-  // ----------------------------
   const loadCabinets = async () => {
     try {
-      const data = await CabinetService.getAllCabinets(); // Assure-toi que le service a cette méthode
+      setIsLoading(true);
+      const data = await CabinetService.getAllCabinets();
       setCabinets(data);
     } catch (e) {
       console.error("Erreur:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ----------------------------
-  // useEffect pour charger au montage
-  // ----------------------------
   useEffect(() => {
     loadCabinets();
   }, []);
 
-  // ----------------------------
-  // SEARCH backend
-  // ----------------------------
   const handleSearch = async (value) => {
     setSearchTerm(value);
     if (value.trim() === "") {
       loadCabinets();
     } else {
-      const results = await CabinetService.rechercherCabinets(value); // correspond au backend
+      const results = await CabinetService.rechercherCabinets(value);
       setCabinets(results);
     }
   };
 
-  // ----------------------------
-  // OPEN MODAL ADD
-  // ----------------------------
   const openAddModal = () => {
     setForm({
       nom: "",
@@ -64,35 +56,29 @@ export default function MedicalManagement() {
     setShowModal(true);
   };
 
-  // ----------------------------
-  // OPEN MODAL EDIT
-  // ----------------------------
   const openEditModal = (cabinet) => {
     setForm(cabinet);
     setEditingId(cabinet.id);
     setShowModal(true);
   };
 
-  // ----------------------------
-  // SAVE CABINET
-  // ----------------------------
   const saveCabinet = async () => {
     try {
+      setIsLoading(true);
       if (editingId) {
         await CabinetService.modifierCabinet(editingId, form);
       } else {
         await CabinetService.ajouterCabinet(form);
       }
       setShowModal(false);
-      loadCabinets();
+      await loadCabinets();
     } catch (e) {
       console.error("Erreur Save:", e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ----------------------------
-  // TOGGLE ACTIF
-  // ----------------------------
   const toggleStatus = async (cabinet) => {
     try {
       const newStatus = !cabinet.actif;
@@ -104,141 +90,365 @@ export default function MedicalManagement() {
   };
 
   return (
-    <div className="flex flex-col overflow-y-auto p-6">
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-slate-900">Gestion des Cabinets</h1>
-
+    <div className="flex flex-col overflow-y-auto p-4 md:p-8 lg:p-12 font-sans bg-gray-50 min-h-screen">
+      {/* HEADER avec plus d'espace */}
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-12">
+        <div className="mb-6 lg:mb-0">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Gestion des Cabinets
+          </h1>
+          <p className="text-gray-600 text-xl">
+            Gérez vos cabinets médicaux en toute simplicité
+          </p>
+        </div>
         <button
           onClick={openAddModal}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2"
+          className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 transition-all duration-300 text-white font-semibold py-4 px-8 rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <MdAdd size={20} /> Ajouter un Cabinet
+          <MdAdd size={22} /> 
+          <span className="text-lg">Ajouter un Cabinet</span>
         </button>
       </div>
 
-      {/* SEARCH */}
-      <div className="mb-6 relative">
-        <MdSearch className="absolute left-3 top-3 text-slate-400" size={20} />
-        <input
-          type="text"
-          placeholder="Rechercher par nom..."
-          value={searchTerm}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        />
+      {/* SEARCH avec plus d'espace en dessous */}
+      <div className="mb-16">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="🔍 Rechercher par nom, spécialité, email, téléphone, adresse..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full px-8 py-5 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-3 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg placeholder:text-gray-500"
+          />
+          {searchTerm && (
+            <button
+              onClick={() => handleSearch("")}
+              className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2.5 rounded-full hover:bg-gray-100 transition-colors duration-200"
+            >
+              <MdClose size={24} />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-lg shadow border overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-50 border-b">
-            <tr>
-              <th className="px-6 py-4 text-left font-semibold">Nom</th>
-              <th className="px-6 py-4 text-left font-semibold">Email</th>
-              <th className="px-6 py-4 text-left font-semibold">Téléphone</th>
-              <th className="px-6 py-4 text-left font-semibold">Spécialité</th>
-              <th className="px-6 py-4 text-left font-semibold">Statut</th>
-              <th className="px-6 py-4 text-left font-semibold">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {cabinets.map((c) => (
-              <tr key={c.id} className="border-b hover:bg-slate-50">
-                <td className="px-6 py-4">{c.nom}</td>
-                <td className="px-6 py-4">{c.email}</td>
-                <td className="px-6 py-4">{c.tel}</td>
-                <td className="px-6 py-4">{c.specialite}</td>
-
-                <td className="px-6 py-4">
-                  <button
-                    onClick={() => toggleStatus(c)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      c.actif ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {c.actif ? "Actif" : "Inactif"}
-                  </button>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => openEditModal(c)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                    >
-                      <MdEdit size={20} />
-                    </button>
-
-                    
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* MODAL */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-xl">
-            {/* HEADER */}
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-2xl font-bold">
-                {editingId ? "Modifier Cabinet" : "Ajouter Cabinet"}
-              </h2>
-              <button onClick={() => setShowModal(false)}>
-                <MdClose size={25} />
-              </button>
-            </div>
-
-            {/* FORM */}
-            <div className="p-6 grid grid-cols-2 gap-4">
-              {["nom", "email", "tel", "specialite", "adresse"].map((field) => (
-                <div key={field}>
-                  <label className="text-sm font-medium capitalize">{field}</label>
-                  <input
-                    type="text"
-                    value={form[field] || ""}
-                    onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg"
-                  />
+      {/* TABLE CONTAINER - MODERNE ET DYNAMIQUE */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-[400px]">
+            <div className="flex flex-col items-center gap-6">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-blue-600 font-medium">Chargement...</div>
                 </div>
-              ))}
-
-              <div>
-                <label className="text-sm font-medium">Statut</label>
-                <select
-                  value={form.actif ? "Actif" : "Inactif"}
-                  onChange={(e) => setForm({ ...form, actif: e.target.value === "Actif" })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                >
-                  <option>Actif</option>
-                  <option>Inactif</option>
-                </select>
               </div>
             </div>
+          </div>
+        ) : cabinets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[400px] text-gray-500 p-12">
+            <div className="text-6xl mb-6 opacity-40">🏥</div>
+            <p className="text-2xl font-semibold text-gray-700 mb-3">Aucun cabinet trouvé</p>
+            <p className="text-gray-600 text-lg mb-10 text-center max-w-md">
+              Essayez de modifier vos critères de recherche ou créez votre premier cabinet
+            </p>
+            <button
+              onClick={openAddModal}
+              className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 shadow hover:shadow-md"
+            >
+              <MdAdd size={20} /> 
+              <span className="font-medium">Créer le premier cabinet</span>
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              {/* EN-TÊTE DU TABLEAU - MODERNE */}
+              <thead>
+                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
+                  <th className="px-8 py-6 text-left text-base font-bold text-gray-800 uppercase tracking-wide">
+                    Informations du Cabinet
+                  </th>
+                  <th className="px-8 py-6 text-left text-base font-bold text-gray-800 uppercase tracking-wide">
+                    Contact
+                  </th>
+                  <th className="px-8 py-6 text-left text-base font-bold text-gray-800 uppercase tracking-wide">
+                    Spécialité
+                  </th>
+                  <th className="px-8 py-6 text-left text-base font-bold text-gray-800 uppercase tracking-wide">
+                    Statut
+                  </th>
+                  <th className="px-8 py-6 text-left text-base font-bold text-gray-800 uppercase tracking-wide">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              
+              {/* CORPS DU TABLEAU - DYNAMIQUE */}
+              <tbody>
+                {cabinets.map((c, index) => (
+                  <tr
+                    key={c.id}
+                    className={`border-b border-gray-100 transition-all duration-300 hover:bg-blue-50/50 group ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                    }`}
+                  >
+                    {/* Informations du Cabinet */}
+                    <td className="px-8 py-6">
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 mb-1">{c.nom}</h3>
+                          <div className="flex items-start gap-2 text-gray-600">
+                            <MdLocationOn className="mt-1 flex-shrink-0" size={16} />
+                            <span className="text-sm">{c.adresse}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    
+                    {/* Contact */}
+                    <td className="px-8 py-6">
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 rounded-lg bg-blue-100 text-blue-600 mt-0.5">
+                            <MdEmail size={18} />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-500 mb-0.5">Email</div>
+                            <div className="text-base text-gray-900 font-medium">{c.email}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 rounded-lg bg-green-100 text-green-600 mt-0.5">
+                            <MdPhone size={18} />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-500 mb-0.5">Téléphone</div>
+                            <div className="text-base text-gray-900 font-medium">{c.tel}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    
+                    {/* Spécialité */}
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                          <span className="font-bold text-sm">S</span>
+                        </div>
+                        <span className="text-lg font-semibold text-gray-900">{c.specialite}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Statut - DYNAMIQUE */}
+                    <td className="px-8 py-6">
+                      <button
+                        onClick={() => toggleStatus(c)}
+                        className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 transform hover:scale-105 ${
+                          c.actif
+                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl"
+                            : "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg hover:shadow-xl"
+                        }`}
+                      >
+                        {c.actif ? (
+                          <>
+                            <MdCheckCircle size={20} />
+                            <span className="font-semibold">ACTIF</span>
+                          </>
+                        ) : (
+                          <>
+                            <MdCancel size={20} />
+                            <span className="font-semibold">INACTIF</span>
+                          </>
+                        )}
+                      </button>
+                    </td>
+                    
+                    {/* Actions */}
+                    <td className="px-8 py-6">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => openEditModal(c)}
+                          className="inline-flex items-center gap-3 px-5 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all duration-300 transform group-hover:translate-x-1"
+                          title="Modifier"
+                        >
+                          <MdEdit size={18} />
+                          <span className="font-medium">Modifier</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        
+        {/* FOOTER DU TABLEAU - MODERNE */}
+        {cabinets.length > 0 && (
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-t-2 border-gray-200 px-8 py-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="flex items-center gap-6">
+                <div className="text-base text-gray-700">
+                  <span className="font-bold">{cabinets.length}</span> cabinet{cabinets.length > 1 ? 's' : ''} trouvé{cabinets.length > 1 ? 's' : ''}
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="text-sm text-gray-600">
+                      <span className="font-bold">{cabinets.filter(c => c.actif).length}</span> actif{cabinets.filter(c => c.actif).length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span className="text-sm text-gray-600">
+                      <span className="font-bold">{cabinets.filter(c => !c.actif).length}</span> inactif{cabinets.filter(c => !c.actif).length > 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">
+                Dernière mise à jour : {new Date().toLocaleDateString('fr-FR')}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
-            {/* FOOTER */}
-            <div className="flex gap-3 p-4 border-t">
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 border py-2 rounded-lg"
+     {/* MODAL avec arrière-plan transparent et confortable */}
+{showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    {/* Arrière-plan avec transparence améliorée et effet de flou doux */}
+    <div
+      className="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity duration-500 ease-in-out"
+      onClick={() => !isLoading && setShowModal(false)}
+    ></div>
+
+    <div className="relative w-full max-w-2xl z-10 bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-500 ease-out scale-100 opacity-100">
+      <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {editingId ? "Modifier Cabinet" : "Ajouter Cabinet"}
+            </h2>
+            <p className="text-gray-600 text-base mt-2">
+              {editingId ? "Mettez à jour les informations du cabinet" : "Remplissez les informations du nouveau cabinet"}
+            </p>
+          </div>
+          <button
+            onClick={() => !isLoading && setShowModal(false)}
+            className="p-3 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-300"
+            disabled={isLoading}
+          >
+            <MdClose size={24} />
+          </button>
+        </div>
+      </div>
+
+      <div className="p-8 max-h-[60vh] overflow-y-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {["nom", "email", "tel", "specialite", "adresse"].map((field) => (
+            <div key={field} className="space-y-3">
+              <label className="block text-base font-semibold text-gray-700 capitalize">
+                {field} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form[field] || ""}
+                onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300"
+                placeholder={`Entrez ${field}`}
+                disabled={isLoading}
+              />
+            </div>
+          ))}
+          
+          <div className="space-y-3">
+            <label className="block text-base font-semibold text-gray-700">
+              Statut <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={form.actif ? "Actif" : "Inactif"}
+                onChange={(e) => setForm({ ...form, actif: e.target.value === "Actif" })}
+                className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 appearance-none"
+                disabled={isLoading}
               >
-                Annuler
-              </button>
-              <button
-                onClick={saveCabinet}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-              >
-                Enregistrer
-              </button>
+                <option>Actif</option>
+                <option>Inactif</option>
+              </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      <div className="px-8 py-6 border-t border-gray-200 bg-gray-50">
+        <div className="flex gap-4">
+          <button
+            onClick={() => !isLoading && setShowModal(false)}
+            className="flex-1 border-2 border-gray-300 py-3.5 rounded-lg hover:bg-gray-100 transition-all duration-300 font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
+          >
+            Annuler
+          </button>
+          <button
+            onClick={saveCabinet}
+            disabled={isLoading}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3.5 rounded-lg font-semibold text-base transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                Enregistrement...
+              </>
+            ) : (
+              <>
+                <MdAdd size={20} />
+                {editingId ? "Mettre à jour" : "Créer le cabinet"}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+      {/* Styles CSS */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .overflow-x-auto {
+          animation: fadeIn 0.5s ease-out;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar {
+          height: 8px;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+          margin: 0 8px;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
+          transition: background 0.3s;
+        }
+        
+        .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+      `}</style>
     </div>
   );
 }

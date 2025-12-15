@@ -2,11 +2,12 @@ package com.cabinetmedical.gestioncabinet.repository.admin;
 
 import com.cabinetmedical.gestioncabinet.model.DemandeCreationCabinet;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
+public interface DemandeCreationCabinetRepository
+        extends JpaRepository<DemandeCreationCabinet, Integer> {
 
-@Repository
-public interface DemandeCreationCabinetRepository extends JpaRepository<DemandeCreationCabinet,Integer> {
-    List<DemandeCreationCabinet> findByStatut(DemandeCreationCabinet.Statut statut);
+    List<DemandeCreationCabinet>
+    findByStatut(DemandeCreationCabinet.Statut statut);
 }

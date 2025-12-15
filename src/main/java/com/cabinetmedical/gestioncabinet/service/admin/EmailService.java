@@ -47,5 +47,21 @@ public class EmailService {
         message.setText(text);
         mailSender.send(message);
     }
+    public void sendDemandeRefuseNotification(String toEmail, String commentaire) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Demande de création de compte refusée - Cabinet Médical");
+
+        String text = new StringBuilder()
+                .append("Bonjour,\n\n")
+                .append("Votre demande de création de cabinet a été refusée.\n")
+                .append("Commentaire de l'administration : ").append(commentaire).append("\n\n")
+                .append("Cordialement,\nL'équipe du cabinet")
+                .toString();
+
+        message.setText(text);
+        mailSender.send(message);
+    }
+
 
 }

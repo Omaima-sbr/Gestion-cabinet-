@@ -1,28 +1,34 @@
-// src/components/Admin/components/StatCard.jsx
-
-export default function StatCard({ title, value, change, icon, color = "blue" }) {
-  const iconColors = {
-    blue: "text-blue-500",
-    green: "text-green-500",
-    orange: "text-orange-500",
-    purple: "text-purple-500",
-  }
-
-  const changeColor = change.startsWith("+") ? "text-green-600" : "text-red-600"
+export default function StatCard({ title, value, change, icon }) {
+  const positive = change.startsWith("+");
 
   return (
-    <div className="bg-white p-10 rounded-lg shadow-sm border border-slate-200 min-h-40">
-      {/* Header: Title et Icon */}
-      <div className="flex items-start justify-between mb-12">
-        <p className="text-sm text-slate-600 font-medium">{title}</p>
-        <div className={`text-2xl ${iconColors[color]}`}>{icon}</div>
+    <div className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 min-h-[100px]
+                    flex flex-col justify-center gap-4
+                    hover:shadow-xl transition-all duration-300">
+
+      {/* Icon */}
+      <div className="flex justify-center text-blue-600 text-3xl">
+        {icon}
       </div>
 
-      {/* Footer: Value et Change */}
-      <div className="flex items-end justify-between">
-        <p className="text-4xl font-bold text-slate-900">{value}</p>
-        <p className={`text-sm font-semibold ${changeColor}`}>{change}</p>
-      </div>
+      {/* Title */}
+      <p className="text-xs uppercase tracking-wider text-slate-500 text-center">
+        {title}
+      </p>
+
+      {/* Value */}
+      <p className="text-2xl font-bold text-slate-900 text-center">
+        {value}
+      </p>
+
+      {/* Change */}
+      <span
+        className={`text-xs font-semibold text-center ${
+          positive ? "text-green-600" : "text-red-600"
+        }`}
+      >
+        {change}
+      </span>
     </div>
-  )
+  );
 }
