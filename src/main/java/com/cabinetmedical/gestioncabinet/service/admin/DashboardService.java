@@ -80,7 +80,7 @@ public class DashboardService {
         // Derniers utilisateurs ajoutés
         dashboardRepository.findLastUsers(PageRequest.of(0, 5))
                 .forEach(u -> recentActivities.add(new DashboardDTO.ActivityDTO(
-                        "Utilisateur ajouté",
+                        "Utilisateur ajouté" ,
                         u.getNom(),
                         formatTimeAgo(u.getDateCreation())
                 )));

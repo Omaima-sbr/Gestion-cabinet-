@@ -58,8 +58,8 @@ public class DemandeCreationCabinet {
     @Column(name = "login_medecin", nullable = false, length = 50)
     private String loginMedecin;
 
-    @Column(name = "pwd_medecin", nullable = false, length = 255)
-    private String pwdMedecin;
+    // @Column(name = "pwd_medecin", nullable = false, length = 255)
+    // private String pwdMedecin;
 
     @Column(name = "signature_medecin", length = 255)
     private String signatureMedecin;
@@ -83,8 +83,8 @@ public class DemandeCreationCabinet {
     @Column(name = "login_secretaire", length = 50)
     private String loginSecretaire;
 
-    @Column(name = "pwd_secretaire", length = 255)
-    private String pwdSecretaire;
+    // @Column(name = "pwd_secretaire", length = 255)
+    // private String pwdSecretaire;
 
     // Informations de la demande
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,8 @@
 package com.cabinetmedical.gestioncabinet.service.admin;
 
 import com.cabinetmedical.gestioncabinet.model.Cabinet;
+import com.cabinetmedical.gestioncabinet.model.DemandeCreationCabinet;
+import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.admin.CabinetRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +13,15 @@ import java.util.Optional;
 public class CabinetService {
 
     private final CabinetRepository cabinetRepository;
-    private final AdminFactureService adminFactureService; // <-- AJOUT
+    private final AdminFactureService adminFactureService;
+    private final UtilisateurService utilisateurService;
 
-    public CabinetService(CabinetRepository cabinetRepository ,  AdminFactureService adminFactureService) {
+    public CabinetService(CabinetRepository cabinetRepository,
+                          AdminFactureService adminFactureService,
+                          UtilisateurService utilisateurService) {
         this.cabinetRepository = cabinetRepository;
-        this.adminFactureService = adminFactureService; // <-- AJOUT
+        this.adminFactureService = adminFactureService;
+        this.utilisateurService = utilisateurService;
     }
 
     // Lister tous les cabinets
@@ -25,14 +31,56 @@ public class CabinetService {
 
     // Rechercher par ID
     public Optional<Cabinet> getCabinetById(Integer id) {
-        return cabinetRepository.findById(id); // findById renvoie déjà Optional
+        return cabinetRepository.findById(id);
     }
 
-    // Ajouter un cabinet
+    // Ajouter un cabinet “nu”
     public Cabinet addCabinet(Cabinet cabinet) {
         cabinet.setActif(false);
-
         return cabinetRepository.save(cabinet);
+    }
+
+    // Créer cabinet + utilisateurs à partir d’une demande
+    public Cabinet creerCabinetEtUtilisateurs(DemandeCreationCabinet demande) {
+        // 1️⃣ Créer le cabinet
+        Cabinet cabinet = new Cabinet();
+        cabinet.setNom(demande.getNomCabinet());
+        cabinet.setAdresse(demande.getAdresseCabinet());
+        cabinet.setTel(demande.getTelCabinet());
+        cabinet.setEmail(demande.getEmailCabinet());
+        cabinet.setLogo(demande.getLogoCabinet());
+        cabinet.setSpecialite(demande.getSpecialite());
+        cabinet.setActif(true); // cabinet actif dès approbation
+
+        Cabinet savedCabinet = cabinetRepository.save(cabinet);
+
+        // 2️⃣ Créer l’utilisateur médecin
+        Utilisateur medecin = new Utilisateur();
+        medecin.setNom(demande.getNomMedecin());
+        medecin.setPrenom(demande.getPrenomMedecin());
+        medecin.setLogin(demande.getLoginMedecin());
+        medecin.setEmail(demande.getEmailMedecin());
+        medecin.setNumTel(demande.getTelMedecin());
+        medecin.setRole(Utilisateur.Role.MEDECIN);
+        medecin.setSignature(demande.getSignatureMedecin());
+        utilisateurService.creerUtilisateur(medecin);
+
+        // 3️⃣ Créer l’utilisateur secrétaire si infos présentes
+        if (demande.getNomSecretaire() != null && !demande.getNomSecretaire().isEmpty()) {
+            Utilisateur secretaire = new Utilisateur();
+            secretaire.setNom(demande.getNomSecretaire());
+            secretaire.setPrenom(demande.getPrenomSecretaire());
+            secretaire.setLogin(demande.getLoginSecretaire());
+            secretaire.setEmail(demande.getEmailSecretaire());
+            secretaire.setNumTel(demande.getTelSecretaire());
+            secretaire.setRole(Utilisateur.Role.SECRETAIRE);
+            utilisateurService.creerUtilisateur(secretaire);
+        }
+
+        // 4️⃣ Créer la facture initiale pour le cabinet
+        adminFactureService.createFactureForCabinet(savedCabinet);
+
+        return savedCabinet;
     }
 
     // Modifier un cabinet
@@ -59,7 +107,6 @@ public class CabinetService {
         cabinet.setActif(actif);
         Cabinet savedCabinet = cabinetRepository.save(cabinet);
 
-        // Création automatique de la facture si passage de inactif à actif
         if (!etatPrecedent && actif) {
             adminFactureService.createFactureForCabinet(savedCabinet);
         }
@@ -67,8 +114,7 @@ public class CabinetService {
         return savedCabinet;
     }
 
-
-    // Recherche par nom exact
+    // Recherche par nom
     public List<Cabinet> searchByNom(String nom) {
         return cabinetRepository.findByNomContainingIgnoreCase(nom);
     }
