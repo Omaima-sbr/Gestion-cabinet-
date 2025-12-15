@@ -1,8 +1,10 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 })
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class RendezVous {
 
     @Id
@@ -30,11 +33,11 @@ public class RendezVous {
     private LocalTime heureRdv;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private Motif motif;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'EN_ATTENTE'")
     private Statut statut = Statut.EN_ATTENTE;
 
     @Column(columnDefinition = "TEXT")
@@ -54,18 +57,11 @@ public class RendezVous {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToOne(mappedBy = "rendezVous", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Consultation consultation;
 
-    public Integer getId() {
-        return idRendezVous;
-    }
-
-    public LocalDate getDateHeureDebut() {
-        return dateRdv;
-    }
-
     public enum Motif {
-        CONSULTATION, CONTROLE,URGENCE,SUIVI
+        CONSULTATION, CONTROLE
     }
 
     public enum Statut {

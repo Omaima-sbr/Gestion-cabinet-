@@ -10,12 +10,12 @@ import java.util.List;
 @Entity
 @Table(name = "Historique_Actions", indexes = {
         @Index(name = "idx_utilisateur", columnList = "id_utilisateur"),
-        @Index(name = "idx_date3", columnList = "date_action")
+        @Index(name = "idx_date", columnList = "date_action")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class HistoriqueActions {
+public class HistoriqueActions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

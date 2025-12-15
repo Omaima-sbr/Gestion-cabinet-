@@ -1,18 +1,14 @@
 package com.cabinetmedical.gestioncabinet.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.List;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "Patient", indexes = {
@@ -58,12 +54,14 @@ public class Patient {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Patient_Cabinet"))
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Cabinet cabinet;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private DossierMedical dossierMedical;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
@@ -74,15 +72,6 @@ public class Patient {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<Facture> factures;
-
-    public String getTelephone() {
-        return this.numTel;
-    }
-
-    // ✅ APRÈS
-    public Integer getIdPatient() {
-        return this.id;
-    }
 
     public enum Sexe {
         HOMME, FEMME
