@@ -3,10 +3,10 @@ import Acceuil from './pages/acceuil';
 import Form from './pages/Form';
 import ForgotPassword from "./components/auth/ForgotPassword.jsx";
 import ResetPassword from "./components/auth/ResetPassword.jsx";
-/**
- * ROUTEUR PRINCIPAL DE L'APPLICATION
- * Gère la navigation entre la page d'accueil et le formulaire d'inscription
- */
+
+// Importez votre fichier de routes Admin (ajustez le chemin selon votre structure)
+import AdminRoutes from '../routes/AdminRoutes';
+
 export default function Router() {
     return (
         <BrowserRouter>
@@ -14,13 +14,17 @@ export default function Router() {
                 {/* Page d'accueil */}
                 <Route path="/" element={<Acceuil />} />
 
-                {/* Page de formulaire d'inscription */}
+                {/* Formulaire d'inscription */}
                 <Route path="/inscription" element={<Form />} />
 
+                {/* Authentification */}
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* Redirection pour les routes non trouvées */}
+                {/* 👇 AJOUTEZ CECI : Intégration des routes Admin */}
+                {/* Le "/*" permet à AdminRoutes de gérer les sous-chemins (ex: /admin/dashboard) */}
+                <Route path="/admin/*" element={<AdminRoutes />} />
+                {/* Redirection pour les routes non trouvées (DOIT ÊTRE EN DERNIER) */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>

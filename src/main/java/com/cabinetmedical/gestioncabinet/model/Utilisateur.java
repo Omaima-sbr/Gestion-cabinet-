@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "Utilisateur")
+@Table(name = "utilisateur")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,10 +22,6 @@ public class Utilisateur {
     @Column(unique = true, nullable = false, length = 50)
     private String login;
 
-    // 🔥 AJOUT DU CHAMP EMAIL POUR LA CONNEXION HYBRIDE
-    @Column(unique = true, length = 100)
-    private String email;
-
     @Column(nullable = false, length = 255)
     private String pwd;
 
@@ -34,6 +30,10 @@ public class Utilisateur {
 
     @Column(nullable = false, length = 100)
     private String prenom;
+
+    @Column(nullable = false, length = 100, unique = true)
+    private String email;
+
 
     @Column(name = "num_tel", length = 20)
     private String numTel;
@@ -45,8 +45,14 @@ public class Utilisateur {
     @Column(nullable = false)
     private Role role;
 
+    // Pour la suppression soft delete
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean actif = true;
+
+    // Pour le statut (ACTIF / INACTIF)
+    @Column(nullable = false, length = 20)
+    private String statut = "INACTIF";
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Utilisateur_Cabinet"))
@@ -80,6 +86,9 @@ public class Utilisateur {
         dateCreation = LocalDateTime.now();
         if (actif == null) {
             actif = true;
+        }
+        if (statut == null) {
+            statut = "ACTIF";
         }
     }
 }

@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 @Slf4j
 public class InscriptionService {
 
-    private final DemandeCreationCabinetRepository demandeRepository;
+    private final DemandeCreationCabinetsRepository demandeRepository;
     private final AlerteAdminRepository alerteRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CabinetRepository cabinetRepository;
-    private final UtilisateurRepository utilisateurRepository;
+    private final CabinetsRepository cabinetRepository;
+    private final UtilisateursRepository utilisateurRepository;
 
     @Transactional
     public DemandeCreationCabinet creerDemande(InscriptionCabinetDTO dto) {

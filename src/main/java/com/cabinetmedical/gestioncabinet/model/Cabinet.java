@@ -1,5 +1,7 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,6 +32,10 @@ public class Cabinet {
     private String nom;
 
     @Column(length = 100)
+    private String email;
+
+
+    @Column(length = 100)
     private String specialite;
 
     @Column(length = 255)
@@ -45,13 +51,22 @@ public class Cabinet {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Utilisateur> utilisateurs;
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Patient> patients;
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Facture> factures;
+
+    @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<AdminFacture> adminFactures;
+
 
     @PrePersist
     protected void onCreate() {

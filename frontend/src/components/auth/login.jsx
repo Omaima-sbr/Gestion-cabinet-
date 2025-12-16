@@ -7,12 +7,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../../i18n';
 import axios from 'axios';
-import { Link } from 'react-router-dom'; // À ajouter en haut du fichier
+// ✅ AJOUT : Import de useNavigate ici
+import { Link, useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:8080/api';
 
 export default function LoginModal({ onClose, onLoginSuccess }) {
   const { t } = useTranslation();
+
+  // ✅ AJOUT : Initialisation du hook de navigation
+  const navigate = useNavigate();
+
   const [selectedRole, setSelectedRole] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [login, setLogin] = useState('');
@@ -124,6 +129,17 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
       alert(t('login.success'));
       onClose();
+
+      // ✅ AJOUT : Logique de redirection selon le rôle
+      if (response.data.role === 'ADMINISTRATEUR') {
+        navigate('/admin'); // Redirige vers le dashboard admin
+      } else if (response.data.role === 'MEDECIN') {
+        navigate('/medecin/dashboard'); // Exemple de route médecin
+      } else if (response.data.role === 'SECRETAIRE') {
+        navigate('/secretaire/dashboard'); // Exemple de route secrétaire
+      } else {
+        navigate('/');
+      }
 
     } catch (err) {
       console.error('❌ Erreur de connexion:', err);

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+
 
 import java.math.BigDecimal; // pour BigDecimal
 
@@ -20,7 +22,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Facture {
+public class Facture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

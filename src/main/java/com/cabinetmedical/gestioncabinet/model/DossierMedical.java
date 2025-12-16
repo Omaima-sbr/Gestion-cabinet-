@@ -1,4 +1,5 @@
 package com.cabinetmedical.gestioncabinet.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +41,7 @@ class DossierMedical {
     @OneToOne
     @JoinColumn(name = "id_patient", unique = true, nullable = false,
             foreignKey = @ForeignKey(name = "FK_DossierMedical_Patient"))
+    @JsonIgnore
     private Patient patient;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL)

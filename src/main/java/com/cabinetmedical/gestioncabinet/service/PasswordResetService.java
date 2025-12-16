@@ -3,7 +3,7 @@ package com.cabinetmedical.gestioncabinet.service;
 import com.cabinetmedical.gestioncabinet.model.PasswordResetToken;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.PasswordResetTokenRepository;
-import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
+import com.cabinetmedical.gestioncabinet.repository.UtilisateursRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 public class PasswordResetService {
 
-    @Autowired private UtilisateurRepository utilisateurRepository;
+    @Autowired private UtilisateursRepository utilisateurRepository;
     @Autowired private PasswordResetTokenRepository tokenRepository;
     @Autowired private JavaMailSender mailSender;
     @Autowired private PasswordEncoder passwordEncoder;

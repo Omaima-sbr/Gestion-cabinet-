@@ -1,10 +1,9 @@
 package com.cabinetmedical.gestioncabinet.controller;
 
 import com.cabinetmedical.gestioncabinet.model.Cabinet;
-import com.cabinetmedical.gestioncabinet.repository.CabinetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import com.cabinetmedical.gestioncabinet.service.CabinetService;
+import com.cabinetmedical.gestioncabinet.service.CabinetsService;
 
 import java.util.List;
 
@@ -12,9 +11,9 @@ import java.util.List;
 @RequestMapping("/api/cabinets")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
-public class CabinetController {
+public class CabinetsController {
 
-    private final CabinetService cabinetService;
+    private final CabinetsService cabinetService;
 
     /**
      * GET /api/cabinets

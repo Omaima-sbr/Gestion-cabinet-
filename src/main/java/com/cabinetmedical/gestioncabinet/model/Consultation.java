@@ -1,9 +1,11 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.time.LocalDate;
@@ -48,21 +50,25 @@ class Consultation {
     @OneToOne
     @JoinColumn(name = "id_rendez_vous", unique = true,
             foreignKey = @ForeignKey(name = "FK_Consultation_RendezVous"))
+    @JsonIgnore
     private RendezVous rendezVous;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_patient", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Patient"))
+    @JsonIgnore
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_medecin", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Medecin"))
+    @JsonIgnore
     private Utilisateur medecin;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_dossier", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Consultation_Dossier"))
+    @JsonIgnore
     private DossierMedical dossier;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
