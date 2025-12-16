@@ -1,6 +1,8 @@
 package com.cabinetmedical.gestioncabinet.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,6 +46,7 @@ class RendezVous {
     private String notes;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"rendezVous", "cabinet"})
     @JoinColumn(name = "id_patient", nullable = false,
             foreignKey = @ForeignKey(name = "FK_RendezVous_Patient"))
     private Patient patient;
@@ -64,7 +67,7 @@ class RendezVous {
     }
 
     public enum Statut {
-        CONFIRME, ANNULE, EN_ATTENTE, TERMINE
+        CONFIRME, ANNULE, EN_ATTENTE, TERMINE, EN_COURS
     }
 
     @PrePersist

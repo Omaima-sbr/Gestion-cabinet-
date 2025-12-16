@@ -7,8 +7,8 @@ import com.cabinetmedical.gestioncabinet.dto.LoginResponse;
 import com.cabinetmedical.gestioncabinet.dto.RegisterRequest;
 import com.cabinetmedical.gestioncabinet.model.Cabinet;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
-import com.cabinetmedical.gestioncabinet.repository.CabinetRepository;
-import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
+import com.cabinetmedical.gestioncabinet.repository.CabinetsRepository;
+import com.cabinetmedical.gestioncabinet.repository.UtilisateursRepository;
 import com.cabinetmedical.gestioncabinet.service.AuthService;
 import com.cabinetmedical.gestioncabinet.service.LoginAttemptService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UtilisateurRepository utilisateurRepository;
-    private final CabinetRepository cabinetRepository;
+    private final UtilisateursRepository utilisateurRepository;
+    private final CabinetsRepository cabinetRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
