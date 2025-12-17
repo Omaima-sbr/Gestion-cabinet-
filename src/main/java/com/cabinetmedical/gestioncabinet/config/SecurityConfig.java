@@ -44,6 +44,7 @@ public class SecurityConfig {
                         // Routes protégées
                         .requestMatchers("/api/dashboard/**").authenticated()
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMINISTRATEUR")
+                        .requestMatchers("/api/demandes/**").hasAuthority("ROLE_ADMINISTRATEUR")
                         .requestMatchers("/api/admin-factures/**")
                         .hasAuthority("ROLE_ADMINISTRATEUR")
                         .requestMatchers("/api/medicaments/**")

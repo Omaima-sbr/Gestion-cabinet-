@@ -46,7 +46,10 @@ class RendezVous {
     private String notes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"rendezVous", "cabinet"})
+    @JsonIgnoreProperties({
+            "rendezVous", "consultations", "factures",
+            "dossierMedical", "cabinet"
+    })
     @JoinColumn(name = "id_patient", nullable = false,
             foreignKey = @ForeignKey(name = "FK_RendezVous_Patient"))
     private Patient patient;
@@ -54,12 +57,14 @@ class RendezVous {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_medecin", nullable = false,
             foreignKey = @ForeignKey(name = "FK_RendezVous_Medecin"))
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE
     private Utilisateur medecin;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToOne(mappedBy = "rendezVous", cascade = CascadeType.ALL)
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE (important pour éviter boucle RendezVous↔Consultation)
     private Consultation consultation;
 
     public enum Motif {

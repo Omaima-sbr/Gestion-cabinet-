@@ -14,7 +14,7 @@ export default function Sidebar() {
     { id: "cabinets", icon: <FiBriefcase />, label: "Gestion Cabinets", path: "/admin/cabinets" },
     { id: "users", icon: <FiUsers />, label: "Gestion Utilisateurs", path: "/admin/utilisateurs" },
     { id: "medicaments", icon: <FiPackage />, label: "Médicaments", path: "/admin/medicaments" },
-    { id: "invoices", icon: <FiFileText />, label: "Factures", path: "/admin/factures", badge: "12" },
+    { id: "invoices", icon: <FiFileText />, label: "Factures", path: "/admin/factures"  },
     { id: "candidatures", icon: <FiClipboard />, label: "Candidatures", path: "/admin/candidatures" },
   ];
 
@@ -97,16 +97,21 @@ export default function Sidebar() {
         {/* Logout */}
         <div className="p-6 border-t border-slate-700/50 flex-shrink-0">
           <button
-              onClick={() => navigate("/logout")}
-              className="group relative flex items-center gap-5 w-full px-6 py-4 rounded-xl text-slate-300 hover:text-white transition-all duration-200 overflow-hidden text-base font-medium"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+    onClick={() => {
+        // 1. Supprimer le token JWT du stockage local
+        localStorage.removeItem("token"); // ou sessionStorage si tu l’utilises
 
-            <FiLogOut className="text-2xl group-hover:scale-105 transition-transform duration-200 flex-shrink-0" />
-            {isOpen && (
-                <span className="flex-1 text-left">Déconnexion</span>
-            )}
-          </button>
+        // 2. Rediriger vers la page login
+        navigate("/login");
+    }}
+    className="group relative flex items-center gap-5 w-full px-6 py-4 rounded-xl text-slate-300 hover:text-white transition-all duration-200 overflow-hidden text-base font-medium"
+>
+    <div className="absolute inset-0 bg-gradient-to-r from-red-600/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+
+    <FiLogOut className="text-2xl group-hover:scale-105 transition-transform duration-200 flex-shrink-0" />
+    {isOpen && <span className="flex-1 text-left">Déconnexion</span>}
+</button>
+
         </div>
       </aside>
   );

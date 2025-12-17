@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdDownload, MdCheck, MdCheckCircle, MdFilterList, MdRefresh } from "react-icons/md";
+import { MdDownload, MdCheck, MdCheckCircle, MdFilterList, MdRefresh, MdLock, MdLockOpen } from "react-icons/md";
 import InvoicesService from "../services/InvoicesService";
 
 export default function InvoicesManagement() {
@@ -8,6 +8,7 @@ export default function InvoicesManagement() {
   const [filterStatut, setFilterStatut] = useState("Tous les status");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [editingInvoices, setEditingInvoices] = useState({}); // Pour suivre les factures en cours d'édition
 
   useEffect(() => {
     loadInvoices();
@@ -18,6 +19,24 @@ export default function InvoicesManagement() {
     try {
       const data = await InvoicesService.getAll();
       setInvoices(data);
+      // Initialiser l'état d'édition
+      const initialEditingState = {};
+      data.forEach(invoice => {
+        if (invoice.statut === "EN_ATTENTE") {
+          initialEditingState[invoice.id] = {
+            montant: invoice.montant || "",
+            periode: invoice.periode || "",
+            isEditing: true // Par défaut, les factures EN_ATTENTE sont éditables
+          };
+        } else {
+          initialEditingState[invoice.id] = {
+            montant: invoice.montant || "",
+            periode: invoice.periode || "",
+            isEditing: false // Les factures PAYEE ne sont pas éditables
+          };
+        }
+      });
+      setEditingInvoices(initialEditingState);
     } catch (err) {
       console.error("Erreur chargement factures:", err);
     } finally {
@@ -25,15 +44,39 @@ export default function InvoicesManagement() {
     }
   };
 
-  // Filtre dynamique avec recherche
+  // Mise à jour des valeurs d'édition
+  const handleEditChange = (invoiceId, field, value) => {
+    setEditingInvoices(prev => ({
+      ...prev,
+      [invoiceId]: {
+        ...prev[invoiceId],
+        [field]: value
+      }
+    }));
+  };
+
+  // Basculer l'édition pour une facture PAYEE (optionnel, pour débloquer)
+  const toggleEditing = (invoiceId, currentStatut) => {
+    if (currentStatut === "PAYEE") {
+      setEditingInvoices(prev => ({
+        ...prev,
+        [invoiceId]: {
+          ...prev[invoiceId],
+          isEditing: !prev[invoiceId].isEditing
+        }
+      }));
+    }
+  };
+
+  // filtre dynamique et recherche 
   const filteredInvoices = invoices.filter(
     (invoice) =>
       (filterCabinet === "Tous les cabinets" || invoice.cabinetNom === filterCabinet) &&
       (filterStatut === "Tous les status" || invoice.statut === filterStatut) &&
       (searchTerm === "" ||
         invoice.id.toString().includes(searchTerm) ||
-        invoice.cabinetNom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        invoice.cabinetEmail.toLowerCase().includes(searchTerm.toLowerCase()))
+        (invoice.cabinetNom ?? "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (invoice.cabinetEmail ?? "").toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Statistiques
@@ -46,6 +89,14 @@ export default function InvoicesManagement() {
   const handleMarkAsPaid = async (id) => {
     try {
       await InvoicesService.markAsPaid(id);
+      // Après marquer comme payé, désactiver l'édition
+      setEditingInvoices(prev => ({
+        ...prev,
+        [id]: {
+          ...prev[id],
+          isEditing: false
+        }
+      }));
       loadInvoices();
     } catch (err) {
       console.error("Erreur marque payée:", err);
@@ -55,9 +106,10 @@ export default function InvoicesManagement() {
   // Mise à jour montant + période
   const handleUpdateInvoice = async (invoice) => {
     try {
+      const editingData = editingInvoices[invoice.id];
       await InvoicesService.update(invoice.id, {
-        montant: Number(invoice.montant),
-        periode: invoice.periode,
+        montant: Number(editingData.montant),
+        periode: editingData.periode,
       });
       loadInvoices();
     } catch (err) {
@@ -140,13 +192,19 @@ export default function InvoicesManagement() {
           </div>
           
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm text-gray-500 mb-3">En Attente</p>
-            <p className="text-2xl font-bold text-amber-600">{pendingCount}</p>
+            <div className="flex items-center gap-2">
+              <MdLockOpen className="text-amber-500" size={20} />
+              <p className="text-sm text-gray-500">En Attente (Modifiable)</p>
+            </div>
+            <p className="text-2xl font-bold text-amber-600 mt-2">{pendingCount}</p>
           </div>
           
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <p className="text-sm text-gray-500 mb-3">Payées</p>
-            <p className="text-2xl font-bold text-green-600">{paidCount}</p>
+            <div className="flex items-center gap-2">
+              <MdLock className="text-green-500" size={20} />
+              <p className="text-sm text-gray-500">Payées (Verrouillées)</p>
+            </div>
+            <p className="text-2xl font-bold text-green-600 mt-2">{paidCount}</p>
           </div>
         </div>
       </div>
@@ -158,16 +216,14 @@ export default function InvoicesManagement() {
         <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
           {/* Recherche - PLUS GRAND et sans icône */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-3"></label>
             <div className="relative">
               <input
                 type="text"
                 placeholder="Rechercher par ID, Cabinet, Email, Période, Statut..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-4 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors outline-none text-base placeholder-gray-400"
+                className="w-full px-4 py-4 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500 transition-colors outline-none text-base placeholder-gray-400 text-gray-800"
                 style={{ minHeight: "52px" }}
               />
               {searchTerm && (
@@ -192,11 +248,11 @@ export default function InvoicesManagement() {
                 <select
                   value={filterCabinet}
                   onChange={(e) => setFilterCabinet(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none appearance-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none appearance-none text-gray-800"
                 >
-                  <option>Tous les cabinets</option>
+                  <option className="text-gray-800">Tous les cabinets</option>
                   {Array.from(new Set(invoices.map((inv) => inv.cabinetNom))).map((cab) => (
-                    <option key={cab}>{cab}</option>
+                    <option key={cab} className="text-gray-800">{cab}</option>
                   ))}
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
@@ -213,11 +269,11 @@ export default function InvoicesManagement() {
                 <select
                   value={filterStatut}
                   onChange={(e) => setFilterStatut(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none appearance-none"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none appearance-none text-gray-800"
                 >
-                  <option>Tous les status</option>
-                  <option>PAYEE</option>
-                  <option>EN_ATTENTE</option>
+                  <option className="text-gray-800">Tous les status</option>
+                  <option className="text-gray-800">PAYEE</option>
+                  <option className="text-gray-800">EN_ATTENTE</option>
                 </select>
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                   <MdFilterList className="text-gray-400" size={18} />
@@ -280,107 +336,142 @@ export default function InvoicesManagement() {
                 </thead>
 
                 <tbody>
-                  {filteredInvoices.map((invoice) => (
-                    <tr 
-                      key={invoice.id} 
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <span className="font-medium text-gray-900">#{invoice.id}</span>
-                      </td>
-                      
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{invoice.cabinetNom}</div>
-                      </td>
-                      
-                      <td className="px-6 py-4 text-gray-600">
-                        {invoice.cabinetEmail}
-                      </td>
+                  {filteredInvoices.map((invoice) => {
+                    const isEditable = editingInvoices[invoice.id]?.isEditing || false;
+                    const isPending = invoice.statut === "EN_ATTENTE";
+                    
+                    return (
+                      <tr 
+                        key={invoice.id} 
+                        className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <span className="font-medium text-gray-900">#{invoice.id}</span>
+                        </td>
+                        
+                        <td className="px-6 py-4">
+                          <div className="font-medium text-gray-900">{invoice.cabinetNom}</div>
+                        </td>
+                        
+                        <td className="px-6 py-4 text-gray-600">
+                          {invoice.cabinetEmail}
+                        </td>
 
-                      {/* Montant input */}
-                      <td className="px-6 py-4">
-                        <div className="relative">
-                          <input
-                            type="number"
-                            value={invoice.montant || ""}
-                            onChange={(e) =>
-                              setInvoices(
-                                invoices.map((inv) =>
-                                  inv.id === invoice.id
-                                    ? { ...inv, montant: e.target.value }
-                                    : inv
-                                )
-                              )
-                            }
-                            className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
-                            placeholder="0.00"
-                          />
-                          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">MAD</span>
-                        </div>
-                      </td>
-
-                      {/* Période input */}
-                      <td className="px-6 py-4">
-                        <input
-                          type="text"
-                          value={invoice.periode || ""}
-                          onChange={(e) =>
-                            setInvoices(
-                              invoices.map((inv) =>
-                                inv.id === invoice.id
-                                  ? { ...inv, periode: e.target.value }
-                                  : inv
-                              )
-                            )
-                          }
-                          className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors outline-none"
-                          placeholder="MM/AAAA"
-                        />
-                      </td>
-
-                      <td className="px-6 py-4 text-gray-600">
-                        {invoice.dateCreation}
-                      </td>
-
-                      {/* Statut */}
-                      <td className="px-6 py-4">
-                        {invoice.statut === "PAYEE" ? (
-                          <div className="flex items-center gap-2">
-                            <MdCheckCircle className="text-green-600" size={18} />
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Payée
+                        {/* Montant input */}
+                        <td className="px-6 py-4">
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={editingInvoices[invoice.id]?.montant || ""}
+                              onChange={(e) => handleEditChange(invoice.id, "montant", e.target.value)}
+                              disabled={!isEditable}
+                              className={`w-full px-3 py-2 border rounded transition-colors outline-none text-gray-800 ${
+                                isEditable 
+                                  ? "bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                  : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                              }`}
+                              placeholder="0.00"
+                            />
+                            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                              {isEditable ? "MAD" : <MdLock size={14} className="text-gray-400" />}
                             </span>
                           </div>
-                        ) : (
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                            En Attente
-                          </span>
-                        )}
-                      </td>
+                        </td>
 
-                      {/* Actions */}
-                      <td className="px-6 py-4">
-                        <div className="flex flex-col gap-2">
-                          {invoice.statut === "EN_ATTENTE" && (
-                            <button
-                              onClick={() => handleMarkAsPaid(invoice.id)}
-                              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2 transition-colors text-sm"
-                            >
-                              <MdCheck size={16} />
-                              Marquer Payée
-                            </button>
+                        {/* Période input */}
+                        <td className="px-6 py-4">
+                          <input
+                            type="text"
+                            value={editingInvoices[invoice.id]?.periode || ""}
+                            onChange={(e) => handleEditChange(invoice.id, "periode", e.target.value)}
+                            disabled={!isEditable}
+                            className={`w-full px-3 py-2 border rounded transition-colors outline-none text-gray-800 ${
+                              isEditable 
+                                ? "bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                            }`}
+                            placeholder="MM/AAAA"
+                          />
+                        </td>
+
+                        <td className="px-6 py-4 text-gray-600">
+                          {invoice.dateCreation}
+                        </td>
+
+                        {/* Statut avec icône de verrouillage */}
+                        <td className="px-6 py-4">
+                          {invoice.statut === "PAYEE" ? (
+                            <div className="flex items-center gap-2">
+                              <MdCheckCircle className="text-green-600" size={18} />
+                              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 flex items-center gap-1">
+                                Payée
+                                <MdLock size={12} />
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <MdLockOpen className="text-amber-600" size={18} />
+                              <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                En Attente
+                              </span>
+                            </div>
                           )}
+                        </td>
 
-                          <button
-                            onClick={() => handleUpdateInvoice(invoice)}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors text-sm"
-                          >
-                            Enregistrer
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        {/* Actions */}
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col gap-2">
+                            {isPending ? (
+                              <>
+                                <button
+                                  onClick={() => handleMarkAsPaid(invoice.id)}
+                                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2 transition-colors text-sm"
+                                >
+                                  <MdCheck size={16} />
+                                  Marquer Payée
+                                </button>
+                                <button
+                                  onClick={() => handleUpdateInvoice(invoice)}
+                                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors text-sm"
+                                >
+                                  Enregistrer
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {!isEditable ? (
+                                  <button
+                                    onClick={() => toggleEditing(invoice.id, invoice.statut)}
+                                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded flex items-center gap-2 transition-colors text-sm"
+                                    title="Déverrouiller pour modifier"
+                                  >
+                                    <MdLockOpen size={16} />
+                                    Déverrouiller
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => handleUpdateInvoice(invoice)}
+                                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors text-sm"
+                                    >
+                                      Enregistrer
+                                    </button>
+                                    <button
+                                      onClick={() => toggleEditing(invoice.id, invoice.statut)}
+                                      className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded flex items-center gap-2 transition-colors text-sm"
+                                    >
+                                      <MdLock size={16} />
+                                      Verrouiller
+                                    </button>
+                                  </>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -394,12 +485,12 @@ export default function InvoicesManagement() {
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
-                      <MdCheckCircle className="text-green-600" size={16} />
-                      <span>Payées: {paidCount}</span>
+                      <MdLockOpen className="text-amber-600" size={16} />
+                      <span>En attente (modifiable): {pendingCount}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                      <span>En attente: {pendingCount}</span>
+                      <MdLock className="text-green-600" size={16} />
+                      <span>Payées (verrouillées): {paidCount}</span>
                     </div>
                   </div>
                 </div>

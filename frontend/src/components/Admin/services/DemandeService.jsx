@@ -31,20 +31,21 @@ class DemandeService {
   }
 
   // 2️⃣ Récupérer les demandes par statut
-  getByStatut(statut) {
-    return api.get(`/statut/${statut}`).then(res => res.data);
-  }
+   getByStatut(statut) {
+  return api.get(`?statut=${statut}`).then(res => res.data);
+}
+
 
   // 3️⃣ Approuver une demande
-  approuver(id, admin) {
-    return api.post(`/${id}/approuver`, admin).then(res => res.data);
-  }
+  approuver(id) {
+  return api.post(`/${id}/approuver`);
+}
+
 
   // 4️⃣ Rejeter une demande
-  rejeter(id, commentaire, admin) {
-    const dto = { commentaire: commentaire, admin: admin };
-    return api.post(`/${id}/rejeter`, dto).then(res => res.data);
-  }
+  rejeter(id, commentaire) {
+  return api.post(`/${id}/rejeter`, { commentaire });
+}
 }
 
 export default new DemandeService();

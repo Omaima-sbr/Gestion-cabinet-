@@ -47,13 +47,42 @@ const UserService = {
     }
   },
 
-  // 🔹 Créer un utilisateur
-  creerUser: async (user) => {
+  // 🔹 Récupérer tous les cabinets (NOUVELLE MÉTHODE)
+  getAllCabinets: async () => {
     try {
-      const response = await api.post("", user);
+      // À ADAPTER: Remplacez cette URL par celle de votre backend pour les cabinets
+      const response = await axios.get("http://localhost:8080/api/admin/cabinets", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de la récupération des cabinets:", error);
+      throw error;
+    }
+  },
+
+  // 🔹 Créer un utilisateur (MODIFIÉ pour accepter cabinetNom en paramètre)
+  creerUser: async (user, cabinetNom) => {
+    try {
+      // Structure CORRECTE pour le DTO backend
+      const payload = {
+        login: user.login,       // login = email
+        nom: user.nom,
+        prenom: user.prenom,
+        numTel: user.numTel,
+        role: user.role,
+        nomCabinet: cabinetNom,  // Cabinet passé en paramètre séparé
+      };
+
+      console.log("Création utilisateur avec payload:", payload);
+      const response = await api.post("", payload);
       return response.data;
     } catch (error) {
       console.error("Erreur lors de la création de l'utilisateur:", error);
+      console.error("Détails erreur:", error.response?.data);
       throw error;
     }
   },

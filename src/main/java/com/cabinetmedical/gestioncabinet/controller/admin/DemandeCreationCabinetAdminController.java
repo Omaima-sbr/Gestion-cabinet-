@@ -3,6 +3,8 @@ package com.cabinetmedical.gestioncabinet.controller.admin;
 import com.cabinetmedical.gestioncabinet.dto.admin.DemandeDTO;
 import com.cabinetmedical.gestioncabinet.model.DemandeCreationCabinet;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
+import org.springframework.security.core.Authentication;
+
 import com.cabinetmedical.gestioncabinet.service.admin.DemandeCreationCabinetService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,20 +35,30 @@ public class DemandeCreationCabinetAdminController {
     // 🔹 Approuver une demande
     @PostMapping("/{id}/approuver")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATEUR')")
+    public String approuverDemande(@PathVariable Integer id,
+                                   Authentication authentication) {
 
-    public String approuverDemande(@PathVariable Integer id, @RequestBody Utilisateur admin) {
+        Utilisateur admin = (Utilisateur) authentication.getPrincipal();
         demandeService.approuverDemande(id, admin);
+
         return "Demande approuvée avec succès";
     }
+
 
     // 🔹 Rejeter une demande
     @PostMapping("/{id}/rejeter")
     @PreAuthorize("hasAuthority('ROLE_ADMINISTRATEUR')")
-    public String rejeterDemande(@PathVariable Integer id, @RequestBody RejetDemandeDTO dto) {
-        demandeService.rejeterDemande(id, dto.commentaire(), dto.admin());
+    public String rejeterDemande(
+            @PathVariable Integer id,
+            @RequestBody RejetDemandeDTO dto,
+            Authentication authentication
+    ) {
+        Utilisateur admin = (Utilisateur) authentication.getPrincipal();
+        demandeService.rejeterDemande(id, dto.commentaire(), admin);
         return "Demande rejetée avec succès";
     }
-
     // DTO interne pour le rejet
-    public record RejetDemandeDTO(String commentaire, Utilisateur admin) {}
+    public record RejetDemandeDTO(String commentaire) {}
+
+
 }

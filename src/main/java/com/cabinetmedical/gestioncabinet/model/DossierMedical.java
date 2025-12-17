@@ -45,9 +45,11 @@ class DossierMedical {
     private Patient patient;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL)
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE
     private List<DocumentMedical> documents;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL)
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE
     private List<Consultation> consultations;
 
     @PrePersist

@@ -145,7 +145,8 @@ export default function MedicalRequests() {
     
     try {
       // Mettez à jour cette ligne selon votre service
-      await DemandeService.approuver(selectedAppForAction.id, { nom: "Admin" });
+      await DemandeService.approuver(selectedAppForAction.id);
+
       
       // Mettre à jour localement l'état de la demande
       setApplications(prev => prev.map(app => 
@@ -183,7 +184,8 @@ export default function MedicalRequests() {
     }
     
     try {
-      await DemandeService.rejeter(selectedAppForAction.id, rejectComment, { nom: "Admin" });
+      await DemandeService.rejeter(selectedAppForAction.id, rejectComment);
+
       
       // Mettre à jour localement l'état de la demande
       setApplications(prev => prev.map(app => 

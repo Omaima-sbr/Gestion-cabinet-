@@ -11,9 +11,11 @@ public interface CabinetRepository extends JpaRepository<Cabinet, Integer> {
     Optional<Cabinet> findByEmail(String email);
 
     List<Cabinet> findByActif(Boolean actif);
+    Optional<Cabinet> findByNomAndActifTrue(String nom);
+
 
     // Recherche par nom exact
-    List<Cabinet> findByNom(String nom);
+    Optional<Cabinet> findByNom(String nom);
 
     // Recherche par nom partiel (ignore la casse)
     List<Cabinet> findByNomContainingIgnoreCase(String nom);

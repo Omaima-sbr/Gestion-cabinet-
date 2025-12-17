@@ -63,7 +63,11 @@ public class CabinetService {
         medecin.setNumTel(demande.getTelMedecin());
         medecin.setRole(Utilisateur.Role.MEDECIN);
         medecin.setSignature(demande.getSignatureMedecin());
-        utilisateurService.creerUtilisateur(medecin);
+        utilisateurService.creerUtilisateur(
+                medecin,
+                savedCabinet.getNom() // ou demande.getNomCabinet()
+        );
+
 
         // 3️⃣ Créer l’utilisateur secrétaire si infos présentes
         if (demande.getNomSecretaire() != null && !demande.getNomSecretaire().isEmpty()) {
@@ -74,7 +78,11 @@ public class CabinetService {
             secretaire.setEmail(demande.getEmailSecretaire());
             secretaire.setNumTel(demande.getTelSecretaire());
             secretaire.setRole(Utilisateur.Role.SECRETAIRE);
-            utilisateurService.creerUtilisateur(secretaire);
+            utilisateurService.creerUtilisateur(
+                    secretaire,
+                    savedCabinet.getNom()
+            );
+
         }
 
         // 4️⃣ Créer la facture initiale pour le cabinet

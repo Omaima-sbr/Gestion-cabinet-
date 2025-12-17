@@ -66,12 +66,15 @@ public class Patient {
     private DossierMedical dossierMedical;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<RendezVous> rendezVous;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Consultation> consultations;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Facture> factures;
 
     public enum Sexe {

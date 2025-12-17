@@ -63,18 +63,23 @@ public class Utilisateur {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<RendezVous> rendezVous;
 
     @OneToMany(mappedBy = "medecin", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Consultation> consultations;
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "expediteur", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Messagerie> messagesEnvoyes;
 
     @OneToMany(mappedBy = "destinataire", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Messagerie> messagesRecus;
 
     public enum Role {
@@ -88,7 +93,7 @@ public class Utilisateur {
             actif = true;
         }
         if (statut == null) {
-            statut = "ACTIF";
+            statut = "INACTIF";
         }
     }
 }
