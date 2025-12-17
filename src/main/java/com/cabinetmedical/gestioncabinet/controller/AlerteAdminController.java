@@ -4,6 +4,7 @@ package com.cabinetmedical.gestioncabinet.controller;
 import com.cabinetmedical.gestioncabinet.service.InscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import  com.cabinetmedical.gestioncabinet.repository.AlerteAdminRepository;
 import  com.cabinetmedical.gestioncabinet.model.AlerteAdmin;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/alertes")
 @RequiredArgsConstructor
+@PreAuthorize("hasAuthority('ROLE_ADMINISTRATEUR')")
 public class AlerteAdminController {
 
     private final AlerteAdminRepository alerteRepository;

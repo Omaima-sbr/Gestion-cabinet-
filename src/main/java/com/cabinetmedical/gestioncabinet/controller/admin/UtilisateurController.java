@@ -1,15 +1,17 @@
 package com.cabinetmedical.gestioncabinet.controller.admin;
 
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
+import com.cabinetmedical.gestioncabinet.dto.admin.UtilisateurDTO;
 import com.cabinetmedical.gestioncabinet.service.admin.UtilisateurService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
-public class UtilisateurController {
+@PreAuthorize("hasAuthority('ROLE_ADMINISTRATEUR')")public class UtilisateurController {
 
     private final UtilisateurService utilisateurService;
 
@@ -19,18 +21,32 @@ public class UtilisateurController {
 
     // ✅ Créer un nouvel utilisateur
     @PostMapping
-    public ResponseEntity<Utilisateur> creerUtilisateur(@RequestBody Utilisateur utilisateur) {
-        Utilisateur saved = utilisateurService.creerUtilisateur(utilisateur);
+    public ResponseEntity<Utilisateur> creerUtilisateur(@RequestBody UtilisateurDTO dto) {
+
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setLogin(dto.getLogin());
+        utilisateur.setNom(dto.getNom());
+        utilisateur.setPrenom(dto.getPrenom());
+        utilisateur.setNumTel(dto.getNumTel());
+        utilisateur.setRole(dto.getRole());
+
+        Utilisateur saved = utilisateurService.creerUtilisateur(
+                utilisateur,
+                dto.getNomCabinet() // 👈 nom du cabinet (unique)
+        );
+
         return ResponseEntity.ok(saved);
     }
 
 
     // ✅ Récupérer tous les utilisateurs
     @GetMapping
-    public ResponseEntity<List<Utilisateur>> getAllUtilisateurs() {
-        List<Utilisateur> utilisateurs = utilisateurService.getAllUtilisateursActifs();
-        return ResponseEntity.ok(utilisateurs);
+    public ResponseEntity<List<UtilisateurDTO>> getAllUtilisateurs() {
+        return ResponseEntity.ok(
+                utilisateurService.getAllUtilisateursActifsDTO()
+        );
     }
+
 
     // ✅ Récupérer un utilisateur par ID
     @GetMapping("/{id}")

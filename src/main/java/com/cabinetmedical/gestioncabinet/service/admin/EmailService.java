@@ -23,7 +23,7 @@ public class EmailService {
         String text = new StringBuilder()
                 .append("Bonjour,\n\n")
                 .append("Un compte a été créé pour vous sur l'application du cabinet.\n")
-                .append("Voici votre mot de passe temporaire : ").append(tempPwd).append("\n\n")
+                .append("Voici votre mot de passe temporaire qui va etre fonctionnable apres votre paiement  : ").append(tempPwd).append("\n\n")
                 .append("Pour votre sécurité, changez ce mot de passe dès votre première connexion.\n\n")
                 .append("Cordialement,\nL'équipe du cabinet")
                 .toString();

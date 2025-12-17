@@ -1,6 +1,7 @@
 package com.cabinetmedical.gestioncabinet.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -54,6 +55,7 @@ public class Facture {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_patient", nullable = false,
             foreignKey = @ForeignKey(name = "FK_Facture_Patient"))
+    @JsonIgnore // Ajoutez cette annotation
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)

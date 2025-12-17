@@ -241,7 +241,7 @@ export default function MedecinManagement() {
                 placeholder="🔍 Rechercher un médicament par nom, forme, dosage, laboratoire ou DCI..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-8 py-5 bg-white/90 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg placeholder:text-gray-400 shadow-lg"
+                className="w-full px-8 py-5 bg-white/90 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg placeholder:text-gray-400 shadow-lg text-gray-800"
               />
               {searchTerm && (
                 <button
@@ -553,37 +553,37 @@ export default function MedecinManagement() {
             onClick={handleCloseModal}
           ></div>
 
-          <div className="relative w-full max-w-2xl z-10 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl overflow-hidden border border-gray-200/50 transform transition-all duration-500 scale-100">
+          <div className="relative w-full max-w-md z-10 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-2xl overflow-hidden border border-gray-200/50 transform transition-all duration-500 scale-100">
             {/* Header du modal */}
-            <div className="px-10 py-8 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200/50">
+            <div className="px-6 py-6 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200/50">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shadow-sm">
                     <span className="text-2xl">💊</span>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 className="text-xl font-bold text-gray-900">
                       {editingId ? "Modifier le Médicament" : "Nouveau Médicament"}
                     </h2>
-                    <p className="text-gray-600 mt-2">
+                    <p className="text-gray-600 mt-1 text-sm">
                       {editingId ? "Mettez à jour les informations" : "Remplissez les informations du médicament"}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={handleCloseModal}
-                  className="p-3 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-300 transform hover:rotate-90"
+                  className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-300 transform hover:rotate-90"
                 >
-                  <MdClose size={26} />
+                  <MdClose size={22} />
                 </button>
               </div>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="p-10 max-h-[70vh] overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <form onSubmit={handleSubmit} className="p-6 max-h-[70vh] overflow-y-auto">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Nom du Médicament <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -591,14 +591,14 @@ export default function MedecinManagement() {
                     name="nom"
                     value={formData.nom}
                     onChange={handleInputChange}
-                    className="w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg"
+                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-gray-800"
                     placeholder="Ex: Aspirine"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Forme <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -606,14 +606,14 @@ export default function MedecinManagement() {
                     name="forme"
                     value={formData.forme}
                     onChange={handleInputChange}
-                    className="w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg"
+                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-gray-800"
                     placeholder="Ex: Comprimé"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Dosage <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -621,14 +621,14 @@ export default function MedecinManagement() {
                     name="dosage"
                     value={formData.dosage}
                     onChange={handleInputChange}
-                    className="w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg"
+                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-gray-800"
                     placeholder="Ex: 500mg"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Laboratoire <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -636,14 +636,14 @@ export default function MedecinManagement() {
                     name="laboratoire"
                     value={formData.laboratoire}
                     onChange={handleInputChange}
-                    className="w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg"
+                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-gray-800"
                     placeholder="Ex: Bayer"
                     required
                   />
                 </div>
 
-                <div className="md:col-span-2 space-y-2">
-                  <label className="block text-base font-semibold text-gray-900 mb-3">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
                     DCI (Dénomination Commune Internationale) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -651,7 +651,7 @@ export default function MedecinManagement() {
                     name="dci"
                     value={formData.dci}
                     onChange={handleInputChange}
-                    className="w-full px-6 py-4 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-lg"
+                    className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-300 text-gray-800"
                     placeholder="Ex: Acide acétylsalicylique"
                     required
                   />
@@ -659,22 +659,22 @@ export default function MedecinManagement() {
               </div>
 
               {/* Footer du modal */}
-              <div className="flex gap-6 pt-12 mt-8 border-t border-gray-200/50">
+              <div className="flex gap-4 pt-6 mt-6 border-t border-gray-200/50">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 border-2 border-gray-300 text-gray-700 py-4 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 text-lg"
+                  className="flex-1 border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-50 transition-all duration-300"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-lg flex items-center justify-center gap-3 group"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 group"
                 >
-                  <div className="p-1.5 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
-                    <MdCheck size={22} />
+                  <div className="p-1 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
+                    <MdCheck size={18} />
                   </div>
-                  <span>{editingId ? "Mettre à jour" : "Créer le médicament"}</span>
+                  <span>{editingId ? "Mettre à jour" : "Créer"}</span>
                 </button>
               </div>
             </form>

@@ -10,13 +10,14 @@ public class UtilisateurDTO {
     private String prenom;            // ✅ Prénom de l'utilisateur
     private String numTel;            // ✅ Numéro de téléphone
     private Utilisateur.Role role;    // ✅ Rôle de l'utilisateur (MEDECIN, SECRETAIRE, ADMINISTRATEUR)
-    private Boolean actif;            // ✅ Indique si l'utilisateur peut se connecter ou non
-
+    private Boolean actif;// ✅ Indique si l'utilisateur peut se connecter ou non
+    private String  statut;
+    private String nomCabinet;
     // Constructeur vide requis par Spring pour la sérialisation/désérialisation JSON
     public UtilisateurDTO() {}
 
     // Constructeur avec tous les champs pour faciliter la création de DTO
-    public UtilisateurDTO(Integer id, String login, String nom, String prenom, String numTel, Utilisateur.Role role, Boolean actif) {
+    public UtilisateurDTO(Integer id, String login, String nom, String prenom, String numTel, Utilisateur.Role role, Boolean actif , String statut , String nomCabinet) {
         this.id = id;
         this.login = login;
         this.nom = nom;
@@ -24,6 +25,8 @@ public class UtilisateurDTO {
         this.numTel = numTel;
         this.role = role;
         this.actif = actif;
+        this.statut = statut;
+        this.nomCabinet = nomCabinet;
     }
 
     // Getters et Setters pour tous les champs
@@ -83,4 +86,20 @@ public class UtilisateurDTO {
     public void setActif(Boolean actif) {
         this.actif = actif;
     }
+
+    public String getStatut() {
+        return statut;
+    }
+
+    public void setStatut(String statut) {
+        this.statut = statut;
+    }
+
+    public String getNomCabinet() {
+        return nomCabinet;
+    }
+    public void setNomCabinet(String nomCabinet) {
+        this.nomCabinet = nomCabinet;
+    }
+
 }

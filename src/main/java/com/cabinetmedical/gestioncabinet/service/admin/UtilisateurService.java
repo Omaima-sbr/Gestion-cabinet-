@@ -2,8 +2,12 @@ package com.cabinetmedical.gestioncabinet.service.admin;
 
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.admin.UtilisateurRepository;
+import com.cabinetmedical.gestioncabinet.dto.admin.UtilisateurDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.cabinetmedical.gestioncabinet.model.Cabinet;
+import com.cabinetmedical.gestioncabinet.repository.admin.CabinetRepository;
+
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +18,14 @@ public class UtilisateurService {
     private final UtilisateurRepository utilisateurRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService; // Service pour envoyer les emails
+    private final CabinetRepository cabinetRepository;
 
     public UtilisateurService(UtilisateurRepository utilisateurRepository,
+                              CabinetRepository cabinetRepository,
                               PasswordEncoder passwordEncoder,
                               EmailService emailService) {
         this.utilisateurRepository = utilisateurRepository;
+        this.cabinetRepository = cabinetRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
     }
@@ -36,11 +43,23 @@ public class UtilisateurService {
     }
 
     // Crée un utilisateur, génère mot de passe temporaire, l'encode, sauvegarde et envoie par email
-    public Utilisateur creerUtilisateur(Utilisateur utilisateur) {
-        // Vérifier si le login/email existe déjà
+    public Utilisateur creerUtilisateur(Utilisateur utilisateur, String nomCabinet) {
+
         if (utilisateurRepository.existsByLogin(utilisateur.getLogin())) {
             throw new RuntimeException("Un utilisateur avec ce login existe déjà.");
         }
+
+        // 🔍 Trouver le cabinet par NOM
+        Cabinet cabinet = cabinetRepository
+                .findByNomAndActifTrue(nomCabinet)
+                .orElseThrow(() ->
+                        new RuntimeException("Cabinet introuvable ou inactif : " + nomCabinet)
+                );
+
+        utilisateur.setCabinet(cabinet);
+
+        // 🔗 Associer l'utilisateur au cabinet
+        utilisateur.setCabinet(cabinet);
 
         // Générer un mot de passe temporaire (ici 8 caractères)
         String tempPwd = generateTempPassword(8);
@@ -51,7 +70,7 @@ public class UtilisateurService {
         // Soft delete actif par défaut
         utilisateur.setActif(true);
         // Statut par défaut
-        utilisateur.setStatut("ACTIF");
+        utilisateur.setStatut("INACTIF");
 
         // Sauvegarder l'utilisateur
         Utilisateur saved = utilisateurRepository.save(utilisateur);
@@ -70,6 +89,25 @@ public class UtilisateurService {
     public List<Utilisateur> getAllUtilisateursActifs() {
         return utilisateurRepository.findByActifTrue();
     }
+
+
+    public List<UtilisateurDTO> getAllUtilisateursActifsDTO() {
+        return utilisateurRepository.findByActifTrue()
+                .stream()
+                .map(u -> new UtilisateurDTO(
+                        u.getId(),
+                        u.getLogin(),
+                        u.getNom(),
+                        u.getPrenom(),
+                        u.getNumTel(),
+                        u.getRole(),
+                        u.getActif(),
+                        u.getStatut(),
+                        u.getCabinet() != null ? u.getCabinet().getNom() : null
+                ))
+                .toList();
+    }
+
 
     // Récupérer un utilisateur par ID
     public Optional<Utilisateur> getUtilisateurById(Integer id) {
