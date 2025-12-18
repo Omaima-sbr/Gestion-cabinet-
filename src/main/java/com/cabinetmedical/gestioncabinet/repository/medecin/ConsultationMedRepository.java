@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ConsultationRepository extends JpaRepository<Consultation, Integer> {
+public interface ConsultationMedRepository extends JpaRepository<Consultation, Integer> {
 
     @Query("""
         SELECT c

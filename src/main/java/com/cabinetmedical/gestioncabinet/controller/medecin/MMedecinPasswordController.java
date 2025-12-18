@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/medecin/parametres")
 @RequiredArgsConstructor
-@PreAuthorize("hasAuthority('MEDECIN')")
+@PreAuthorize("hasAuthority('ROLE_MEDECIN')")
 public class MMedecinPasswordController {
 
     private final MMedecinPasswordService passwordService;

@@ -19,8 +19,8 @@ public class OrdonnanceService {
 
     private final OrdonnanceRepository ordonnanceRepository;
     private final OrdonnanceExamenRepository ordonnanceExamenRepository;
-    private final ConsultationRepository consultationRepository;
-    private final RendezVousRepository rendezVousRepository;
+    private final ConsultationMedRepository consultationMedRepository;
+    private final RendezVousMedRepository rendezVousMedRepository;
 
     /**
      * Récupère les ordonnances d'une consultation
@@ -31,7 +31,7 @@ public class OrdonnanceService {
             log.info("📋 Récupération ordonnances - Consultation: {}, Médecin: {}", consultationId, medecinId);
 
             // Vérifier que la consultation appartient au médecin
-            Consultation consultation = consultationRepository.findByIdAndMedecin(consultationId, medecinId)
+            Consultation consultation = consultationMedRepository.findByIdAndMedecin(consultationId, medecinId)
                     .orElseThrow(() -> new RuntimeException("Consultation non trouvée ou accès non autorisé"));
 
             List<Ordonnance> ordonnances = ordonnanceRepository.findByConsultationId(consultationId);
@@ -56,7 +56,7 @@ public class OrdonnanceService {
         try {
             log.info("🔍 Recherche consultation EN_COURS pour médecin {}", medecinId);
 
-            List<RendezVous> rdvEnCours = rendezVousRepository.findByMedecinIdAndStatut(
+            List<RendezVous> rdvEnCours = rendezVousMedRepository.findByMedecinIdAndStatut(
                     medecinId,
                     RendezVous.Statut.EN_COURS
             );
@@ -69,7 +69,7 @@ public class OrdonnanceService {
             RendezVous rendezVous = rdvEnCours.get(0);
 
             // Récupérer la consultation si elle existe
-            Consultation consultation = consultationRepository.findByRendezVousId(rendezVous.getIdRendezVous())
+            Consultation consultation = consultationMedRepository.findByRendezVousId(rendezVous.getIdRendezVous())
                     .orElse(null);
 
             if (consultation == null) {
@@ -101,7 +101,7 @@ public class OrdonnanceService {
                 throw new RuntimeException("Aucune consultation en cours. Veuillez créer une consultation d'abord.");
             }
 
-            Consultation consultation = consultationRepository.findByIdAndMedecin(
+            Consultation consultation = consultationMedRepository.findByIdAndMedecin(
                             consultationDTO.getIdConsultation(), medecinId)
                     .orElseThrow(() -> new RuntimeException("Consultation non trouvée"));
 
@@ -136,7 +136,7 @@ public class OrdonnanceService {
                 throw new RuntimeException("Aucune consultation en cours. Veuillez créer une consultation d'abord.");
             }
 
-            Consultation consultation = consultationRepository.findByIdAndMedecin(
+            Consultation consultation = consultationMedRepository.findByIdAndMedecin(
                             consultationDTO.getIdConsultation(), medecinId)
                     .orElseThrow(() -> new RuntimeException("Consultation non trouvée"));
 

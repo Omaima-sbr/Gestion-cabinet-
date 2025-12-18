@@ -4,7 +4,7 @@ import com.cabinetmedical.gestioncabinet.dto.medecin.PatientDTO;
 import com.cabinetmedical.gestioncabinet.model.Patient;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.service.medecin.PatientmedService;
-import com.cabinetmedical.gestioncabinet.service.medecin.UtilisateurService;
+import com.cabinetmedical.gestioncabinet.service.medecin.UtilisateurMedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 public class PatientmedController {
 
     private final PatientmedService patientmedService;
-    private final UtilisateurService utilisateurService;
+    private final UtilisateurMedService utilisateurMedService;
 
     @GetMapping("/medsearch")
-    @PreAuthorize("hasAuthority('MEDECIN')")
+    @PreAuthorize("hasAuthority('ROLE_MEDECIN')")
     public ResponseEntity<List<PatientDTO>> searchPatients(
             @RequestParam String q,
             Authentication authentication) {
 
         String username = authentication.getName();
-        Utilisateur user = utilisateurService.findByLogin(username);
+        Utilisateur user = utilisateurMedService.findByLogin(username);
 
         // Rechercher dans le cabinet de l'utilisateur
         List<Patient> patients = patientmedService.searchPatientsByCabinet(q, user.getCabinet().getId());
@@ -60,10 +60,10 @@ public class PatientmedController {
     // AJOUTER cette méthode DANS la classe
     @GetMapping("/all")  // ← CHANGEMENT ICI
 
-    @PreAuthorize("hasAuthority('MEDECIN')")
+    @PreAuthorize("hasAuthority('ROLE_MEDECIN')")
     public ResponseEntity<List<PatientDTO>> getAllPatients(Authentication authentication) {
         String username = authentication.getName();
-        Utilisateur user = utilisateurService.findByLogin(username);
+        Utilisateur user = utilisateurMedService.findByLogin(username);
 
         // Récupérer tous les patients du cabinet
         List<Patient> patients = patientmedService.getAllPatientsByCabinet(user.getCabinet().getId());

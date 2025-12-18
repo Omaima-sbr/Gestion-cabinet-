@@ -5,10 +5,9 @@ import com.cabinetmedical.gestioncabinet.dto.medecin.DossierMedicalRequestDTO;
 import com.cabinetmedical.gestioncabinet.model.DossierMedical;
 import com.cabinetmedical.gestioncabinet.model.Patient;
 import com.cabinetmedical.gestioncabinet.model.RendezVous;
-import com.cabinetmedical.gestioncabinet.repository.medecin.DossierMedicalRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.RendezVousRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.DossierMedicalMedRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.RendezVousMedRepository;
 import com.cabinetmedical.gestioncabinet.repository.PatientRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.PatientmedRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +22,8 @@ import java.util.List;
 @Slf4j
 public class DossierMedicalService {
 
-    private final DossierMedicalRepository dossierMedicalRepository;
-    private final RendezVousRepository rendezVousRepository;
+    private final DossierMedicalMedRepository dossierMedicalMedRepository;
+    private final RendezVousMedRepository rendezVousMedRepository;
     private final PatientRepository patientRepository;
 
     /**
@@ -36,7 +35,7 @@ public class DossierMedicalService {
             log.info("📋 Récupération dossier médical - Médecin: {}", medecinId);
 
             // 1. Trouver le rendez-vous EN_COURS
-            List<RendezVous> rdvEnCours = rendezVousRepository.findByMedecinIdAndStatut(
+            List<RendezVous> rdvEnCours = rendezVousMedRepository.findByMedecinIdAndStatut(
                     medecinId,
                     RendezVous.Statut.EN_COURS
             );
@@ -81,7 +80,7 @@ public class DossierMedicalService {
             log.info("Request DTO: {}", requestDTO);
 
             // 1. Trouver le rendez-vous EN_COURS
-            List<RendezVous> rdvEnCours = rendezVousRepository.findByMedecinIdAndStatut(
+            List<RendezVous> rdvEnCours = rendezVousMedRepository.findByMedecinIdAndStatut(
                     medecinId,
                     RendezVous.Statut.EN_COURS
             );
@@ -114,7 +113,7 @@ public class DossierMedicalService {
             dossier.setHabitudes(requestDTO.getHabitudes());
 
             // 4. Sauvegarder
-            DossierMedical savedDossier = dossierMedicalRepository.save(dossier);
+            DossierMedical savedDossier = dossierMedicalMedRepository.save(dossier);
             log.info("✅ Dossier médical créé (ID: {})", savedDossier.getIdDossier());
 
             return toDTO(savedDossier);
@@ -134,7 +133,7 @@ public class DossierMedicalService {
             log.info("📝 Mise à jour dossier médical par médecin {}", medecinId);
 
             // 1. Trouver le rendez-vous EN_COURS
-            List<RendezVous> rdvEnCours = rendezVousRepository.findByMedecinIdAndStatut(
+            List<RendezVous> rdvEnCours = rendezVousMedRepository.findByMedecinIdAndStatut(
                     medecinId,
                     RendezVous.Statut.EN_COURS
             );
@@ -158,7 +157,7 @@ public class DossierMedicalService {
             dossier.setTraitement(requestDTO.getTraitement());
             dossier.setHabitudes(requestDTO.getHabitudes());
 
-            DossierMedical updatedDossier = dossierMedicalRepository.save(dossier);
+            DossierMedical updatedDossier = dossierMedicalMedRepository.save(dossier);
             log.info("✅ Dossier médical mis à jour (ID: {})", updatedDossier.getIdDossier());
 
             return toDTO(updatedDossier);

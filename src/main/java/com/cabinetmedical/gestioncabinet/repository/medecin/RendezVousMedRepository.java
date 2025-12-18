@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RendezVousRepository extends JpaRepository<RendezVous, Integer> {
+public interface RendezVousMedRepository extends JpaRepository<RendezVous, Integer> {
 
     // ========================================
     // MÉTHODES OPTIMISÉES AVEC JOIN FETCH
