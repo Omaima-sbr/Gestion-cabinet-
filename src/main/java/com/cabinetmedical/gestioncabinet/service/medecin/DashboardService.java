@@ -3,16 +3,15 @@ package com.cabinetmedical.gestioncabinet.service.medecin;
 import com.cabinetmedical.gestioncabinet.dto.medecin.*;
 import com.cabinetmedical.gestioncabinet.model.*;
 import com.cabinetmedical.gestioncabinet.repository.medecin.DashboardRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.NotificationRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.PatientEnCoursRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.NotificationMedRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.PatientEnCoursMedRepository;
 import com.cabinetmedical.gestioncabinet.service.mapper.DashboardMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.format.TextStyle;
-import java.util.Locale;
- import java.util.HashMap;
+
+import java.util.HashMap;
  import java.util.Map;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,8 +24,8 @@ import java.util.*;
 public class DashboardService {
 
     private final DashboardRepository dashboardRepository;
-    private final NotificationRepository notificationRepository;
-    private final PatientEnCoursRepository patientEnCoursRepository;
+    private final NotificationMedRepository notificationMedRepository;
+    private final PatientEnCoursMedRepository patientEnCoursMedRepository;
     private final DashboardMapper dashboardMapper;
 
     @Transactional(readOnly = true)
@@ -357,12 +356,12 @@ public class DashboardService {
     @Transactional
     public void markNotificationAsRead(Integer notificationId, Integer medecinId) {
         try {
-            Optional<Notification> notificationOpt = notificationRepository.findById(notificationId);
+            Optional<Notification> notificationOpt = notificationMedRepository.findById(notificationId);
             if (notificationOpt.isPresent()) {
                 Notification notification = notificationOpt.get();
                 if (notification.getUtilisateur().getId().equals(medecinId)) {
                     notification.setLu(true);
-                    notificationRepository.save(notification);
+                    notificationMedRepository.save(notification);
                 }
             }
         } catch (Exception e) {
@@ -377,7 +376,7 @@ public class DashboardService {
             for (Notification notification : notifications) {
                 notification.setLu(true);
             }
-            notificationRepository.saveAll(notifications);
+            notificationMedRepository.saveAll(notifications);
         } catch (Exception e) {
             log.error("Erreur dans markAllNotificationsAsRead: ", e);
         }

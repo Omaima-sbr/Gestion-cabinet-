@@ -8,12 +8,12 @@ const dashboardService = {
     getDashboardData: async () => {
         try {
             console.log('🔄 [Dashboard] Appel API: GET /medecin/dashboard');
-            
+
             // DEBUG: Vérifier le token avant l'appel
             const token = localStorage.getItem('token');
             console.log('🔑 [Dashboard] Token disponible:', token ? 'OUI' : 'NON');
             console.log('📤 [Dashboard] Headers actuels:', api.defaults.headers);
-            
+
             const response = await api.get('/medecin/dashboard');
             console.log('✅ [Dashboard] Données reçues:', response.data);
             return response.data;
@@ -26,19 +26,44 @@ const dashboardService = {
                 url: error.config?.url,
                 headers: error.config?.headers
             });
-            
+
+            // 🔥 AJOUT: Afficher les détails complets de l'erreur backend
+            if (error.response?.data) {
+                console.error('🔥 [Dashboard] Erreur Backend Détaillée:');
+                console.error('   → Message:', error.response.data.message);
+                console.error('   → Error:', error.response.data.error);
+                console.error('   → Path:', error.response.data.path);
+                console.error('   → Timestamp:', error.response.data.timestamp);
+                console.error('   → Trace:', error.response.data.trace);
+
+                // Afficher dans une alerte pour debug (à retirer ensuite)
+                alert(`Erreur Backend:\n${error.response.data.message || error.response.data.error || 'Erreur inconnue'}`);
+            }
+
             // Si c'est une erreur 403, vérifier l'authentification
             if (error.response?.status === 403) {
                 console.error('🚫 Accès interdit - Vérifiez:');
                 console.error('1. Le token est-il valide?');
                 console.error('2. L\'utilisateur a-t-il le rôle MEDECIN?');
                 console.error('3. Le backend autorise-t-il cette route?');
-                
+
                 // Vérifier l'état de l'authentification
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
                 console.error('👤 Utilisateur actuel:', user);
             }
-            
+
+            // Si c'est une erreur 500
+            if (error.response?.status === 500) {
+                console.error('🔥 Erreur serveur 500 - Problème côté backend:');
+                console.error('1. Vérifiez les logs Spring Boot');
+                console.error('2. Problème possible: NullPointerException, erreur SQL, etc.');
+                console.error('3. Vérifiez que le médecin existe dans la BD');
+
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                console.error('👤 User ID:', user.userId);
+                console.error('👤 Role:', user.role);
+            }
+
             throw error;
         }
     },
@@ -94,27 +119,24 @@ const dashboardService = {
     },
 
     /**
- * Termine le patient en cours
- */
-completeCurrentPatient: async () => {
-    try {
-        console.log('🔄 [Dashboard] Terminaison du patient en cours');
-        const response = await api.put('/medecin/dashboard/current-patient/complete');
-        
-        console.log('🔄 [Dashboard] Terminaison du patient en cours');
-        console.log('📤 [Dashboard] Envoi requête PUT /medecin/dashboard/current-patient/complete');
-        
-        console.log('✅ [Dashboard] Patient en cours terminé avec succès');
-        return response.data;
-    } catch (error) {
-        console.error('❌ [Dashboard] Erreur completeCurrentPatient:', {
-            error: error.message,
-            status: error.response?.status,
-            data: error.response?.data
-        });
-        throw error;
-    }
-},
+     * Termine le patient en cours
+     */
+    completeCurrentPatient: async () => {
+        try {
+            console.log('🔄 [Dashboard] Terminaison du patient en cours');
+            const response = await api.put('/medecin/dashboard/current-patient/complete');
+
+            console.log('✅ [Dashboard] Patient en cours terminé avec succès');
+            return response.data;
+        } catch (error) {
+            console.error('❌ [Dashboard] Erreur completeCurrentPatient:', {
+                error: error.message,
+                status: error.response?.status,
+                data: error.response?.data
+            });
+            throw error;
+        }
+    },
 
     /**
      * Démarre une consultation (change le statut à EN_COURS)
@@ -131,26 +153,27 @@ completeCurrentPatient: async () => {
     },
 
     /**
-     * NOUVEAU: Vérifier l'authentification avant les appels
+     * Vérifier l'authentification avant les appels
      */
     checkAuth: () => {
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
+
         console.log('🔍 [Dashboard] Vérification auth:', {
             hasToken: !!token,
             userRole: user.role,
-            expectedRole: 'MEDECIN'
+            userId: user.userId,
+            expectedRole: 'ROLE_MEDECIN'
         });
-        
+
         if (!token) {
             throw new Error('Non authentifié - Token manquant');
         }
-        
-        if (user.role !== 'MEDECIN') {
+
+        if (user.role !== 'ROLE_MEDECIN') {
             throw new Error(`Rôle incorrect: ${user.role} (attendu: MEDECIN)`);
         }
-        
+
         return true;
     }
 };

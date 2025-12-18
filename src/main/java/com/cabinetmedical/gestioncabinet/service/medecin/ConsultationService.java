@@ -3,9 +3,9 @@ package com.cabinetmedical.gestioncabinet.service.medecin;
 import com.cabinetmedical.gestioncabinet.dto.medecin.ConsultationDTO;
 import com.cabinetmedical.gestioncabinet.dto.medecin.ConsultationRequestDTO;
 import com.cabinetmedical.gestioncabinet.model.*;
-import com.cabinetmedical.gestioncabinet.repository.medecin.ConsultationRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.RendezVousRepository;
-import com.cabinetmedical.gestioncabinet.repository.medecin.DossierMedicalRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.ConsultationMedRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.RendezVousMedRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.DossierMedicalMedRepository;
 import com.cabinetmedical.gestioncabinet.repository.medecin.UtilisateurmedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ConsultationService {
 
-    private final ConsultationRepository consultationRepository;
-    private final RendezVousRepository rendezVousRepository;
-    private final DossierMedicalRepository dossierMedicalRepository;
+    private final ConsultationMedRepository consultationMedRepository;
+    private final RendezVousMedRepository rendezVousMedRepository;
+    private final DossierMedicalMedRepository dossierMedicalMedRepository;
     private final UtilisateurmedRepository utilisateurRepository;
 
     @Transactional(readOnly = true)
@@ -33,7 +33,7 @@ public class ConsultationService {
         try {
             log.info("📋 Récupération historique - Patient: {}, Médecin: {}", patientId, medecinId);
 
-            List<Consultation> consultations = consultationRepository.findByPatientAndMedecin(
+            List<Consultation> consultations = consultationMedRepository.findByPatientAndMedecin(
                     patientId,
                     medecinId
             );
@@ -59,7 +59,7 @@ public class ConsultationService {
             log.info("🔍 Recherche RDV EN_COURS pour médecin {}", medecinId);
 
             // 1. Trouver le rendez-vous EN_COURS pour ce médecin
-            List<RendezVous> rdvEnCours = rendezVousRepository.findByMedecinIdAndStatut(
+            List<RendezVous> rdvEnCours = rendezVousMedRepository.findByMedecinIdAndStatut(
                     medecinId,
                     RendezVous.Statut.EN_COURS
             );
@@ -83,7 +83,7 @@ public class ConsultationService {
                     patient.getNom(), patient.getPrenom(), patient.getId());
 
             // 2. Vérifier si une consultation existe déjà pour ce rendez-vous
-            Optional<Consultation> existingConsultation = consultationRepository
+            Optional<Consultation> existingConsultation = consultationMedRepository
                     .findByRendezVousId(rendezVous.getIdRendezVous());
 
             if (existingConsultation.isPresent()) {
@@ -98,7 +98,7 @@ public class ConsultationService {
                 dossier = new DossierMedical();
                 dossier.setPatient(patient);
                 dossier.setDateCreation(LocalDate.now());
-                dossier = dossierMedicalRepository.save(dossier);
+                dossier = dossierMedicalMedRepository.save(dossier);
             }
 
             // 4. Récupérer le médecin
@@ -122,7 +122,7 @@ public class ConsultationService {
             consultation.setRendezVous(rendezVous);
 
             // 6. Sauvegarder
-            Consultation savedConsultation = consultationRepository.save(consultation);
+            Consultation savedConsultation = consultationMedRepository.save(consultation);
             log.info("✅ Consultation créée (ID: {})", savedConsultation.getIdConsultation());
 
             return toDTO(savedConsultation);
@@ -141,7 +141,7 @@ public class ConsultationService {
         try {
             log.info("📝 Mise à jour consultation {} par médecin {}", consultationId, medecinId);
 
-            Consultation consultation = consultationRepository.findByIdAndMedecin(consultationId, medecinId)
+            Consultation consultation = consultationMedRepository.findByIdAndMedecin(consultationId, medecinId)
                     .orElseThrow(() -> new RuntimeException("Consultation non trouvée"));
 
             consultation.setType(requestDTO.getType());
@@ -155,7 +155,7 @@ public class ConsultationService {
                 consultation.setDateConsultation(requestDTO.getDateConsultation());
             }
 
-            Consultation updatedConsultation = consultationRepository.save(consultation);
+            Consultation updatedConsultation = consultationMedRepository.save(consultation);
             log.info("✅ Consultation mise à jour");
 
             return toDTO(updatedConsultation);
@@ -168,7 +168,7 @@ public class ConsultationService {
 
     @Transactional(readOnly = true)
     public ConsultationDTO getConsultationById(Integer consultationId, Integer medecinId) {
-        Consultation consultation = consultationRepository.findByIdAndMedecin(consultationId, medecinId)
+        Consultation consultation = consultationMedRepository.findByIdAndMedecin(consultationId, medecinId)
                 .orElseThrow(() -> new RuntimeException("Consultation non trouvée"));
         return toDTO(consultation);
     }

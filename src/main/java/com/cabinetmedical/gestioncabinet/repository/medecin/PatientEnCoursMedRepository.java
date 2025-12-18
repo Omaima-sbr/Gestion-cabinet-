@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PatientEnCoursRepository extends JpaRepository<PatientEnCours, Integer> {
+public interface PatientEnCoursMedRepository extends JpaRepository<PatientEnCours, Integer> {
 
     // Chercher un patient en cours pour un médecin donné
     @Query("SELECT p FROM PatientEnCours p WHERE p.patient.id = :patientId AND p.medecin.id = :medecinId AND p.actif = true")

@@ -22,6 +22,8 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
     // Recherche par CIN
     Optional<Patient> findByCinAndCabinet(String cin, Cabinet cabinet);
     Optional<Patient> findByCin(String cin);
+    Optional<Patient> findById(Integer Id);
+
     boolean existsByCin(String cin);
 
     // Recherche par nom

@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.time.LocalDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -82,10 +85,35 @@ public class Consultation {
     @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Facture facture;
 
+    public String getMotif() {
+        if (this.type == Type.CONSULTATION) {
+            return "Consultation médicale";
+        } else if (this.type == Type.CONTROLE) {
+            return "Contrôle de suivi";
+        }
+        return "Motif inconnu";
+    }
+
+
     public enum Type {
         CONSULTATION, CONTROLE
     }
+    public BigDecimal getMontant() {
+        // Si une facture est associée, retourne son montant
+        if (facture != null) {
+            return facture.getMontant();
+        }
 
+        // Sinon, retourne un montant par défaut selon le type de consultation
+        switch (type) {
+            case CONSULTATION:
+                return BigDecimal.valueOf(200); // exemple pour une consultation
+            case CONTROLE:
+                return BigDecimal.valueOf(100); // exemple pour un contrôle
+            default:
+                return BigDecimal.ZERO;
+        }
+    }
     @PrePersist
     protected void onCreate() {
         dateCreation = LocalDateTime.now();

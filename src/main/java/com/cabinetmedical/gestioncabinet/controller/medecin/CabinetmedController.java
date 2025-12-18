@@ -7,7 +7,7 @@ import com.cabinetmedical.gestioncabinet.model.Cabinet;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.medecin.CabinetmedRepository;
 import com.cabinetmedical.gestioncabinet.service.medecin.CabinetmedService;
-import com.cabinetmedical.gestioncabinet.service.medecin.UtilisateurService;
+import com.cabinetmedical.gestioncabinet.service.medecin.UtilisateurMedService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class CabinetmedController {
 
     private final CabinetmedService cabinetService;
-    private final UtilisateurService utilisateurService;
+    private final UtilisateurMedService utilisateurMedService;
     private final CabinetmedRepository cabinetRepository;
 
     @Value("${file.base-url:http://localhost:8080}")
@@ -34,7 +34,7 @@ public class CabinetmedController {
         System.out.println("🔍 [Cabinet] Récupération info cabinet pour: " + authentication.getName());
 
         String username = authentication.getName();
-        Utilisateur user = utilisateurService.findByLogin(username);
+        Utilisateur user = utilisateurMedService.findByLogin(username);
 
         System.out.println("👤 [Cabinet] Utilisateur trouvé: " + user.getId() + " - " + user.getLogin());
 

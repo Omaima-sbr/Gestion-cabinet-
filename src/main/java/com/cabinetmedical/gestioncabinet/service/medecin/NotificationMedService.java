@@ -3,7 +3,7 @@ package com.cabinetmedical.gestioncabinet.service.medecin;
 import com.cabinetmedical.gestioncabinet.model.Notification;
 import com.cabinetmedical.gestioncabinet.model.RendezVous;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
-import com.cabinetmedical.gestioncabinet.repository.medecin.NotificationRepository;
+import com.cabinetmedical.gestioncabinet.repository.medecin.NotificationMedRepository;
 import com.cabinetmedical.gestioncabinet.repository.medecin.UtilisateurmedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,58 +17,58 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NotificationService {
+public class NotificationMedService {
 
-    private final NotificationRepository notificationRepository;
+    private final NotificationMedRepository notificationMedRepository;
     private final UtilisateurmedRepository utilisateurRepository;
 
     // Méthodes avec filtre par cabinet
     @Transactional(readOnly = true)
     public List<Notification> getNotificationsByUserIdAndCabinet(Integer userId, Integer cabinetId) {
-        return notificationRepository.findByUtilisateurIdAndCabinetId(userId, cabinetId);
+        return notificationMedRepository.findByUtilisateurIdAndCabinetId(userId, cabinetId);
     }
 
     @Transactional(readOnly = true)
     public List<Notification> getUnreadNotificationsByUserIdAndCabinet(Integer userId, Integer cabinetId) {
-        return notificationRepository.findUnreadByUtilisateurIdAndCabinetId(userId, cabinetId);
+        return notificationMedRepository.findUnreadByUtilisateurIdAndCabinetId(userId, cabinetId);
     }
 
     @Transactional(readOnly = true)
     public long countUnreadNotificationsByUserIdAndCabinet(Integer userId, Integer cabinetId) {
-        return notificationRepository.countUnreadByUtilisateurIdAndCabinetId(userId, cabinetId);
+        return notificationMedRepository.countUnreadByUtilisateurIdAndCabinetId(userId, cabinetId);
     }
 
     @Transactional
     public void markAllAsReadByUserIdAndCabinet(Integer userId, Integer cabinetId) {
-        notificationRepository.markAllAsReadByUserIdAndCabinetId(userId, cabinetId);
+        notificationMedRepository.markAllAsReadByUserIdAndCabinetId(userId, cabinetId);
         log.info("Toutes les notifications de l'utilisateur {} dans le cabinet {} marquées comme lues", userId, cabinetId);
     }
 
     // Méthodes existantes (sans filtre par cabinet)
     @Transactional(readOnly = true)
     public List<Notification> getNotificationsByUserId(Integer userId) {
-        return notificationRepository.findByUtilisateurId(userId);
+        return notificationMedRepository.findByUtilisateurId(userId);
     }
 
     @Transactional(readOnly = true)
     public List<Notification> getUnreadNotifications(Integer userId) {
-        return notificationRepository.findUnreadByUtilisateurId(userId);
+        return notificationMedRepository.findUnreadByUtilisateurId(userId);
     }
 
     @Transactional(readOnly = true)
     public int getUnreadCount(Integer userId) {
-        return (int) notificationRepository.countUnreadByUtilisateurId(userId);
+        return (int) notificationMedRepository.countUnreadByUtilisateurId(userId);
     }
 
     @Transactional
     public void markAsRead(Integer notificationId) {
-        notificationRepository.markAsRead(notificationId);
+        notificationMedRepository.markAsRead(notificationId);
         log.info("Notification {} marquée comme lue", notificationId);
     }
 
     @Transactional
     public void markAllAsRead(Integer userId) {
-        notificationRepository.markAllAsRead(userId);
+        notificationMedRepository.markAllAsRead(userId);
         log.info("Toutes les notifications de l'utilisateur {} marquées comme lues", userId);
     }
 
@@ -89,7 +89,7 @@ public class NotificationService {
         notification.setUtilisateur(utilisateur);
         notification.setRendezVous(rendezVous);
 
-        return notificationRepository.save(notification);
+        return notificationMedRepository.save(notification);
     }
 
     @Transactional
@@ -142,13 +142,13 @@ public class NotificationService {
     public void cleanOldNotifications() {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
 
-        List<Notification> oldNotifications = notificationRepository.findAll()
+        List<Notification> oldNotifications = notificationMedRepository.findAll()
                 .stream()
                 .filter(n -> n.getDateNotification() != null && n.getDateNotification().isBefore(thirtyDaysAgo))
                 .toList();
 
         if (!oldNotifications.isEmpty()) {
-            notificationRepository.deleteAll(oldNotifications);
+            notificationMedRepository.deleteAll(oldNotifications);
             log.info("{} anciennes notifications supprimées", oldNotifications.size());
         }
     }
@@ -156,13 +156,13 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<Notification> getRecentNotifications(Integer userId) {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        return notificationRepository.findRecentNotifications(userId, sevenDaysAgo);
+        return notificationMedRepository.findRecentNotifications(userId, sevenDaysAgo);
     }
 
     @Transactional
     public void deleteNotification(Integer notificationId) {
-        if (notificationRepository.existsById(notificationId)) {
-            notificationRepository.deleteById(notificationId);
+        if (notificationMedRepository.existsById(notificationId)) {
+            notificationMedRepository.deleteById(notificationId);
             log.info("Notification {} supprimée", notificationId);
         } else {
             log.warn("Tentative de suppression d'une notification inexistante: {}", notificationId);
@@ -171,9 +171,9 @@ public class NotificationService {
 
     @Transactional
     public void deleteAllNotifications(Integer userId) {
-        List<Notification> notifications = notificationRepository.findByUtilisateurId(userId);
+        List<Notification> notifications = notificationMedRepository.findByUtilisateurId(userId);
         if (!notifications.isEmpty()) {
-            notificationRepository.deleteAll(notifications);
+            notificationMedRepository.deleteAll(notifications);
             log.info("{} notifications de l'utilisateur {} supprimées", notifications.size(), userId);
         }
     }

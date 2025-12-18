@@ -1,41 +1,58 @@
 package com.cabinetmedical.gestioncabinet.security.medecin;
 
-import com.cabinetmedical.gestioncabinet.model.Utilisateur;
+import com.cabinetmedical.gestioncabinet.model.Utilisateur;  // ✅ Changez entity par model
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
+/**
+ * Implémentation personnalisée de UserDetails pour Spring Security
+ * Contient les informations nécessaires pour l'authentification et l'autorisation
+ */
+@Getter
 public class UserPrincipal implements UserDetails {
+
     private final Integer id;
     private final String login;
     private final String password;
-    private final String nom;      // ✅ AJOUTER
-    private final String prenom;   // ✅ AJOUTER
-    private final Utilisateur.Role role;
+    private final String role;
     private final Integer cabinetId;
-    private final boolean active;
+    private final boolean actif;
+    private final Collection<? extends GrantedAuthority> authorities;
 
+    /**
+     * Constructeur à partir d'une entité Utilisateur
+     */
     public UserPrincipal(Utilisateur utilisateur) {
         this.id = utilisateur.getId();
         this.login = utilisateur.getLogin();
         this.password = utilisateur.getPwd();
-        this.nom = utilisateur.getNom();      // ✅ INITIALISER
-        this.prenom = utilisateur.getPrenom(); // ✅ INITIALISER
-        this.role = utilisateur.getRole();
+        this.role = utilisateur.getRole().name();
         this.cabinetId = utilisateur.getCabinet() != null ? utilisateur.getCabinet().getId() : null;
-        this.active = utilisateur.getActif() != null ? utilisateur.getActif() : true;
+        this.actif = utilisateur.getActif();
+
+        // Créer l'autorité avec le préfixe ROLE_
+        this.authorities = Collections.singletonList(
+                new SimpleGrantedAuthority("ROLE_" + utilisateur.getRole().name())
+        );
     }
 
+    /**
+     * Factory method pour créer un UserPrincipal
+     */
     public static UserPrincipal create(Utilisateur utilisateur) {
         return new UserPrincipal(utilisateur);
     }
 
+    // Implémentation de UserDetails
+
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+    public String getUsername() {
+        return login;
     }
 
     @Override
@@ -44,33 +61,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return login;
-    }
-
-    // ✅ AJOUTER LES GETTERS POUR nom ET prenom
-    public String getNom() {
-        return nom;
-    }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public Utilisateur.Role getRole() {
-        return role;
-    }
-
-    public Integer getCabinetId() {
-        return cabinetId;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
     }
 
     @Override
@@ -90,10 +82,23 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return actif;
     }
 
-    public boolean hasRole(Utilisateur.Role requiredRole) {
-        return this.role == requiredRole;
+    // Méthodes utilitaires
+
+    public boolean hasRole(String role) {
+        return this.role.equals(role);
+    }
+
+    @Override
+    public String toString() {
+        return "UserPrincipal{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", role='" + role + '\'' +
+                ", cabinetId=" + cabinetId +
+                ", actif=" + actif +
+                '}';
     }
 }

@@ -76,7 +76,14 @@ public class Patient {
     public enum Sexe {
         HOMME, FEMME
     }
+    public String getTelephone() {
+        return this.numTel;
+    }
 
+    // ✅ APRÈS
+    public Integer getIdPatient() {
+        return this.id;
+    }
     @PrePersist
     protected void onCreate() {
         dateCreation = LocalDateTime.now();

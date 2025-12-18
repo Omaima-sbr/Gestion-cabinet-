@@ -6,14 +6,11 @@ import com.cabinetmedical.gestioncabinet.model.Messagerie;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
 import com.cabinetmedical.gestioncabinet.repository.MessagerieRepository;
 import com.cabinetmedical.gestioncabinet.repository.medecin.UtilisateurmedRepository;
-import com.cabinetmedical.gestioncabinet.security.medecin.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,29 +36,11 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
     private String uploadDir;
 
     /**
-     * Récupérer l'utilisateur connecté (médecin)
+     * Récupérer un utilisateur par son ID
      */
-    private Utilisateur getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated()) {
-            log.error("❌ Aucune authentification trouvée");
-            throw new RuntimeException("Utilisateur non authentifié");
-        }
-
-        Object principal = auth.getPrincipal();
-        log.info("🔍 Principal type: {}", principal.getClass().getName());
-
-        if (principal instanceof UserPrincipal) {
-            UserPrincipal userPrincipal = (UserPrincipal) principal;
-            log.info("✅ UserPrincipal - ID: {}, Login: {}, Role: {}",
-                    userPrincipal.getId(), userPrincipal.getUsername(), userPrincipal.getRole());
-
-            return utilisateurRepository.findById(userPrincipal.getId())
-                    .orElseThrow(() -> new RuntimeException("Utilisateur introuvable avec ID: " + userPrincipal.getId()));
-        }
-
-        throw new RuntimeException("Type de principal non supporté: " + principal.getClass().getName());
+    private Utilisateur getUtilisateurById(Integer userId) {
+        return utilisateurRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable avec ID: " + userId));
     }
 
     /**
@@ -69,10 +48,10 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional
-    public MedecinMessagerieDTO envoyerMessage(MedecinMessagerieDTO dto, MultipartFile file) {
-        log.info("📤 [Medecin] Envoi message vers destinataire ID: {}", dto.getIdDestinataire());
+    public MedecinMessagerieDTO envoyerMessage(MedecinMessagerieDTO dto, MultipartFile file, Integer medecinId) {
+        log.info("📤 [Service] Envoi message vers destinataire ID: {}", dto.getIdDestinataire());
 
-        Utilisateur expediteur = getCurrentUser();
+        Utilisateur expediteur = getUtilisateurById(medecinId);
 
         // Vérifier que l'expéditeur est bien un médecin
         if (expediteur.getRole() != Utilisateur.Role.MEDECIN) {
@@ -109,9 +88,9 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<MedecinMessagerieDTO> getMessagesRecus(Pageable pageable) {
-        Utilisateur user = getCurrentUser();
-        log.info("📥 [Medecin] Récupération messages reçus pour: {}", user.getLogin());
+    public Page<MedecinMessagerieDTO> getMessagesRecus(Pageable pageable, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
+        log.info("📥 [Service] Récupération messages reçus pour: {}", user.getLogin());
 
         Page<Messagerie> messages = messagerieRepository
                 .findByDestinataireAndSupprimeDestinataireOrderByDateEnvoiDesc(user, false, pageable);
@@ -124,9 +103,9 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<MedecinMessagerieDTO> getMessagesEnvoyes(Pageable pageable) {
-        Utilisateur user = getCurrentUser();
-        log.info("📤 [Medecin] Récupération messages envoyés pour: {}", user.getLogin());
+    public Page<MedecinMessagerieDTO> getMessagesEnvoyes(Pageable pageable, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
+        log.info("📤 [Service] Récupération messages envoyés pour: {}", user.getLogin());
 
         Page<Messagerie> messages = messagerieRepository
                 .findByExpediteurAndSupprimeExpediteurOrderByDateEnvoiDesc(user, false, pageable);
@@ -139,8 +118,8 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public MedecinMessagerieDTO getMessageById(Integer id) {
-        Utilisateur user = getCurrentUser();
+    public MedecinMessagerieDTO getMessageById(Integer id, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
 
         Messagerie message = messagerieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message introuvable"));
@@ -159,8 +138,8 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional
-    public MedecinMessagerieDTO marquerCommeLu(Integer id) {
-        Utilisateur user = getCurrentUser();
+    public MedecinMessagerieDTO marquerCommeLu(Integer id, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
 
         Messagerie message = messagerieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message introuvable"));
@@ -185,10 +164,10 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Long countMessagesNonLus() {
-        Utilisateur user = getCurrentUser();
+    public Long countMessagesNonLus(Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
         Long count = messagerieRepository.countByDestinataireAndLu(user, false);
-        log.info("📊 [Medecin] Messages non lus: {}", count);
+        log.info("📊 [Service] Messages non lus: {}", count);
         return count;
     }
 
@@ -197,8 +176,8 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional
-    public void supprimerMessage(Integer id) {
-        Utilisateur user = getCurrentUser();
+    public void supprimerMessage(Integer id, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
 
         Messagerie message = messagerieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message introuvable"));
@@ -221,8 +200,8 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<MedecinMessagerieDTO> getConversation(Integer utilisateurId) {
-        Utilisateur user = getCurrentUser();
+    public List<MedecinMessagerieDTO> getConversation(Integer utilisateurId, Integer medecinId) {
+        Utilisateur user = getUtilisateurById(medecinId);
         Utilisateur otherUser = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
 
@@ -238,8 +217,8 @@ public class MedecinMessagerieServiceImpl implements MedecinMessagerieService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<SecretaireDisponibleDTO> getSecretairesDisponibles() {
-        Utilisateur medecin = getCurrentUser();
+    public List<SecretaireDisponibleDTO> getSecretairesDisponibles(Integer medecinId) {
+        Utilisateur medecin = getUtilisateurById(medecinId);
 
         if (medecin.getCabinet() == null) {
             log.warn("⚠️ Médecin {} n'a pas de cabinet associé", medecin.getLogin());

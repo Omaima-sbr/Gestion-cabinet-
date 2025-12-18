@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, Integer> {
+public interface NotificationMedRepository extends JpaRepository<Notification, Integer> {
 
     // Récupérer les notifications d'un utilisateur
     @Query("SELECT n FROM Notification n WHERE n.utilisateur.id = :userId ORDER BY n.dateNotification DESC")

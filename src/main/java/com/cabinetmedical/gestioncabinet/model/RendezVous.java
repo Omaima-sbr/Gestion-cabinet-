@@ -60,6 +60,14 @@ public class RendezVous {
     @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Consultation consultation;
 
+    public Integer getId() {
+        return idRendezVous;
+    }
+
+    public LocalDate getDateHeureDebut() {
+        return dateRdv;
+    }
+
     public enum Motif {
         CONSULTATION, CONTROLE
     }

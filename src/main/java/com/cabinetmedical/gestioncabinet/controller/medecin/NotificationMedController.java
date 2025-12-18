@@ -4,9 +4,9 @@ import com.cabinetmedical.gestioncabinet.dto.medecin.NotificationDTO;
 import com.cabinetmedical.gestioncabinet.model.Cabinet;
 import com.cabinetmedical.gestioncabinet.model.Notification;
 import com.cabinetmedical.gestioncabinet.model.Utilisateur;
+import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
 import com.cabinetmedical.gestioncabinet.repository.medecin.CabinetmedRepository;
-import com.cabinetmedical.gestioncabinet.service.medecin.NotificationService;
-import com.cabinetmedical.gestioncabinet.service.medecin.UtilisateurService;
+import com.cabinetmedical.gestioncabinet.service.medecin.NotificationMedService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -27,43 +28,40 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
-@Slf4j // ✅ Ajout des logs
-public class NotificationController {
+@Slf4j
+public class NotificationMedController {
 
-    private final NotificationService notificationService;
-    private final UtilisateurService utilisateurService;
+    private final NotificationMedService notificationService;
+    private final UtilisateurRepository utilisateurRepository;
     private final CabinetmedRepository cabinetRepository;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<NotificationDTO>> getNotifications() {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
+            log.info("🔍 [Notifications] Récupération des notifications");
 
-            log.info("🔍 [Notifications] Récupération pour l'utilisateur: {}", username);
-
-            Utilisateur user = utilisateurService.findByLogin(username);
+            Utilisateur user = getCurrentUtilisateur();
             if (user == null) {
-                log.error("❌ [Notifications] Utilisateur non trouvé: {}", username);
+                log.error("❌ [Notifications] Utilisateur non authentifié");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
+            log.info("✅ [Notifications] Utilisateur trouvé: {}", user.getLogin());
+
             Optional<Cabinet> cabinetOpt = cabinetRepository.findByUserId(user.getId());
 
-            // ✅ CORRECTION: Gérer le cas où l'utilisateur n'a pas de cabinet
+            // Gérer le cas où l'utilisateur n'a pas de cabinet
             if (cabinetOpt.isEmpty()) {
                 log.warn("⚠️ [Notifications] Aucun cabinet trouvé pour userId: {}. Retour notifications sans filtre cabinet", user.getId());
 
-                // Option 1: Retourner les notifications sans filtre de cabinet
                 List<Notification> notifications = notificationService.getNotificationsByUserId(user.getId());
                 List<NotificationDTO> dtos = notifications.stream()
                         .map(NotificationDTO::fromEntity)
                         .collect(Collectors.toList());
-                return ResponseEntity.ok(dtos);
 
-                // Option 2 (alternative): Retourner une liste vide
-                // return ResponseEntity.ok(Collections.emptyList());
+                log.info("✅ [Notifications] {} notifications récupérées (sans cabinet)", dtos.size());
+                return ResponseEntity.ok(dtos);
             }
 
             List<Notification> notifications = notificationService.getNotificationsByUserIdAndCabinet(
@@ -88,11 +86,11 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<NotificationDTO>> getUnreadNotifications() {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
+            log.info("🔍 [Notifications] Récupération notifications non lues");
 
-            Utilisateur user = utilisateurService.findByLogin(username);
+            Utilisateur user = getCurrentUtilisateur();
             if (user == null) {
+                log.error("❌ [Notifications/unread] Utilisateur non authentifié");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -104,6 +102,8 @@ public class NotificationController {
                 List<NotificationDTO> dtos = notifications.stream()
                         .map(NotificationDTO::fromEntity)
                         .collect(Collectors.toList());
+
+                log.info("✅ [Notifications/unread] {} notifications non lues (sans cabinet)", dtos.size());
                 return ResponseEntity.ok(dtos);
             }
 
@@ -116,6 +116,7 @@ public class NotificationController {
                     .map(NotificationDTO::fromEntity)
                     .collect(Collectors.toList());
 
+            log.info("✅ [Notifications/unread] {} notifications non lues", dtos.size());
             return ResponseEntity.ok(dtos);
 
         } catch (Exception e) {
@@ -128,11 +129,11 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> getUnreadCount() {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
+            log.info("🔍 [Notifications] Comptage notifications non lues");
 
-            Utilisateur user = utilisateurService.findByLogin(username);
+            Utilisateur user = getCurrentUtilisateur();
             if (user == null) {
+                log.error("❌ [Notifications/unread-count] Utilisateur non authentifié");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -151,6 +152,8 @@ public class NotificationController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("count", count);
+
+            log.info("✅ [Notifications/unread-count] {} notifications non lues", count);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -165,11 +168,11 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> markAllAsRead() {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
+            log.info("🔵 [Notifications] Marquage de toutes les notifications comme lues");
 
-            Utilisateur user = utilisateurService.findByLogin(username);
+            Utilisateur user = getCurrentUtilisateur();
             if (user == null) {
+                log.error("❌ [Notifications/read-all] Utilisateur non authentifié");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -187,6 +190,7 @@ public class NotificationController {
             response.put("success", true);
             response.put("timestamp", java.time.LocalDateTime.now());
 
+            log.info("✅ [Notifications/read-all] Toutes les notifications marquées comme lues");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -199,12 +203,21 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> markAsRead(@PathVariable Integer id) {
         try {
+            log.info("🔵 [Notifications] Marquage notification {} comme lue", id);
+
+            Utilisateur user = getCurrentUtilisateur();
+            if (user == null) {
+                log.error("❌ [Notifications/{}/read] Utilisateur non authentifié", id);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
             notificationService.markAsRead(id);
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Notification marquée comme lue");
             response.put("success", true);
 
+            log.info("✅ [Notifications/{}/read] Notification marquée comme lue", id);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
@@ -217,11 +230,11 @@ public class NotificationController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<NotificationDTO> createTestNotification(@RequestBody TestNotificationRequest request) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
+            log.info("🔵 [Notifications] Création notification test");
 
-            Utilisateur user = utilisateurService.findByLogin(username);
+            Utilisateur user = getCurrentUtilisateur();
             if (user == null) {
+                log.error("❌ [Notifications/test] Utilisateur non authentifié");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
 
@@ -231,6 +244,7 @@ public class NotificationController {
                     Notification.Type.valueOf(request.getType())
             );
 
+            log.info("✅ [Notifications/test] Notification créée: {}", notification.getId());
             return ResponseEntity.ok(NotificationDTO.fromEntity(notification));
 
         } catch (Exception e) {
@@ -241,16 +255,73 @@ public class NotificationController {
 
     @GetMapping("/debug/auth")
     public ResponseEntity<Map<String, Object>> debugAuth() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("authenticated", auth.isAuthenticated());
-        response.put("name", auth.getName());
-        response.put("principal", auth.getPrincipal().toString());
-        response.put("authorities", auth.getAuthorities().toString());
-        response.put("details", auth.getDetails());
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", auth != null && auth.isAuthenticated());
+            response.put("name", auth != null ? auth.getName() : "N/A");
+            response.put("principal", auth != null ? auth.getPrincipal().toString() : "N/A");
+            response.put("authorities", auth != null ? auth.getAuthorities().toString() : "N/A");
+            response.put("details", auth != null ? auth.getDetails() : "N/A");
 
-        return ResponseEntity.ok(response);
+            Utilisateur user = getCurrentUtilisateur();
+            if (user != null) {
+                response.put("utilisateur_id", user.getId());
+                response.put("utilisateur_login", user.getLogin());
+                response.put("utilisateur_role", user.getRole());
+                response.put("utilisateur_cabinet", user.getCabinet() != null ? user.getCabinet().getId() : null);
+            } else {
+                response.put("utilisateur", "Non trouvé");
+            }
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("❌ [Notifications/debug/auth] Erreur:", e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    // ✅ MÉTHODE SIMPLIFIÉE - Fonctionne avec User standard de Spring Security
+    private Utilisateur getCurrentUtilisateur() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated()) {
+                log.warn("❌ Pas d'authentification");
+                return null;
+            }
+
+            String username;
+            Object principal = authentication.getPrincipal();
+
+            // Extraire le username selon le type de principal
+            if (principal instanceof UserDetails) {
+                username = ((UserDetails) principal).getUsername();
+                log.debug("✅ Username extrait de UserDetails: {}", username);
+            } else if (principal instanceof String) {
+                username = (String) principal;
+                log.debug("✅ Username extrait de String: {}", username);
+            } else {
+                username = null;
+                log.error("❌ Type de principal inconnu: {}", principal.getClass().getName());
+                return null;
+            }
+
+            // Récupérer l'utilisateur depuis la base de données
+            return utilisateurRepository.findByLogin(username)
+                    .orElseGet(() -> {
+                        log.error("❌ Utilisateur non trouvé pour login: {}", username);
+                        return null;
+                    });
+
+        } catch (Exception e) {
+            log.error("❌ Erreur lors de la récupération de l'utilisateur: ", e);
+            return null;
+        }
     }
 
     @Data
