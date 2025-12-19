@@ -22,7 +22,7 @@ api.interceptors.request.use(
       if (token) {
         // CORRECTION: Assurez-vous que le header est bien ajouté
         config.headers.Authorization = `Bearer ${token}`;
-        console.log('📤 [Interceptor] Header Authorization ajouté:', config.headers.Authorization.substring(0, 30) + '...');
+        console.log('📤 [Interceptor] Header2 Authorization ajouté:', config.headers.Authorization.substring(0, 30) + '...');
         
         // 🔥 AJOUT: Debug supplémentaire pour les routes protégées
         const isMedecinRoute = config.url?.includes('/api/medecin/') || config.baseURL?.includes('/api/medecin/');
@@ -175,7 +175,7 @@ export const authService = {
         
         // CORRECTION: Configurez le header pour les futures requêtes
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        console.log('⚙️ [Auth] Header configuré pour api instance');
+        console.log('⚙️ [Auth] Header2 configuré pour api instance');
         
         // Vérification
         console.log('🔍 [Auth] Vérification:', {
@@ -286,7 +286,7 @@ export const authService = {
     
     if (token) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log('✅ [Auth] Header forcé configuré');
+      console.log('✅ [Auth] Header2 forcé configuré');
     } else {
       console.warn('⚠️ [Auth] Pas de token pour configurer les headers');
       delete api.defaults.headers.common['Authorization'];

@@ -1,8 +1,10 @@
 package com.cabinetmedical.gestioncabinet;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.TestInstance;
 
+import org.springframework.boot.test.context.SpringBootTest;
+/*
 @SpringBootTest
 class GestioncabinetApplicationTests {
 
@@ -10,4 +12,12 @@ class GestioncabinetApplicationTests {
 	void contextLoads() {
 	}
 
+} */
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class GestioncabinetApplicationTests {
+    @Test
+    void contextLoads() {
+    }
 }
+

@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }) => {
         checkAuth();
     }, []);
 
-    // Fonction de connexion
-    const login = async (userData) => {
+    // Fonction de connexion - VERSION SYNCHRONE
+    const login = (userData) => {
         try {
             console.log('🔐 AuthContext - Mise à jour avec:', userData);
 
@@ -63,15 +63,12 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', userData.token);
             localStorage.setItem('user', JSON.stringify(userToSave));
 
-            // Mettre à jour l'état - IMPORTANT: ceci déclenche un re-render
-            console.log('🔄 Mise à jour de l\'état user...');
+            // ✅ MISE À JOUR SYNCHRONE de l'état
+            console.log('🔄 Mise à jour SYNCHRONE de l\'état user...');
             setUser(userToSave);
 
             console.log('✅ AuthContext - Contexte mis à jour avec succès');
-
-            // Vérification
-            const savedUser = localStorage.getItem('user');
-            console.log('✅ Vérification localStorage:', savedUser);
+            console.log('✅ État user après setUser:', userToSave);
 
             return userToSave;
         } catch (error) {

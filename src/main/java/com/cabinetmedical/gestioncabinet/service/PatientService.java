@@ -6,6 +6,7 @@ import com.cabinetmedical.gestioncabinet.dto.PatientSearchDTO;
 import com.cabinetmedical.gestioncabinet.exception.ResourceNotFoundException;
 import com.cabinetmedical.gestioncabinet.model.*;
 import com.cabinetmedical.gestioncabinet.repository.*;
+import com.cabinetmedical.gestioncabinet.repository.admin.CabinetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

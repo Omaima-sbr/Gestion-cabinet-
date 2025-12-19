@@ -18,7 +18,7 @@ public class InscriptionService {
     private final DemandeCreationCabinetRepository demandeRepository;
     private final AlerteAdminRepository alerteRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CabinetRepository cabinetRepository;
+    private final CabinetsRepository cabinetRepository;
     private final UtilisateurRepository utilisateurRepository;
 
     @Transactional

@@ -36,7 +36,7 @@ export default function ForgotPassword() {
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--color-background))] p-4">
         <div className="max-w-md w-full glass rounded-2xl p-8 shadow-2xl border border-[hsl(var(--color-border))] animate-fade-in-up">
 
-          {/* Header avec icône */}
+          {/* Header2 avec icône */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Mail size={32} className="text-blue-500" />

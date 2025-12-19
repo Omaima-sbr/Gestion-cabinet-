@@ -1,5 +1,7 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class AlerteAdmin {
 
     @Id
@@ -39,11 +42,16 @@ public class AlerteAdmin {
     @Column(name = "date_lecture")
     private LocalDateTime dateLecture;
 
-    // Référence vers la demande de création
+    // ✅ CORRECTION : Ignorer la relation lazy pour éviter ByteBuddyInterceptor
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_demande_cabinet",
             foreignKey = @ForeignKey(name = "FK_Alerte_DemandeCabinet"))
+    @JsonIgnore // ✅ Ne pas sérialiser cette relation
     private DemandeCreationCabinet demandeCabinet;
+
+    // ✅ AJOUT : Exposer juste l'ID de la demande (optionnel)
+    @Column(name = "id_demande_cabinet", insertable = false, updatable = false)
+    private Integer demandeCabinetId;
 
     // Métadonnées additionnelles
     @Column(name = "nom_demandeur", length = 200)

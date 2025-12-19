@@ -230,7 +230,7 @@ export default function Form() {
         <div className="min-h-screen bg-[hsl(var(--color-background))] p-4 transition-colors duration-300">
             <div className="max-w-5xl mx-auto">
 
-                {/* Header */}
+                {/* Header2 */}
                 <div className="text-center mb-8 relative">
                     <button
                         onClick={goHome}

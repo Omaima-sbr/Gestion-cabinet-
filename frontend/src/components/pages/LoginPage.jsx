@@ -8,44 +8,72 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(true);
 
+    console.log('🎨 LoginPage - Rendu avec user:', user);
+
     // Si l'utilisateur est déjà connecté, rediriger immédiatement
     useEffect(() => {
+        console.log('👀 LoginPage useEffect - user:', user);
         if (user) {
-            console.log('👤 Utilisateur connecté détecté, redirection...');
+            console.log('👤 useEffect - Utilisateur détecté:', user);
             const roleRoutes = {
                 'SECRETAIRE': '/secretaire',
                 'MEDECIN': '/medecin',
-                'ADMINISTRATEUR': '/admin'
+                'ADMINISTRATEUR': '/administrateur'
             };
 
             const redirectPath = roleRoutes[user.role] || '/';
-            console.log(`🔀 Redirection vers: ${redirectPath}`);
+            console.log('🔀 useEffect - Redirection vers:', redirectPath);
             navigate(redirectPath, { replace: true });
         }
     }, [user, navigate]);
 
-    const handleLoginSuccess = async (userData) => {
-        console.log('✅ LoginPage - Données reçues:', userData);
+    const handleLoginSuccess = (userData) => {
+        console.log('🎯 ===== DEBUT handleLoginSuccess =====');
+        console.log('✅ LoginPage - handleLoginSuccess appelé !');
+        console.log('📦 Données reçues:', userData);
 
         try {
-            // Mettre à jour le contexte d'authentification
-            console.log('🔄 Appel de login() du contexte...');
-            const savedUser = await login(userData);
-            console.log('✅ login() terminé, user sauvegardé:', savedUser);
-
-            // ✅ REDIRECTION IMMÉDIATE ICI (ne pas attendre le useEffect)
+            // Définir les routes
             const roleRoutes = {
                 'SECRETAIRE': '/secretaire',
                 'MEDECIN': '/medecin',
-                'ADMINISTRATEUR': '/admin'
+                'ADMINISTRATEUR': '/administrateur'
             };
 
-            const redirectPath = roleRoutes[savedUser.role] || '/';
-            console.log(`🔀 Redirection immédiate vers: ${redirectPath}`);
-            navigate(redirectPath, { replace: true });
+            const redirectPath = roleRoutes[userData.role] || '/';
+            console.log('🎯 Route calculée:', redirectPath);
+
+            // Mettre à jour le contexte
+            console.log('🔄 Appel de login() du contexte...');
+            const savedUser = login(userData);
+            console.log('✅ Contexte mis à jour, user:', savedUser);
+
+            // Fermer le modal
+            console.log('🚪 Fermeture du modal...');
+            setShowModal(false);
+
+            // Sauvegarder manuellement dans localStorage (double sécurité)
+            console.log('💾 Sauvegarde manuelle dans localStorage...');
+            localStorage.setItem('token', userData.token);
+            localStorage.setItem('user', JSON.stringify({
+                userId: userData.userId,
+                login: userData.login,
+                nom: userData.nom,
+                prenom: userData.prenom,
+                role: userData.role,
+                cabinetId: userData.cabinetId,
+                cabinetName: userData.cabinetName
+            }));
+
+            console.log('🔀 Redirection FORCÉE vers:', redirectPath);
+
+            // ✅ REDIRECTION FORCÉE
+            window.location.href = redirectPath;
+
+            console.log('🎯 ===== FIN handleLoginSuccess =====');
 
         } catch (error) {
-            console.error('❌ Erreur lors de la mise à jour du contexte:', error);
+            console.error('❌ ERREUR dans handleLoginSuccess:', error);
             alert('Erreur lors de la connexion. Veuillez réessayer.');
         }
     };
@@ -55,6 +83,8 @@ const LoginPage = () => {
         setShowModal(false);
         navigate('/');
     };
+
+    console.log('🎨 LoginPage - Rendu du modal, showModal:', showModal);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">

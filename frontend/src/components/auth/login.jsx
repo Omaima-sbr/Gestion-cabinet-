@@ -2,7 +2,6 @@
  * COMPOSANT LOGIN MODAL avec API Backend
  * Modale de connexion avec 3 rôles (ADMINISTRATEUR/MEDECIN/SECRETAIRE)
  * Backend: Spring Boot + JWT
- * Support Login OU Email comme identifiant
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -14,6 +13,7 @@ const API_URL = 'http://localhost:8080/api';
 
 export default function LoginModal({ onClose, onLoginSuccess }) {
     const { t } = useTranslation();
+
     const [selectedRole, setSelectedRole] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [login, setLogin] = useState('');
@@ -24,7 +24,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
     const modalRef = useRef(null);
     const [cabinets, setCabinets] = useState([]);
 
-    // Rôles backend (ATTENTION: utiliser les valeurs exactes du backend)
+    // Rôles backend
     const roles = [
         {
             id: 'ADMINISTRATEUR',
@@ -67,6 +67,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                 console.error("Erreur lors du chargement des cabinets :", error);
             }
         };
+
         fetchCabinets();
     }, []);
 
@@ -90,7 +91,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
         try {
             // Préparer la requête selon le format backend
             const requestData = {
-                login: login, // Peut être un login ou un email (géré par le backend)
+                login: login,
                 password: password,
                 role: selectedRole,
                 cabinetId: selectedRole !== 'ADMINISTRATEUR' ? parseInt(selectedCabinet) : null
@@ -103,7 +104,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
 
             console.log('✅ Connexion réussie:', response.data);
 
-            // Sauvegarder le token et les infos utilisateur dans localStorage
+            // Sauvegarder dans localStorage
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('user', JSON.stringify({
                 userId: response.data.userId,
@@ -115,45 +116,36 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                 cabinetName: response.data.cabinetName
             }));
 
-            // Préparer les données utilisateur complètes pour le callback
-            const userData = {
-                userId: response.data.userId || response.data.id || response.data.type,
-                login: response.data.login,
-                nom: response.data.nom,
-                prenom: response.data.prenom,
-                role: response.data.role,
-                cabinetId: response.data.cabinetId,
-                cabinetName: response.data.cabinetName,
-                token: response.data.token
-            };
+            // ✅ Appeler onLoginSuccess si défini
+            console.log('📞 Appel de onLoginSuccess avec:', response.data);
 
-            console.log('📦 Données préparées pour le contexte:', userData);
-
-            // IMPORTANT: Appeler le callback avec les données complètes
             if (onLoginSuccess) {
-                onLoginSuccess(userData);
+                onLoginSuccess(response.data);
+            } else {
+                // ⚠️ FALLBACK : Si onLoginSuccess n'est pas défini, rediriger directement
+                console.warn('⚠️ onLoginSuccess n\'est pas défini, redirection directe...');
+
+                const roleRoutes = {
+                    'SECRETAIRE': '/secretaire',
+                    'MEDECIN': '/medecin',
+                    'ADMINISTRATEUR': '/administrateur'
+                };
+
+                const redirectPath = roleRoutes[response.data.role] || '/';
+                console.log('🔀 Redirection de secours vers:', redirectPath);
+
+                window.location.href = redirectPath;
             }
-
-            console.log('✅ Callback onLoginSuccess terminé');
-
-            // Message de succès (optionnel)
-            alert(t('login.success'));
-
-            // Fermer le modal
-            onClose();
 
         } catch (err) {
             console.error('❌ Erreur de connexion:', err);
 
             // Gérer les différents types d'erreurs
             if (err.response) {
-                // Le serveur a répondu avec un code d'erreur
                 setError(err.response.data.message || t('login.errors.connectionFailed'));
             } else if (err.request) {
-                // La requête a été envoyée mais pas de réponse
                 setError('Impossible de contacter le serveur. Vérifiez que le backend est démarré.');
             } else {
-                // Erreur lors de la configuration de la requête
                 setError(t('login.errors.connectionFailed'));
             }
         } finally {
@@ -223,21 +215,21 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                         <p className="text-sm text-[hsl(var(--color-foreground))] mb-6 font-medium">
                             {t('login.connectedAs')}{' '}
                             <span className="font-bold text-[hsl(var(--color-card-foreground))]">
-                                {roles.find((r) => r.id === selectedRole)?.label}
-                            </span>
+                {roles.find((r) => r.id === selectedRole)?.label}
+              </span>
                         </p>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {/* Login/Email (Support hybride) */}
+                            {/* Login */}
                             <div>
                                 <label className="block text-sm font-medium text-[hsl(var(--color-foreground))] mb-2">
-                                    {t('login.fields.email')} {/* Vous pouvez changer en "Login ou Email" */}
+                                    {t('login.fields.email')}
                                 </label>
                                 <input
                                     type="text"
                                     value={login}
                                     onChange={(e) => setLogin(e.target.value)}
-                                    placeholder="Votre identifiant ou email"
+                                    placeholder="Votre identifiant"
                                     className="w-full px-4 py-2 rounded-lg border border-[hsl(var(--color-input))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] bg-[hsl(var(--color-card))] text-[hsl(var(--color-card-foreground))]"
                                 />
                             </div>
@@ -265,7 +257,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                                 </div>
                             </div>
 
-                            {/* Cabinet (seulement pour MEDECIN et SECRETAIRE) */}
+                            {/* Cabinet */}
                             {selectedRole !== 'ADMINISTRATEUR' && (
                                 <div>
                                     <label className="block text-sm font-medium text-[hsl(var(--color-foreground))] mb-2">
@@ -293,7 +285,7 @@ export default function LoginModal({ onClose, onLoginSuccess }) {
                                 </div>
                             )}
 
-                            {/* Mot de passe oublié avec Link React Router */}
+                            {/* Mot de passe oublié */}
                             <div className="text-right">
                                 <Link
                                     to="/forgot-password"

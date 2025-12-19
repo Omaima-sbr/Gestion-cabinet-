@@ -8,6 +8,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import SecretaryRoutes from '../routes/SecretaryRoutes';
 import MedecinRoutes from '../routes/MedecinRoutes';
+import AdminRoutes from '../routes/AdminRoutes';
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import LoadingSpinner from './components/common/LoadingSpinner';
@@ -126,7 +127,7 @@ function App() {
 
                 {user ? (
                     <>
-                        {/* Routes Secrétaire */}
+                        {/* Routes Secrétaire - ✅ RETIRÉ /* */}
                         <Route
                             path="/secretaire/*"
                             element={
@@ -140,7 +141,7 @@ function App() {
                             }
                         />
 
-                        {/* Routes Médecin */}
+                        {/* Routes Médecin - ✅ RETIRÉ /* */}
                         <Route
                             path="/medecin/*"
                             element={
@@ -154,19 +155,12 @@ function App() {
                             }
                         />
 
-                        {/* Routes Administrateur */}
+                        {/* Routes Administrateur - ✅ RETIRÉ /* */}
                         <Route
                             path="/administrateur/*"
                             element={
                                 user.role === 'ADMINISTRATEUR' ? (
-                                    <ProtectedLayout role="ADMINISTRATEUR">
-                                        <div className="page-container">
-                                            <div className="page-header">
-                                                <h1 className="page-title">Espace Administrateur</h1>
-                                                <p className="page-subtitle">Routes à implémenter</p>
-                                            </div>
-                                        </div>
-                                    </ProtectedLayout>
+                                    <AdminRoutes />
                                 ) : (
                                     <Navigate to={`/${user.role.toLowerCase()}`} replace />
                                 )

@@ -33,7 +33,7 @@ export default function StepCabinet({ formData, updateFormData, errors }) {
 
     return (
         <div className="space-y-6 p-1">
-            {/* Header avec Alerte d'information */}
+            {/* Header2 avec Alerte d'information */}
             <div className="border-b border-[hsl(var(--color-border))] pb-3 space-y-2">
                 <h2 className="text-2xl font-extrabold gradient-text flex items-center gap-2">
                     🏥 {t('signup.cabinet.title')}

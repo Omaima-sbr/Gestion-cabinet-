@@ -53,7 +53,7 @@
     animation: fadeInUp 0.6s ease-out;
 }
 
-/* Header de page */
+/* Header2 de page */
 .protected-layout .page-header {
     margin-bottom: 24px;
     padding-bottom: 16px;
@@ -104,7 +104,7 @@
 }
 
 /* ==========================
-   Sidebar avec couleur fixe bleue
+   Sidebar2 avec couleur fixe bleue
 ========================== */
 .protected-layout .sidebar {
     position: fixed;
