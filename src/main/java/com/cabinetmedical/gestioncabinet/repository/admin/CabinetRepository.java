@@ -21,4 +21,6 @@ public interface CabinetRepository extends JpaRepository<Cabinet, Integer> {
     List<Cabinet> findByNomContainingIgnoreCase(String nom);
 
     List<Cabinet> findByActifTrue();
+
+    Optional<Cabinet> findByNomIgnoreCase(String nomCabinet);
 }
