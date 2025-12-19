@@ -68,7 +68,7 @@ export const ThemeProvider = ({ children }) => {
             root.style.setProperty('--active-color', palette.border);
         }
         
-        // Variables Sidebar avec dégradés
+        // Variables Sidebar2 avec dégradés
         root.style.setProperty('--sidebar-gradient-start', palette.sidebar);
         root.style.setProperty('--sidebar-gradient-end', palette.sidebarLight);
         

@@ -40,7 +40,7 @@ export default function StepConfirmation({ formData, updateFormData, errors }) {
     return (
         <div className="space-y-6 p-1">
 
-            {/* Header */}
+            {/* Header2 */}
             <div className="border-b border-[hsl(var(--color-border))] pb-3 space-y-2">
                 <h2 className="text-2xl font-extrabold gradient-text flex items-center gap-2">
                     ✅ {t('signup.confirmation.title')}

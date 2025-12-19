@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CabinetRepository extends JpaRepository<Cabinet, Integer> {
+public interface CabinetsRepository extends JpaRepository<Cabinet, Integer> {
 
     Optional<Cabinet> findByNom(String nom);
 

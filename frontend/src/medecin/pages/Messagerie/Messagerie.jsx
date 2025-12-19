@@ -220,7 +220,7 @@ const Messagerie = () => {
 
     return (
         <div className="messenger-container">
-            {/* Header */}
+            {/* Header2 */}
             <div className="messenger-header">
                 <h1 className="messenger-title">💬 Messagerie</h1>
                 <div className="messenger-tabs">
@@ -247,7 +247,7 @@ const Messagerie = () => {
 
             {/* Body */}
             <div className="messenger-body">
-                {/* Sidebar */}
+                {/* Sidebar2 */}
                 <div className="messenger-sidebar">
                     {activeTab === 'nouveau' ? (
                         <div className="messenger-contacts">

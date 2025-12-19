@@ -244,7 +244,7 @@ export const defaultThemeVariables = {
     hover: 'var(--hover-color)',
     active: 'var(--active-color)',
     
-    // Sidebar
+    // Sidebar2
     sidebarGradientStart: 'var(--sidebar-gradient-start)',
     sidebarGradientEnd: 'var(--sidebar-gradient-end)',
     sidebarText: 'var(--sidebar-text)',

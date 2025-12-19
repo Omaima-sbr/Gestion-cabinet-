@@ -1,170 +1,34 @@
-/*package com.cabinetmedical.gestioncabinet.config;
-
-import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.Collections;
-
-@Component
-@RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private final UtilisateurRepository utilisateurRepository;
-    private final JwtService jwtService;
-
-    @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
-
-        // Récupérer le token depuis l'en-tête Authorization
-        final String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        try {
-            // Extraire le token
-            final String jwt = authHeader.substring(7);
-
-            // Valider et extraire les informations du token
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(jwtService.getSignInKey())
-                    .build()
-                    .parseClaimsJws(jwt)
-                    .getBody();
-
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
-
-            System.out.println("🔍 Username du token: " + username);
-            System.out.println("🔍 Role du token: " + role);
-
-            // Si l'utilisateur n'est pas déjà authentifié
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                System.out.println("🔍 Recherche de l'utilisateur: " + username);
-
-                // Vérifier que l'utilisateur existe et est actif
-                utilisateurRepository.findByLogin(username).ifPresentOrElse(utilisateur -> {
-                    System.out.println("🔍 Utilisateur trouvé: " + utilisateur.getLogin() + ", Actif: " + utilisateur.getActif());
-
-                    if (utilisateur.getActif()) {
-                        // Déterminer le role à utiliser
-                        String authorityString;
-
-                        if (role != null && !role.isEmpty()) {
-                            authorityString = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                        } else {
-                            authorityString = "ROLE_" + utilisateur.getRole().name();
-                        }
-
-                        System.out.println("🔍 Authority définie: " + authorityString);
-
-                        // Créer les authorities avec le role
-                        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(authorityString);
-
-                        // Créer l'utilisateur Spring Security
-                        UserDetails userDetails = User.builder()
-                                .username(utilisateur.getLogin())
-                                .password(utilisateur.getPwd())
-                                .authorities(Collections.singletonList(authority))
-                                .build();
-
-                        // Créer le token d'authentification
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities()
-                                );
-
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                        // Définir l'authentification dans le contexte de sécurité
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                        System.out.println("✅ Authentification réussie pour: " + username + " avec role: " + authorityString);
-                    } else {
-                        System.out.println("❌ Utilisateur inactif: " + username);
-                    }
-                }, () -> {
-                    System.out.println("❌ Utilisateur non trouvé: " + username);
-                });
-            } else if (username == null) {
-                System.out.println("❌ Username est null dans le token");
-            } else {
-                System.out.println("🔍 Utilisateur déjà authentifié");
-            }
-        } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la validation du JWT: " + e.getMessage());
-        }
-
-        filterChain.doFilter(request, response);
-    }
-}*/
 package com.cabinetmedical.gestioncabinet.config;
 
-import com.cabinetmedical.gestioncabinet.repository.UtilisateurRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final UtilisateurRepository utilisateurRepository;
+    private final UserDetailsService userDetailsService; // Utilisation de UserDetailsService (Best Practice)
     private final JwtService jwtService;
 
-    // 🔥 Liste des routes publiques qui ne nécessitent PAS de JWT
-    private static final List<String> PUBLIC_PATHS = Arrays.asList(
-            "/api/auth/",
-            "/api/inscription/",
-            "/api/cabinets/",
-            "/api/auth/forgot-password/",
-            "/api/auth/reset-password/",
-            "/uploads/",
-            "/h2-console/"
-    );
+    // Injection via constructeur
+    public JwtAuthenticationFilter(
+            UserDetailsService userDetailsService,
+            JwtService jwtService
+    ) {
+        this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -173,108 +37,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        final String requestPath = request.getRequestURI();
-
-        // 🔥 IMPORTANT : Ignorer complètement le filtre JWT pour les routes publiques
-        if (isPublicPath(requestPath)) {
-            System.out.println("🔓 Route publique détectée: " + requestPath + " - JWT filter ignoré");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        // Récupérer le token depuis l'en-tête Authorization
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("⚠️ Pas de token JWT pour la route protégée: " + requestPath);
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            // Extraire le token
             final String jwt = authHeader.substring(7);
 
-            // Valider et extraire les informations du token
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(jwtService.getSignInKey())
-                    .build()
-                    .parseClaimsJws(jwt)
-                    .getBody();
+            // 1. Extraire le username
+            String username = jwtService.extractUsername(jwt); // Supposons que vous ayez cette méthode dans JwtService
 
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
-
-            System.out.println("🔍 Username du token: " + username);
-            System.out.println("🔍 Role du token: " + role);
-
-            // Si l'utilisateur n'est pas déjà authentifié
+            // 2. Vérifier si l'utilisateur n'est pas déjà authentifié
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                System.out.println("🔍 Recherche de l'utilisateur: " + username);
+                // 3. Charger les détails de l'utilisateur via le service standard
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                // Vérifier que l'utilisateur existe et est actif
-                utilisateurRepository.findByLogin(username).ifPresentOrElse(utilisateur -> {
-                    System.out.println("🔍 Utilisateur trouvé: " + utilisateur.getLogin() + ", Actif: " + utilisateur.getActif());
+                // 4. Valider le token
+                if (jwtService.isTokenValid(jwt, userDetails)) { // Supposons que vous ayez cette méthode
 
-                    if (utilisateur.getActif()) {
-                        // Déterminer le role à utiliser
-                        String authorityString;
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
-                        if (role != null && !role.isEmpty()) {
-                            authorityString = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-                        } else {
-                            authorityString = "ROLE_" + utilisateur.getRole().name();
-                        }
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                        System.out.println("🔍 Authority définie: " + authorityString);
-
-                        // Créer les authorities avec le role
-                        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(authorityString);
-
-                        // Créer l'utilisateur Spring Security
-                        UserDetails userDetails = User.builder()
-                                .username(utilisateur.getLogin())
-                                .password(utilisateur.getPwd())
-                                .authorities(Collections.singletonList(authority))
-                                .build();
-
-                        // Créer le token d'authentification
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails,
-                                        null,
-                                        userDetails.getAuthorities()
-                                );
-
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                        // Définir l'authentification dans le contexte de sécurité
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-                        System.out.println("✅ Authentification réussie pour: " + username + " avec role: " + authorityString);
-                    } else {
-                        System.out.println("❌ Utilisateur inactif: " + username);
-                    }
-                }, () -> {
-                    System.out.println("❌ Utilisateur non trouvé: " + username);
-                });
-            } else if (username == null) {
-                System.out.println("❌ Username est null dans le token");
-            } else {
-                System.out.println("🔍 Utilisateur déjà authentifié");
+                    // 5. Mettre à jour le contexte de sécurité
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la validation du JWT: " + e.getMessage());
+            // Log discret pour éviter de spammer la console sur des tokens expirés
+            logger.debug("Erreur JWT: " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    /**
-     * 🔥 Vérifie si le chemin de la requête est une route publique
-     */
-    private boolean isPublicPath(String requestPath) {
-        return PUBLIC_PATHS.stream().anyMatch(requestPath::startsWith);
     }
 }

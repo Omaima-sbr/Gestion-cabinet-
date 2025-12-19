@@ -1,5 +1,6 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -53,8 +54,8 @@ public class Patient {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Patient_Cabinet"))
-    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private Cabinet cabinet;
 
     @Column(name = "date_creation", nullable = false, updatable = false)
@@ -65,12 +66,15 @@ public class Patient {
     private DossierMedical dossierMedical;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<RendezVous> rendezVous;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Consultation> consultations;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Facture> factures;
 
     public enum Sexe {

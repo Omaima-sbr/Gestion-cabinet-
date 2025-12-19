@@ -96,7 +96,7 @@ const SecretaireDashboard = () => {
 
     return (
         <div style={{ padding: '2rem', backgroundColor: '#f9fafb', minHeight: '100vh' }}>
-            {/* Header */}
+            {/* Header2 */}
             <div style={{ marginBottom: '2rem' }}>
                 <h1 style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>
                     Tableau de bord - Secrétaire

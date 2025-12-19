@@ -498,7 +498,7 @@ const OrdonnancesPage = () => {
 
   return (
     <div className="ordonnances-page">
-      {/* Header */}
+      {/* Header2 */}
       <div className="ordonnances-header">
         <div className="header-left">
           <FileText size={32} />
