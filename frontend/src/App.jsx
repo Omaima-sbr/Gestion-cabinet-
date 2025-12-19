@@ -146,9 +146,9 @@ function App() {
                             path="/medecin/*"
                             element={
                                 user.role === 'MEDECIN' ? (
-                                    <ProtectedLayout role="MEDECIN">
+                                  //  <ProtectedLayout role="MEDECIN">
                                         <MedecinRoutes />
-                                    </ProtectedLayout>
+                                   // </ProtectedLayout>
                                 ) : (
                                     <Navigate to={`/${user.role.toLowerCase()}`} replace />
                                 )

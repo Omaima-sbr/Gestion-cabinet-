@@ -18,10 +18,9 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final UserDetailsService userDetailsService; // Utilisation de UserDetailsService (Best Practice)
+    private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
 
-    // Injection via constructeur
     public JwtAuthenticationFilter(
             UserDetailsService userDetailsService,
             JwtService jwtService
@@ -46,19 +45,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
+            String username = jwtService.extractUsername(jwt);
 
-            // 1. Extraire le username
-            String username = jwtService.extractUsername(jwt); // Supposons que vous ayez cette méthode dans JwtService
-
-            // 2. Vérifier si l'utilisateur n'est pas déjà authentifié
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                // 3. Charger les détails de l'utilisateur via le service standard
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                // 4. Valider le token
-                if (jwtService.isTokenValid(jwt, userDetails)) { // Supposons que vous ayez cette méthode
-
+                if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -66,13 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    // 5. Mettre à jour le contexte de sécurité
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
         } catch (Exception e) {
-            // Log discret pour éviter de spammer la console sur des tokens expirés
             logger.debug("Erreur JWT: " + e.getMessage());
         }
 

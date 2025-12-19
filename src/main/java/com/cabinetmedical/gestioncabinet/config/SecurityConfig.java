@@ -3,12 +3,12 @@ package com.cabinetmedical.gestioncabinet.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -24,7 +24,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private final AuthenticationProvider authenticationProvider; // Injecté depuis ApplicationConfig
+    private final AuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,21 +32,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // Routes publiques (Authentification, Swagger, etc.)
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/cabinets/**",
-                                "/api/inscription/**",
-                                "/uploads/**",
-                                "/h2-console/**"
-                        ).permitAll()
+                        // 🔓 Routes publiques (inscription + login)
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/cabinets/**").permitAll()
+                        .requestMatchers("/api/inscription/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
 
-                        // Routes protégées
+                        // 🔒 Routes protégées avec rôles
                         .requestMatchers("/api/dashboard/**").authenticated()
                         .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMINISTRATEUR")
                         .requestMatchers("/api/demandes/**").hasAuthority("ROLE_ADMINISTRATEUR")
-                        .requestMatchers("/api/admin-factures/**")
-                        .hasAuthority("ROLE_ADMINISTRATEUR")
+                        .requestMatchers("/api/admin-factures/**").hasAuthority("ROLE_ADMINISTRATEUR")
                         .requestMatchers("/api/medicaments/**")
                         .hasAnyAuthority("ROLE_ADMINISTRATEUR", "ROLE_MEDECIN")
 
@@ -56,8 +53,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider)
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())) // Pour H2 Console
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

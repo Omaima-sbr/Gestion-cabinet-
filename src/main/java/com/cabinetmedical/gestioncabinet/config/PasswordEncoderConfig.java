@@ -1,4 +1,4 @@
-package com.cabinetmedical.gestioncabinet.config;
+/*package com.cabinetmedical.gestioncabinet.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,4 +12,4 @@ public class PasswordEncoderConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-}
+}*/
