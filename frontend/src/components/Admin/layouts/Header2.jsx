@@ -100,17 +100,17 @@ export default function Header2({ user }) {
     const navigateToDemandDetails = (notification) => {
         setShowNotifications(false);
         handleMarkAsRead(notification.id);
-        navigate('/administrateur/demandes'); // ✅ Correction du path
+        navigate('/administrateur/candidatures'); // ✅ Correction du path
     };
 
     const navigateToAllAlerts = () => {
         setShowNotifications(false);
-        navigate('/administrateur/alertes'); // ✅ Correction du path
+        navigate('/administrateur/candidatures'); // ✅ Correction du path
     };
 
     const navigateToAllDemands = () => {
         setShowNotifications(false);
-        navigate('/administrateur/demandes'); // ✅ Correction du path
+        navigate('/administrateur/candidatures'); // ✅ Correction du path
     };
 
     const getNotificationIcon = (type) => {
