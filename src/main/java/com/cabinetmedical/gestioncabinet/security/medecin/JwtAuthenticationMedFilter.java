@@ -33,6 +33,7 @@ public class JwtAuthenticationMedFilter extends OncePerRequestFilter {
         // Chemins publics
         String path = request.getServletPath();
         if (path.startsWith("/api/auth") ||
+                path.startsWith("/api/inscription") ||
                 path.startsWith("/uploads") ||
                 path.startsWith("/api/cabinets") ||
                 path.startsWith("/h2-console")) {
