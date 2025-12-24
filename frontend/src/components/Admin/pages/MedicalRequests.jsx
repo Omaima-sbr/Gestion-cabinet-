@@ -20,6 +20,7 @@ import {
   MdInfo
 } from "react-icons/md";
 import DemandeService from "../services/DemandeService";
+import DocumentService from "../services/DocumentService"; // ✅ AJOUTER CETTE LIGNE
 
 export default function MedicalRequests() {
   const [applications, setApplications] = useState([]);
@@ -226,57 +227,52 @@ export default function MedicalRequests() {
     setShowDetails(true);
   };
 
-  const handleDownloadDocument = (fileName) => {
-    if (!fileName) {
-      showModal("Information", "Aucun document disponible", "info");
-      return;
-    }
-    
-    // Si c'est une URL complète
-    if (fileName.startsWith('http')) {
-      window.open(fileName, "_blank");
-    } else {
-      // Sinon, construire l'URL de téléchargement
-      const downloadUrl = `http://localhost:8080/api/demandes/documents/${fileName}`;
-      window.open(downloadUrl, "_blank");
-    }
-  };
 
-  const renderDocumentButton = (fileName, label) => {
-    if (!fileName) {
-      return (
-        <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-lg">
-          <MdDescription className="text-gray-400" size={20} />
-          <div>
-            <p className="text-sm font-medium text-gray-500">{label}</p>
-            <p className="text-xs text-gray-400">Non fourni</p>
-          </div>
-        </div>
-      );
-    }
-    
+  const renderDocumentButton = (documentUrl, label) => {
+  if (!documentUrl) {
     return (
+      <div className="flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-lg">
+        <MdDescription className="text-gray-400" size={20} />
+        <div>
+          <p className="text-sm font-medium text-gray-500">{label}</p>
+          <p className="text-xs text-gray-400">Non fourni</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="flex gap-2">
+      {/* Bouton Voir */}
       <button
-        onClick={() => handleDownloadDocument(fileName)}
-        className="group flex items-center justify-between w-full px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all duration-200 hover:shadow-md"
+        onClick={() => DocumentService.viewDocument(documentUrl)}
+        className="group flex-1 flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all duration-200 hover:shadow-md"
       >
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
-            <MdDownload className="text-blue-600" size={20} />
+            <MdVisibility className="text-blue-600" size={20} />
           </div>
           <div className="text-left">
             <p className="text-sm font-medium text-blue-900">{label}</p>
-            <p className="text-xs text-blue-600 truncate max-w-[200px]">
-              {fileName.includes('/') ? fileName.split('/').pop() : fileName}
-            </p>
+            <p className="text-xs text-blue-600">Cliquez pour visualiser</p>
           </div>
         </div>
         <div className="text-blue-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
           Voir →
         </div>
       </button>
-    );
-  };
+      
+      {/* Bouton Télécharger */}
+      <button
+  onClick={() => DocumentService.downloadDocument(documentUrl, label)}
+  className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border border-green-200 rounded-lg transition-all duration-200 hover:shadow-md"
+  title="Télécharger le document"
+>
+  <MdDownload className="text-green-600" size={20} />
+</button>
+    </div>
+  );
+}
 
   const filteredApplications = filterStatus === "TOUS"
     ? applications

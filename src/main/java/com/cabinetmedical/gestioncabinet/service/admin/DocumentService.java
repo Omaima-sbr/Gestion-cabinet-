@@ -1,34 +1,79 @@
 package com.cabinetmedical.gestioncabinet.service.admin;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.*;
 
 @Service
 public class DocumentService {
 
-    private final Path uploadDir = Paths.get("uploads"); // dossier physique sur ton serveur
+    private final SupabaseStorageService supabaseStorageService;
 
-    public String saveFile(MultipartFile file) throws IOException {
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
-        }
-
-        String filename = file.getOriginalFilename();
-        Path targetLocation = uploadDir.resolve(filename);
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-        return filename; // stocke juste le nom du fichier en DB
+    public DocumentService(SupabaseStorageService supabaseStorageService) {
+        this.supabaseStorageService = supabaseStorageService;
     }
 
-    public Resource loadFile(String filename) throws MalformedURLException {
-        Path file = uploadDir.resolve(filename).normalize();
-        Resource resource = new UrlResource(file.toUri());
-        if (!resource.exists()) throw new RuntimeException("Fichier non trouvé : " + filename);
-        return resource;
+    /**
+     * Sauvegarder une licence
+     */
+    public String saveLicence(MultipartFile file) throws IOException {
+        System.out.println("📄 Upload licence : " + file.getOriginalFilename());
+        return supabaseStorageService.uploadFile(file, "licences");
+    }
+
+    /**
+     * Sauvegarder un diplôme
+     */
+    public String saveDiplome(MultipartFile file) throws IOException {
+        System.out.println("🎓 Upload diplôme : " + file.getOriginalFilename());
+        return supabaseStorageService.uploadFile(file, "diplomes");
+    }
+
+    /**
+     * Sauvegarder une CIN
+     */
+    public String saveCinMedecin(MultipartFile file) throws IOException {
+        System.out.println("🪪 Upload CIN médecin : " + file.getOriginalFilename());
+        return supabaseStorageService.uploadFile(file, "cin_medecins");
+    }
+
+    /**
+     * Sauvegarder un logo de cabinet
+     */
+    public String saveLogo(MultipartFile file) throws IOException {
+        System.out.println("🏥 Upload logo cabinet : " + file.getOriginalFilename());
+        return supabaseStorageService.uploadFile(file, "logos");
+    }
+
+    /**
+     * Sauvegarder une signature
+     */
+    public String saveSignature(MultipartFile file) throws IOException {
+        System.out.println("✍️ Upload signature : " + file.getOriginalFilename());
+        return supabaseStorageService.uploadFile(file, "signatures");
+    }
+
+    /**
+     * Récupérer un document par son URL
+     */
+    public byte[] loadFile(String fileUrl) throws IOException {
+        String filePath = supabaseStorageService.extractFilePathFromUrl(fileUrl);
+        return supabaseStorageService.downloadFile(filePath);
+    }
+
+    /**
+     * Supprimer un document
+     */
+    public void deleteFile(String fileUrl) throws IOException {
+        String filePath = supabaseStorageService.extractFilePathFromUrl(fileUrl);
+        supabaseStorageService.deleteFile(filePath);
+    }
+
+    /**
+     * Obtenir l'URL publique d'un document
+     */
+    public String getPublicUrl(String filePath) {
+        return supabaseStorageService.getPublicUrl(filePath);
     }
 }
