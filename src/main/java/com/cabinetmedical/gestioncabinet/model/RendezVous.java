@@ -69,7 +69,7 @@ public class RendezVous {
     }
 
     public enum Motif {
-        CONSULTATION, CONTROLE
+        CONSULTATION, CONTROLE,URGENCE,SUIVI
     }
 
     public enum Statut {

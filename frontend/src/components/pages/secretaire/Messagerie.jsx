@@ -87,14 +87,9 @@ const Messagerie = () => {
 
         try {
             await apiService.messagerie.supprimerMessage(messageId);
-
-            // Retirer le message de la conversation
             setConversation(prev => prev.filter(msg => msg.id !== messageId));
-
-            // Recharger la liste des conversations
             loadMessages();
 
-            // Si c'était le seul message, fermer la conversation
             if (conversation.length <= 1) {
                 setSelectedMessage(null);
                 setSelectedDestinataire(null);
@@ -205,7 +200,42 @@ const Messagerie = () => {
     };
 
     const getCurrentUserId = () => {
-        return localStorage.getItem('userId') || null;
+        // Essayer plusieurs sources possibles
+
+        // 1. localStorage 'userId'
+        let userId = localStorage.getItem('userId');
+        if (userId) {
+            console.log('✅ User ID trouvé dans localStorage.userId:', userId);
+            return parseInt(userId);
+        }
+
+        // 2. localStorage 'user' (objet JSON)
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                if (user && user.userId) {
+                    console.log('✅ User ID trouvé dans localStorage.user:', user.userId);
+                    return parseInt(user.userId);
+                }
+                if (user && user.id) {
+                    console.log('✅ User ID trouvé dans localStorage.user.id:', user.id);
+                    return parseInt(user.id);
+                }
+            } catch (e) {
+                console.error('❌ Erreur parsing user:', e);
+            }
+        }
+
+        // 3. sessionStorage
+        userId = sessionStorage.getItem('userId');
+        if (userId) {
+            console.log('✅ User ID trouvé dans sessionStorage:', userId);
+            return parseInt(userId);
+        }
+
+        console.error('❌ User ID introuvable dans localStorage/sessionStorage');
+        return null;
     };
 
     const isAudioMessage = (msg) => {
@@ -219,9 +249,9 @@ const Messagerie = () => {
 
     return (
         <div className="messenger-container">
-            {/* Header2 */}
+            {/* Header */}
             <div className="messenger-header">
-                <h1 className="messenger-title">💬 </h1>
+                <h1 className="messenger-title">💬 Messagerie</h1>
                 <div className="messenger-tabs">
                     <button
                         className={`messenger-tab ${activeTab === 'recus' ? 'active' : ''}`}
@@ -246,7 +276,7 @@ const Messagerie = () => {
 
             {/* Body */}
             <div className="messenger-body">
-                {/* Sidebar2 */}
+                {/* Sidebar */}
                 <div className="messenger-sidebar">
                     {activeTab === 'nouveau' ? (
                         <div className="messenger-contacts">
@@ -313,7 +343,7 @@ const Messagerie = () => {
                                             <div className="messenger-conv-meta">
                                                 <div className="messenger-conv-time">{formatTime(msg.dateEnvoi)}</div>
                                                 {!msg.lu && activeTab === 'recus' && (
-                                                    <div className="messenger-unread-badge">●</div>
+                                                    <div className="messenger-unread-badge"></div>
                                                 )}
                                             </div>
                                         </div>
@@ -335,10 +365,11 @@ const Messagerie = () => {
                                     <span className="messenger-status">En ligne</span>
                                 </div>
                             </div>
-
                             <div className="messenger-messages">
                                 {conversation.length === 0 && selectedMessage ? (
-                                    <div className={`messenger-message ${activeTab === 'recus' ? 'received' : 'sent'}`}>
+                                    <div className={`messenger-message ${
+                                        selectedMessage.idExpediteur !== getCurrentUserId() ? 'received' : 'sent'
+                                    }`}>
                                         <div className="messenger-message-content">
                                             {isAudioMessage(selectedMessage) ? (
                                                 <AudioPlayer audioPath={selectedMessage.pieceJointe} />
@@ -361,9 +392,14 @@ const Messagerie = () => {
                                     </div>
                                 ) : (
                                     conversation.map((msg, idx) => {
-                                        const isReceived = msg.idDestinataire === getCurrentUserId();
+                                        const currentUserId = getCurrentUserId();
+                                        const isReceived = msg.idDestinataire === currentUserId;
+
                                         return (
-                                            <div key={idx} className={`messenger-message ${isReceived ? 'received' : 'sent'}`}>
+                                            <div
+                                                key={idx}
+                                                className={`messenger-message ${isReceived ? 'received' : 'sent'}`}
+                                            >
                                                 <div className="messenger-message-content">
                                                     {isAudioMessage(msg) ? (
                                                         <AudioPlayer audioPath={msg.pieceJointe} />
@@ -389,7 +425,6 @@ const Messagerie = () => {
                                 )}
                                 <div ref={messagesEndRef} />
                             </div>
-
                             <div className="messenger-input-container">
                                 {showEmojiPicker && <EmojiPicker onEmojiSelect={handleEmojiSelect} />}
 

@@ -4,12 +4,16 @@ import { authService } from '../../../services/authService';
 import notificationService from '../../../services/notificationService';
 import cabinetService from '../../../services/cabinetService';
 import patientService from '../../../services/patientService';
+import documentService from '../documentService';
+
+
 import { useTheme } from '../../../contexts';
 import './Navbar.css';
 
 const Navbar = () => {
     const [user, setUser] = useState(null);
     const [cabinet, setCabinet] = useState(null);
+    const [logoUrl, setLogoUrl] = useState(null); // ✅ AJOUTER CETTE LIGNE
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
@@ -19,42 +23,61 @@ const Navbar = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
-    
+
     const notificationRef = useRef(null);
     const profileRef = useRef(null);
     const searchRef = useRef(null);
     const searchInputRef = useRef(null);
     const colorPickerRef = useRef(null);
 
-    const { 
-        currentPalette,  
-        isDarkMode, 
-        changePalette, 
+    const {
+        currentPalette,
+        isDarkMode,
+        changePalette,
         toggleDarkMode,
         getCurrentPalette,
         getPalettesByType
     } = useTheme();
 
+    // ✅ NOUVELLE FONCTION : Charger le logo avec authentification
+    const loadCabinetLogo = async (logoPath) => {
+        if (!logoPath) {
+            console.log('📋 [Navbar] Pas de logo à charger');
+            setLogoUrl(null);
+            return;
+        }
+
+        try {
+            console.log('🔍 [Navbar] Chargement du logo:', logoPath);
+            const dataUrl = await documentService.loadAsDataUrl(logoPath); // ✅ Utiliser documentService
+            setLogoUrl(dataUrl);
+            console.log('✅ [Navbar] Logo chargé avec succès');
+        } catch (error) {
+            console.error('❌ [Navbar] Erreur chargement logo:', error);
+            setLogoUrl(null);
+        }
+    };
+
     const parseDate = (dateString) => {
         if (!dateString) return null;
-        
+
         const formats = [
             dateString,
             dateString.endsWith('Z') ? dateString : dateString + 'Z',
             dateString.replace(' ', 'T'),
             dateString.split('.')[0].replace(' ', 'T') + 'Z'
         ];
-        
+
         for (const format of formats) {
             const date = new Date(format);
             if (!isNaN(date.getTime())) {
                 return date;
             }
         }
-        
+
         const mysqlPattern = /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
         const match = dateString.match(mysqlPattern);
-        
+
         if (match) {
             const [_, year, month, day, hour, minute, second] = match;
             return new Date(
@@ -66,19 +89,19 @@ const Navbar = () => {
                 parseInt(second)
             );
         }
-        
+
         return null;
     };
 
     const formatDate = (dateString) => {
         if (!dateString) return 'Date non disponible';
-        
+
         const date = parseDate(dateString);
         if (!date) {
             console.warn('Date non parsable:', dateString);
             return 'Date non disponible';
         }
-        
+
         try {
             return date.toLocaleDateString('fr-FR', {
                 day: '2-digit',
@@ -94,12 +117,11 @@ const Navbar = () => {
             const year = date.getFullYear();
             const hours = date.getHours().toString().padStart(2, '0');
             const minutes = date.getMinutes().toString().padStart(2, '0');
-            
+
             return `${day}/${month}/${year} ${hours}:${minutes}`;
         }
     };
 
-    // ✅ Fonction pour formater le type de notification
     const formatNotificationType = (type) => {
         const typeMap = {
             'RAPPEL_RDV': 'Rappel RDV',
@@ -110,7 +132,6 @@ const Navbar = () => {
         return typeMap[type] || type;
     };
 
-    // ✅ Fonction pour obtenir la classe CSS du type
     const getNotificationTypeClass = (type) => {
         return type.toLowerCase();
     };
@@ -118,14 +139,14 @@ const Navbar = () => {
     const formatRelativeTime = (dateString) => {
         const date = parseDate(dateString);
         if (!date) return 'récemment';
-        
+
         const now = new Date();
         const diffMs = now - date;
         const diffSec = Math.floor(diffMs / 1000);
         const diffMin = Math.floor(diffSec / 60);
         const diffHour = Math.floor(diffMin / 60);
         const diffDay = Math.floor(diffHour / 24);
-        
+
         if (diffDay > 7) {
             return formatDate(dateString);
         } else if (diffDay > 0) {
@@ -182,7 +203,7 @@ const Navbar = () => {
     useEffect(() => {
         loadUserAndCabinet();
         loadNotifications();
-        
+
         const interval = setInterval(() => {
             loadUnreadCount();
         }, 10000);
@@ -218,14 +239,20 @@ const Navbar = () => {
         }
     }, [showSearch]);
 
+    // ✅ MODIFIÉ : Charger le cabinet ET son logo
     const loadUserAndCabinet = async () => {
         const currentUser = authService.getCurrentUser();
         setUser(currentUser);
-        
+
         try {
             const cabinetInfo = await cabinetService.getCabinetInfo();
             console.log('📋 [Navbar] Cabinet info reçu:', cabinetInfo);
             setCabinet(cabinetInfo);
+
+            // ✅ Charger le logo si disponible
+            if (cabinetInfo?.logo) {
+                await loadCabinetLogo(cabinetInfo.logo);
+            }
         } catch (error) {
             console.error('❌ [Navbar] Erreur chargement cabinet:', error);
         }
@@ -234,7 +261,7 @@ const Navbar = () => {
     const loadNotifications = async () => {
         try {
             const data = await notificationService.getNotifications();
-            
+
             const processedNotifications = data.map(notification => ({
                 ...notification,
                 parsedDate: parseDate(notification.dateNotification)
@@ -243,7 +270,7 @@ const Navbar = () => {
                 const dateB = b.parsedDate || new Date(0);
                 return dateB - dateA;
             });
-            
+
             setNotifications(processedNotifications);
             setUnreadCount(processedNotifications.filter(n => !n.lu).length);
         } catch (error) {
@@ -290,17 +317,14 @@ const Navbar = () => {
         <nav className="navbar">
             <div className="navbar-left">
                 <div className="logo-container">
-                    {cabinet?.logo ? (
-                        <img 
-                            src={cabinet.logo}
-                            alt={`Logo ${cabinet.nom}`}
-                            className="cabinet-logo" 
-                            onLoad={() => {
-                                console.log("✅ [Navbar] Logo chargé avec succès:", cabinet.logo);
-                            }}
+                    {/* ✅ MODIFIÉ : Utiliser logoUrl au lieu de cabinet.logo */}
+                    {logoUrl ? (
+                        <img
+                            src={logoUrl}
+                            alt={`Logo ${cabinet?.nom || 'Cabinet'}`}
+                            className="cabinet-logo"
                             onError={(e) => {
-                                console.error("❌ [Navbar] Erreur chargement logo:", cabinet.logo);
-                                console.error("   → URL tentée:", e.target.src);
+                                console.error("❌ [Navbar] Erreur affichage logo");
                                 e.target.style.display = 'none';
                                 if (e.target.nextElementSibling) {
                                     e.target.nextElementSibling.style.display = 'flex';
@@ -308,16 +332,16 @@ const Navbar = () => {
                             }}
                         />
                     ) : null}
-                    
-                    <div 
-                        className="logo-placeholder" 
-                        style={{ 
-                            display: cabinet?.logo ? 'none' : 'flex' 
+
+                    <div
+                        className="logo-placeholder"
+                        style={{
+                            display: logoUrl ? 'none' : 'flex'
                         }}
                     >
                         {cabinet?.nom?.charAt(0) || 'C'}
                     </div>
-                    
+
                     <div className="cabinet-info">
                         <h2 className="cabinet-name">{cabinet?.nom || 'Cabinet Médical'}</h2>
                         <p className="cabinet-specialty">{cabinet?.specialite || 'Médecine Générale'}</p>
@@ -332,7 +356,7 @@ const Navbar = () => {
             <div className="navbar-right">
                 {/* Recherche */}
                 <div className="search-container" ref={searchRef}>
-                    <button 
+                    <button
                         className="search-btn"
                         onClick={() => setShowSearch(!showSearch)}
                         title="Rechercher un patient"
@@ -355,12 +379,12 @@ const Navbar = () => {
                                     <div className="search-spinner"></div>
                                 )}
                             </div>
-                            
+
                             {searchResults.length > 0 && (
                                 <div className="search-results">
                                     {searchResults.map(patient => (
-                                        <div 
-                                            key={patient.id} 
+                                        <div
+                                            key={patient.id}
                                             className="search-result-item"
                                             onClick={() => handlePatientSelect(patient)}
                                         >
@@ -382,7 +406,7 @@ const Navbar = () => {
                                     ))}
                                 </div>
                             )}
-                            
+
                             {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
                                 <div className="no-results">
                                     Aucun patient trouvé pour "{searchQuery}"
@@ -407,7 +431,7 @@ const Navbar = () => {
                         <div className="color-picker-dropdown compact">
                             <div className="color-picker-header">
                                 <h4>Thème</h4>
-                                <button 
+                                <button
                                     className="dark-mode-toggle"
                                     onClick={toggleDarkMode}
                                     title={isDarkMode ? "Passer en mode clair" : "Passer en mode sombre"}
@@ -415,7 +439,7 @@ const Navbar = () => {
                                     {isDarkMode ? '🌙' : '☀️'}
                                 </button>
                             </div>
-                            
+
                             {/* Palettes claires */}
                             <div className="palette-section">
                                 <h5 className="palette-section-title">Clair</h5>
@@ -428,16 +452,16 @@ const Navbar = () => {
                                             title={palette.name}
                                         >
                                             <div className="palette-preview">
-                                                <div 
-                                                    className="color-primary" 
+                                                <div
+                                                    className="color-primary"
                                                     style={{ backgroundColor: palette.primary }}
                                                 />
-                                                <div 
-                                                    className="color-secondary" 
+                                                <div
+                                                    className="color-secondary"
                                                     style={{ backgroundColor: palette.secondary }}
                                                 />
-                                                <div 
-                                                    className="color-accent" 
+                                                <div
+                                                    className="color-accent"
                                                     style={{ backgroundColor: palette.accent }}
                                                 />
                                             </div>
@@ -448,7 +472,7 @@ const Navbar = () => {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             {/* Palettes sombres */}
                             <div className="palette-section">
                                 <h5 className="palette-section-title">Sombre</h5>
@@ -461,16 +485,16 @@ const Navbar = () => {
                                             title={palette.name}
                                         >
                                             <div className="palette-preview dark">
-                                                <div 
-                                                    className="color-primary" 
+                                                <div
+                                                    className="color-primary"
                                                     style={{ backgroundColor: palette.primary }}
                                                 />
-                                                <div 
-                                                    className="color-secondary" 
+                                                <div
+                                                    className="color-secondary"
                                                     style={{ backgroundColor: palette.secondary }}
                                                 />
-                                                <div 
-                                                    className="color-accent" 
+                                                <div
+                                                    className="color-accent"
                                                     style={{ backgroundColor: palette.accent }}
                                                 />
                                             </div>
@@ -481,7 +505,7 @@ const Navbar = () => {
                                     ))}
                                 </div>
                             </div>
-                            
+
                             {/* Palette actuelle */}
                             <div className="current-palette-info">
                                 <span className="current-palette-name" title={getCurrentPalette()?.name}>
@@ -494,7 +518,7 @@ const Navbar = () => {
 
                 {/* Notifications */}
                 <div className="notifications-container" ref={notificationRef}>
-                    <button 
+                    <button
                         className="notification-btn"
                         onClick={() => setShowNotifications(!showNotifications)}
                     >
@@ -509,7 +533,7 @@ const Navbar = () => {
                             <div className="notifications-header">
                                 <h3>Notifications ({notifications.length})</h3>
                                 {unreadCount > 0 && (
-                                    <button 
+                                    <button
                                         className="mark-all-read-btn"
                                         onClick={handleMarkAllAsRead}
                                     >
@@ -517,29 +541,27 @@ const Navbar = () => {
                                     </button>
                                 )}
                             </div>
-                            
-                            {/* ✅ SECTION NOTIFICATIONS CORRIGÉE */}
+
                             <div className="notifications-list">
                                 {notifications.length === 0 ? (
                                     <p className="no-notifications">Aucune notification</p>
                                 ) : (
                                     notifications.map(notification => (
-                                        <div 
-                                            key={notification.id} 
+                                        <div
+                                            key={notification.id}
                                             className={`notification-item ${!notification.lu ? 'unread' : ''}`}
                                             onClick={() => handleNotificationClick(notification.id)}
                                         >
                                             <div className="notification-content">
-                                                {/* ✅ Afficher le type de notification */}
-                                                <span 
+                                                <span
                                                     className={`notification-type ${getNotificationTypeClass(notification.type)}`}
                                                     title={`Type: ${formatNotificationType(notification.type)}`}
                                                 >
                                                     {formatNotificationType(notification.type)}
                                                 </span>
-                                                
+
                                                 <p className="notification-message">{notification.message}</p>
-                                                
+
                                                 <span className="notification-time">
                                                     {formatRelativeTime(notification.dateNotification)}
                                                 </span>
@@ -557,7 +579,7 @@ const Navbar = () => {
 
                 {/* Profil utilisateur */}
                 <div className="user-profile-container" ref={profileRef}>
-                    <button 
+                    <button
                         className="user-profile-btn"
                         onClick={() => setShowProfileMenu(!showProfileMenu)}
                     >
@@ -593,7 +615,7 @@ const Navbar = () => {
                                     <p className="profile-role">{user?.role}</p>
                                 </div>
                             </div>
-                            
+
                             <div className="profile-menu">
                                 <button className="profile-menu-item">
                                     <Settings size={16} />
