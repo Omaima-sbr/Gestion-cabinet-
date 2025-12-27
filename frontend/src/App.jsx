@@ -12,7 +12,6 @@ import AdminRoutes from '../routes/AdminRoutes';
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import DebugAuth from './components/debug/DebugAuth';
 
 import './App.css';
 import './ProtectedLayout.css';
@@ -59,7 +58,7 @@ function App() {
 
     return (
         <div className="app">
-            <DebugAuth />
+
             <Routes>
                 {/* ========== ROUTES PUBLIQUES (SANS LAYOUT PROTÉGÉ) ========== */}
 

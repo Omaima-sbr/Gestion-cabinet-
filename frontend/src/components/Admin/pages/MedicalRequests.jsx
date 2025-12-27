@@ -656,6 +656,8 @@ export default function MedicalRequests() {
                   {renderDocumentButton(selectedApp.documentLicence, "Licence médicale")}
                   {renderDocumentButton(selectedApp.documentDiplome, "Diplôme")}
                   {renderDocumentButton(selectedApp.documentCinMedecin, "CIN médecin")}
+                    {renderDocumentButton(selectedApp.logoCabinet, "Logo cabinet")}
+
                 </div>
               </div>
 
