@@ -4,7 +4,7 @@ import { authService } from '../../../services/authService';
 import notificationService from '../../../services/notificationService';
 import cabinetService from '../../../services/cabinetService';
 import patientService from '../../../services/patientService';
-import documentService from '../documentService';
+import DocumentService from '../documentService';
 
 
 import { useTheme } from '../../../contexts';
@@ -49,7 +49,7 @@ const Navbar = () => {
 
         try {
             console.log('🔍 [Navbar] Chargement du logo:', logoPath);
-            const dataUrl = await documentService.loadAsDataUrl(logoPath); // ✅ Utiliser documentService
+            const dataUrl = await DocumentService.loadAsDataUrl(logoPath); // ✅ Utiliser documentService
             setLogoUrl(dataUrl);
             console.log('✅ [Navbar] Logo chargé avec succès');
         } catch (error) {

@@ -19,33 +19,31 @@ class DocumentService {
         console.log('🔍 [DocumentService] Chargement:', documentPath);
 
         try {
-            // Si c'est une URL complète Supabase ou localhost, extraire juste le nom du fichier
             let fileName = documentPath;
 
-            if (documentPath.includes('supabase.co') || documentPath.includes('localhost:8080')) {
-                // Extraire le nom du fichier depuis l'URL
+            // ✅ Si c'est une URL Supabase complète, extraire le nom du fichier
+            if (documentPath.includes('supabase.co')) {
+                // Extraire après "logos/"
+                const match = documentPath.match(/logos\/(.+)$/);
+                if (match) {
+                    fileName = match[1];
+                    console.log('📎 [DocumentService] Fichier extrait de Supabase:', fileName);
+                }
+            } else if (documentPath.includes('/')) {
+                // URL localhost ou autre
                 const urlParts = documentPath.split('/');
                 fileName = urlParts[urlParts.length - 1];
-                console.log('📎 [DocumentService] Nom de fichier extrait:', fileName);
             }
 
-            // Construire l'URL de l'API
-            const apiUrl = `${this.baseURL}/admin/documents/view?path=${encodeURIComponent(fileName)}`;
-            console.log('🌐 [DocumentService] URL API:', apiUrl);
+            // Utiliser l'endpoint backend
+            const finalUrl = `${this.baseURL}/public/logos/${encodeURIComponent(fileName)}`;
+            console.log('🌐 [DocumentService] URL API:', finalUrl);
 
-            // Récupérer le token
-            const token = authService.getToken();
-            if (!token) {
-                throw new Error('Token non disponible');
-            }
-
-            // Faire la requête avec le token
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+            const response = await fetch(finalUrl, {
+                method: 'GET'
             });
+
+            console.log('📡 [DocumentService] Réponse:', response.status, response.statusText);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -53,20 +51,18 @@ class DocumentService {
                 throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
             }
 
-            // Récupérer le blob
             const blob = await response.blob();
             console.log('📦 [DocumentService] Blob reçu:', blob.type, blob.size, 'bytes');
 
-            // Convertir en Data URL
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onloadend = () => {
-                    console.log('✅ [DocumentService] Conversion en Data URL réussie');
+                    console.log('✅ [DocumentService] Conversion réussie');
                     resolve(reader.result);
                 };
-                reader.onerror = () => {
-                    console.error('❌ [DocumentService] Erreur conversion blob');
-                    reject(new Error('Erreur lors de la conversion en Data URL'));
+                reader.onerror = (error) => {
+                    console.error('❌ [DocumentService] Erreur conversion:', error);
+                    reject(new Error('Erreur conversion blob'));
                 };
                 reader.readAsDataURL(blob);
             });
@@ -76,7 +72,6 @@ class DocumentService {
             throw error;
         }
     }
-
     /**
      * Obtient l'URL complète pour afficher un document
      * @param {string} documentPath - Chemin du document
