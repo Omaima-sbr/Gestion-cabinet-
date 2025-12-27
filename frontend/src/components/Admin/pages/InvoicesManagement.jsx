@@ -357,27 +357,27 @@ export default function InvoicesManagement() {
                           {invoice.cabinetEmail}
                         </td>
 
-                        {/* Montant input */}
-                        <td className="px-6 py-4">
-                          <div className="relative">
-                            <input
-                              type="number"
-                              value={editingInvoices[invoice.id]?.montant || ""}
-                              onChange={(e) => handleEditChange(invoice.id, "montant", e.target.value)}
-                              disabled={!isEditable}
-                              className={`w-full px-3 py-2 border rounded transition-colors outline-none text-gray-800 ${
-                                isEditable 
-                                  ? "bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
-                                  : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
-                              }`}
-                              placeholder="0.00"
-                            />
-                            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                          {/* Montant input */}
+                          <td className="px-6 py-4">
+                              <div className="relative">
+                                  <input
+                                      type="number"
+                                      value={editingInvoices[invoice.id]?.montant || ""}
+                                      onChange={(e) => handleEditChange(invoice.id, "montant", e.target.value)}
+                                      disabled={!isEditable}
+                                      className={`w-full px-3 py-2 pr-12 border rounded transition-colors outline-none font-semibold text-base ${
+                                          isEditable
+                                              ? "bg-white border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-gray-900"
+                                              : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-700"
+                                      }`}
+                                      placeholder="0.00"
+                                      style={{ minWidth: "140px" }}
+                                  />
+                                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm font-medium">
                               {isEditable ? "MAD" : <MdLock size={14} className="text-gray-400" />}
                             </span>
-                          </div>
-                        </td>
-
+                              </div>
+                          </td>
                         {/* Période input */}
                         <td className="px-6 py-4">
                           <input
@@ -391,6 +391,8 @@ export default function InvoicesManagement() {
                                 : "bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
                             }`}
                             placeholder="MM/AAAA"
+                            style={{ minWidth: "140px" }}
+
                           />
                         </td>
 

@@ -323,7 +323,7 @@ export default function Header2({ user }) {
                     <div className="flex items-center gap-3">
                         <div className="text-right hidden md:block">
                             <p className="text-white font-semibold text-sm">{user?.name || "Administrateur"}</p>
-                            <p className="text-blue-100/70 text-xs">{user?.role || "Super Admin"}</p>
+                            <p className="text-blue-100/70 text-xs">{user?.role || "Admin"}</p>
                         </div>
 
                         <div className="relative w-12 h-12 rounded-full cursor-pointer overflow-hidden">
