@@ -12,6 +12,12 @@ import AdminRoutes from '../routes/AdminRoutes';
 import Navbar from './components/common/Navbar';
 import Sidebar from './components/common/Sidebar';
 import LoadingSpinner from './components/common/LoadingSpinner';
+// Import du ThemeProvider pour la secrétaire
+// OPTION 1 : Import depuis useTheme.js (recommandé)
+import { ThemeProvider } from './medecin/contexts/useTheme';
+
+// OU OPTION 2 : Import direct depuis ThemeContext.jsx
+// import { ThemeProvider } from './medecin/contexts/ThemeContext';
 
 import './App.css';
 import './ProtectedLayout.css';
@@ -37,28 +43,29 @@ function App() {
         setIsSidebarOpen(false);
     };
 
-    // Layout pour les routes protégées avec navbar et sidebar
+    // Layout pour les routes protégées avec navbar et sidebar (SECRÉTAIRE)
     const ProtectedLayout = ({ children, role }) => (
-        <div className="protected-layout">
-            <Navbar
-                onMenuToggle={toggleSidebar}
-                isSidebarOpen={isSidebarOpen}
-            />
-            <div className="app-container">
-                <Sidebar
-                    isMobileOpen={isSidebarOpen}
-                    onClose={closeSidebar}
+        <ThemeProvider>
+            <div className="protected-layout">
+                <Navbar
+                    onMenuToggle={toggleSidebar}
+                    isSidebarOpen={isSidebarOpen}
                 />
-                <main className="main-content" onClick={closeSidebar}>
-                    {children}
-                </main>
+                <div className="app-container">
+                    <Sidebar
+                        isMobileOpen={isSidebarOpen}
+                        onClose={closeSidebar}
+                    />
+                    <main className="main-content" onClick={closeSidebar}>
+                        {children}
+                    </main>
+                </div>
             </div>
-        </div>
+        </ThemeProvider>
     );
 
     return (
         <div className="app">
-
             <Routes>
                 {/* ========== ROUTES PUBLIQUES (SANS LAYOUT PROTÉGÉ) ========== */}
 
@@ -126,7 +133,7 @@ function App() {
 
                 {user ? (
                     <>
-                        {/* Routes Secrétaire - ✅ RETIRÉ /* */}
+                        {/* Routes Secrétaire - ✅ AVEC ThemeProvider */}
                         <Route
                             path="/secretaire/*"
                             element={
@@ -140,21 +147,19 @@ function App() {
                             }
                         />
 
-                        {/* Routes Médecin - ✅ RETIRÉ /* */}
+                        {/* Routes Médecin - ✅ Garde son propre layout */}
                         <Route
                             path="/medecin/*"
                             element={
                                 user.role === 'MEDECIN' ? (
-                                  //  <ProtectedLayout role="MEDECIN">
-                                        <MedecinRoutes />
-                                   // </ProtectedLayout>
+                                    <MedecinRoutes />
                                 ) : (
                                     <Navigate to={`/${user.role.toLowerCase()}`} replace />
                                 )
                             }
                         />
 
-                        {/* Routes Administrateur - ✅ RETIRÉ /* */}
+                        {/* Routes Administrateur - ✅ Garde son propre layout */}
                         <Route
                             path="/administrateur/*"
                             element={

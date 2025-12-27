@@ -1,6 +1,6 @@
 import api from './api';
 
-export const patientService = {
+export  const patientService = {
     getAll: (page = 0, size = 10) =>
         api.get(`/secretaire/patients?page=${page}&size=${size}`),
 
@@ -25,3 +25,4 @@ export const patientService = {
     envoyerAuMedecin: (patientId, medecinId) =>
         api.post(`/secretaire/patients/${patientId}/envoyer-medecin/${medecinId}`)
 };
+export default patientService;
