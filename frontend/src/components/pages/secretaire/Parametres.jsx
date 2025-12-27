@@ -18,11 +18,19 @@ const Parametres = () => {
         numTel: ''
     });
 
+
     // Données du mot de passe
     const [passwordData, setPasswordData] = useState({
         ancienMotDePasse: '',
         nouveauMotDePasse: '',
         confirmationMotDePasse: ''
+    });
+
+    // Visibilité des mots de passe
+    const [showPassword, setShowPassword] = useState({
+        ancien: false,
+        nouveau: false,
+        confirmation: false
     });
 
     useEffect(() => {

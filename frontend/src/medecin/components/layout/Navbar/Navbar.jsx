@@ -617,10 +617,6 @@ const Navbar = () => {
                             </div>
 
                             <div className="profile-menu">
-                                <button className="profile-menu-item">
-                                    <Settings size={16} />
-                                    <span>Paramètres</span>
-                                </button>
                                 <button className="profile-menu-item logout" onClick={handleLogout}>
                                     <LogOut size={16} />
                                     <span>Déconnexion</span>

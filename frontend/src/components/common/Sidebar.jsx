@@ -1,11 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import {
+    LayoutDashboard,
+    Users,
+    Calendar,
+    CreditCard,
+    MessageSquare,
+    Settings,
+    Menu,
+    X,
+    Bell
+} from 'lucide-react';
 import apiService from '../../services/apiService.js';
 import './Sidebar.css';
 
-const Sidebar = ({ isMobileOpen = false, onClose }) => {
-    const [unreadCount, setUnreadCount] = useState(0);
+const Sidebar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const location = useLocation();
 
     useEffect(() => {
         const fetchUnreadCount = async () => {
@@ -23,131 +36,153 @@ const Sidebar = ({ isMobileOpen = false, onClose }) => {
         return () => clearInterval(interval);
     }, []);
 
-    const menu = [
+    const menuItems = [
         {
-            label: "Dashboard",
-            path: "/secretaire",
-            icon: "📊",
-            description: "Vue d'ensemble"
+            path: '/secretaire',
+            icon: <LayoutDashboard size={22} />,
+            label: 'Dashboard',
+            exact: true
         },
         {
-            label: "Patients",
-            path: "/secretaire/patients",
-            icon: "🧑‍⚕️",
-            description: "Gestion des patients"
+            path: '/secretaire/patients',
+            icon: <Users size={22} />,
+            label: 'Patients'
         },
         {
-            label: "Rendez-vous",
-            path: "/secretaire/rendez-vous",
-            icon: "📅",
-            description: "Calendrier"
+            path: '/secretaire/rendez-vous',
+            icon: <Calendar size={22} />,
+            label: 'Rendez-vous'
         },
         {
-            label: "Messagerie",
-            path: "/secretaire/messagerie",
-            icon: "💬",
-            description: "Messages",
+            path: '/secretaire/messagerie',
+            icon: <MessageSquare size={22} />,
+            label: 'Messagerie',
             badge: unreadCount
         },
         {
-            label: "Factures",
-            path: "/secretaire/factures",
-            icon: "💳",
-            description: "Facturation"
+            path: '/secretaire/factures',
+            icon: <CreditCard size={22} />,
+            label: 'Factures'
         },
         {
-            label: "Paramètres",
-            path: "/secretaire/parametres",
-            icon: "⚙️",
-            description: "Configuration"
+            path: '/secretaire/notifications',
+            icon: <Bell size={22} />,
+            label: 'Notifications'
         },
         {
-            label: "Notifications",
-            path: "/secretaire/notifications",
-            icon: "🔔",
-            description: "Notifications"
-        },
+            path: '/secretaire/parametres',
+            icon: <Bell size={22} />,
+            label: 'parametres'
+        }
     ];
 
-    const handleLinkClick = () => {
-        // Fermer la sidebar sur mobile après un clic
-        if (window.innerWidth <= 768 && onClose) {
-            onClose();
+    const bottomMenuItems = [
+        {
+            path: '/secretaire/parametres',
+            icon: <Settings size={22} />,
+            label: 'Paramètres'
         }
-    };
+    ];
+
+    // Fermer la sidebar mobile lors du changement de route
+    useEffect(() => {
+        setIsMobileOpen(false);
+    }, [location.pathname]);
+
+    // Gérer la taille de l'écran
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768) {
+                setIsMobileOpen(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const toggleSidebar = useCallback(() => {
+        if (window.innerWidth <= 768) {
+            setIsMobileOpen(prev => !prev);
+        } else {
+            setIsCollapsed(prev => !prev);
+        }
+    }, []);
+
+    const closeMobileSidebar = useCallback(() => {
+        if (window.innerWidth <= 768) {
+            setIsMobileOpen(false);
+        }
+    }, []);
 
     return (
         <>
-            {/* Overlay pour mobile */}
-            {isMobileOpen && (
-                <div
-                    className="sidebar-overlay"
-                    onClick={onClose}
-                />
-            )}
-
-            <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
+            <div className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobileOpen ? 'mobile-open' : ''}`}>
                 <div className="sidebar-header">
-                    <div className="sidebar-logo">
-                        <img
-                            src="/defaultLogo.png"
-                            alt="Logo"
-                            className="logo-image"
-                        />
-
-                        {/* Texte affiché seulement si non-collapsé */}
-                        {!isCollapsed && (
-                            <span className="logo-text">Cabinet Médical</span>
-                        )}
-                    </div>
+                    {!isCollapsed && (
+                        <h2 className="sidebar-title">Menu</h2>
+                    )}
+                    <button
+                        className="toggle-btn"
+                        onClick={toggleSidebar}
+                        title={isCollapsed ? 'Développer' : 'Réduire'}
+                    >
+                        {isCollapsed || isMobileOpen ? <Menu size={24} /> : <X size={24} />}
+                    </button>
                 </div>
 
-                <button
-                    className="sidebar-toggle"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    title={isCollapsed ? "Développer" : "Réduire"}
-                >
-                    {isCollapsed ? '→' : '←'}
-                </button>
-
-                <nav className="sidebar-menu">
-                    {menu.map((item) => (
+                <div className="sidebar-menu">
+                    {menuItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
-                            end={item.path === "/secretaire"}
                             className={({ isActive }) =>
-                                `sidebar-link ${isActive ? 'active' : ''}`
+                                `menu-item ${isActive ? 'active' : ''}`
                             }
-                            title={isCollapsed ? item.label : ''}
-                            onClick={handleLinkClick}
+                            data-label={item.label}
+                            end={item.exact}
+                            onClick={closeMobileSidebar}
                         >
-                            <span className="sidebar-icon">{item.icon}</span>
+                            <div className="menu-icon">
+                                {item.icon}
+                                {item.badge > 0 && (
+                                    <span className="menu-badge">{item.badge}</span>
+                                )}
+                            </div>
                             {!isCollapsed && (
-                                <div className="sidebar-content">
-                                    <span className="sidebar-label">{item.label}</span>
-                                    <span className="sidebar-description">{item.description}</span>
-                                </div>
-                            )}
-                            {item.badge > 0 && (
-                                <span className="sidebar-badge">{item.badge}</span>
+                                <span className="menu-label">{item.label}</span>
                             )}
                         </NavLink>
                     ))}
-                </nav>
+                </div>
 
                 <div className="sidebar-footer">
-                    {!isCollapsed && (
-                        <div className="sidebar-user">
-                            <div className="user-avatar">👤</div>
-                            <div className="user-info">
-                                <div className="user-name">Secrétaire</div>
-                                <div className="user-role">Administrateur</div>
-                            </div>
-                        </div>
-                    )}
+                    {bottomMenuItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            className={({ isActive }) =>
+                                `menu-item ${isActive ? 'active' : ''}`
+                            }
+                            data-label={item.label}
+                            onClick={closeMobileSidebar}
+                        >
+                            <div className="menu-icon">{item.icon}</div>
+                            {!isCollapsed && (
+                                <span className="menu-label">{item.label}</span>
+                            )}
+                        </NavLink>
+                    ))}
                 </div>
-            </aside>
+            </div>
+
+            {/* Overlay pour mobile */}
+            {isMobileOpen && (
+                <div
+                    className="sidebar-overlay active"
+                    onClick={closeMobileSidebar}
+                />
+            )}
         </>
     );
 };
