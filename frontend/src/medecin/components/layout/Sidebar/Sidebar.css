@@ -28,13 +28,18 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--sidebar-border);
+    background: linear-gradient(
+        180deg,
+        var(--sidebar-gradient-start),
+        var(--sidebar-gradient-end)
+    );
 }
 
 .sidebar-title {
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--sidebar-title);
+    color: var(--sidebar-title) ; 
     white-space: nowrap;
     transition: opacity 0.3s;
 }

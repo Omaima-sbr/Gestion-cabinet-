@@ -9,6 +9,7 @@ import {
   User
 } from 'lucide-react';
 import ordonnanceService from '../../services/ordonnancepService';
+import DocumentService from '../../components/layout/documentService';  // Ajouter cet import
 import './OrdonnancesPage.css';
 
 const OrdonnancesPage = () => {
@@ -17,6 +18,7 @@ const OrdonnancesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [logoDataUrl, setLogoDataUrl] = useState(null);
   
   // État pour ordonnance médicaments
   const [contenuMedicaments, setContenuMedicaments] = useState('');
@@ -70,20 +72,45 @@ const OrdonnancesPage = () => {
     fetchConsultationEnCours();
   }, []);
 
+  // ✅ NOUVELLE FONCTION : Charger le logo avec authentification
+const loadCabinetLogo = async (logoPath) => {
+  if (!logoPath) {
+    console.log('📋 [Ordonnance] Pas de logo à charger');
+    setLogoDataUrl(null);
+    return;
+  }
+
+  try {
+    console.log('🔍 [Ordonnance] Chargement du logo:', logoPath);
+    const dataUrl = await DocumentService.loadAsDataUrl(logoPath);
+    setLogoDataUrl(dataUrl);
+    console.log('✅ [Ordonnance] Logo chargé avec succès');
+  } catch (error) {
+    console.error('❌ [Ordonnance] Erreur chargement logo:', error);
+    setLogoDataUrl(null);
+  }
+};
+
   // Charger les infos du cabinet
-  useEffect(() => {
-    const loadCabinetInfo = async () => {
-      try {
-        const { default: cabinetService } = await import('../../services/cabinetService');
-        const cabinetInfo = await cabinetService.getCabinetInfo();
-        setCabinet(cabinetInfo);
-      } catch (err) {
-        console.error('Erreur chargement cabinet:', err);
+ // Charger les infos du cabinet
+useEffect(() => {
+  const loadCabinetInfo = async () => {
+    try {
+      const { default: cabinetService } = await import('../../services/cabinetService');
+      const cabinetInfo = await cabinetService.getCabinetInfo();
+      setCabinet(cabinetInfo);
+      
+      // ✅ AJOUTER : Charger le logo si disponible
+      if (cabinetInfo?.logo) {
+        await loadCabinetLogo(cabinetInfo.logo);
       }
-    };
-    
-    loadCabinetInfo();
-  }, []);
+    } catch (err) {
+      console.error('Erreur chargement cabinet:', err);
+    }
+  };
+  
+  loadCabinetInfo();
+}, []);
 
   // Charger les ordonnances existantes
   const fetchOrdonnances = async (consultationId) => {
@@ -246,13 +273,13 @@ const OrdonnancesPage = () => {
 
   // Télécharger l'ordonnance avec style moderne
   const printOrdonnance = async (ordonnance) => {
-    const logoUrl = cabinet?.logo || '';
-    const cabinetNom = cabinet?.nom || 'Cabinet Médical';
+const logoUrl = logoDataUrl || '';  // ✅ Utiliser la Data URL chargée    const cabinetNom = cabinet?.nom || 'Cabinet Médical';
     const cabinetAdresse = cabinet?.adresse || '';
     const cabinetTel = cabinet?.tel || '';
     const cabinetEmail = cabinet?.email || 'contact@cabinet.ma';
     const cabinetSpecialite = cabinet?.specialite || 'Médecine Générale';
-    
+        const cabinetNom = cabinet?.nom || 'Cabinet Médical';
+
     const logoDisplay = logoUrl ? 
       `<img src="${logoUrl}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;" />` : 
       `<div style="font-size: 180px; color: #3b82f6; opacity: 1;">⚕</div>`;

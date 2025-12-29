@@ -574,12 +574,75 @@
   gap: 12px;
 }
 
+.detail-item:has(.detail-value:only-of-type) {
+  justify-content: flex-start;
+  gap: 12px;
+}
+.detail-item:has(.detail-value:only-of-type) {
+  grid-template-columns: 20px 1fr; /* Icône + Valeur seulement */
+}
+
+.detail-item:has(.detail-value:only-of-type) .detail-value {
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .detail-item {
+    grid-template-columns: 18px 75px 1fr;
+    padding: 10px 14px;
+    min-height: 48px;
+  }
+  
+  .detail-item svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .detail-label {
+    font-size: 0.8125rem;
+  }
+  
+  .detail-value {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-item {
+    grid-template-columns: 18px 70px 1fr;
+    padding: 10px 12px;
+    min-height: 46px;
+    gap: 10px;
+  }
+  
+  .detail-label {
+    font-size: 0.75rem;
+  }
+  
+  .detail-value {
+    font-size: 0.75rem;
+  }
+}
+
 .detail-item {
-  display: flex;
+  display: grid; /* ✅ MODIFIÉ : Grid au lieu de flex */
+  grid-template-columns: 20px 80px 1fr; /* ✅ Icône | Label | Valeur */
   align-items: center;
   gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  border: 1px solid var(--border-color); /* ✅ MODIFIÉ : Bordure complète */
+  background: var(--hover-bg);
+  border-radius: 8px;
+  min-height: 52px; /* ✅ Hauteur uniforme */
+  width: 100%; /* ✅ Même largeur pour tous */
+}
+
+.detail-item svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--primary-color);
+  justify-self: center;
 }
 
 .detail-item:last-child {
@@ -589,16 +652,17 @@
 .detail-label {
   color: var(--text-secondary);
   font-size: 0.875rem;
-  font-weight: 500;
-  min-width: 40px;
+  font-weight: 600;
+  white-space: nowrap; /* ✅ Empêche le retour à la ligne */
 }
 
 .detail-value {
   color: var(--text-color);
   font-size: 0.875rem;
   font-weight: 600;
-  flex: 1;
-  text-align: right;
+  text-align: left;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .rdv-info {

@@ -276,7 +276,7 @@ const MedecinDashboard = () => {
             <div className="chart-card main-chart reduced-chart">
               <div className="chart-header">
                 <div className="chart-title">
-                  <FaChartLine /> Évolution Hebdomadaire
+                  <FaChartLine /> Évolution Hebdomadaire des consultations
                 </div>
                 <div className="chart-period">7 derniers jours</div>
               </div>
