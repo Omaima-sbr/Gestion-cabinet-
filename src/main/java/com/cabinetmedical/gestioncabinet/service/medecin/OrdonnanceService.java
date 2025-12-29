@@ -250,6 +250,8 @@ public class OrdonnanceService {
                 dto.setPatientNom(patient.getNom());
                 dto.setPatientPrenom(patient.getPrenom());
                 dto.setPatientCin(patient.getCin());
+                dto.setPatientDateNaissance(patient.getDateNaissance()); // ✅ AJOUTER
+                dto.setPatientTel(patient.getNumTel());                   // ✅ AJOUTER
             }
 
             Utilisateur medecin = ordonnance.getConsultation().getMedecin();
