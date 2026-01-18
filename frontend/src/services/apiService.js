@@ -428,29 +428,55 @@ const apiService = {
          * Envoie un message avec fichier (audio ou document)
          */
         envoyerMessageAvecFichier: async (messageData, file) => {
+            // ✅ Récupérer le token directement depuis localStorage
+            const token = localStorage.getItem('token');
+
             const formData = new FormData();
+
+            // Ajouter le message en JSON
             formData.append('message', new Blob([JSON.stringify(messageData)], {
                 type: 'application/json'
             }));
 
+            // Ajouter le fichier
             if (file) {
                 formData.append('file', file);
+                console.log('📎 Fichier ajouté:', {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
             }
 
-            // ⚠️ Utiliser fetch directement pour FormData (pas request())
-            const response = await fetch(`${API_BASE_URL}/messagerie/avec-fichier`, {
-                method: 'POST',
-                headers: {
-                    // Ne pas mettre Content-Type pour FormData
-                },
-                body: formData
-            });
+            console.log('🚀 Envoi message avec fichier vers:', `${API_BASE_URL}/messagerie/avec-fichier`);
 
-            if (!response.ok) {
-                throw new Error('Erreur lors de l\'envoi du fichier');
+            try {
+                const response = await fetch(`${API_BASE_URL}/messagerie/avec-fichier`, {
+                    method: 'POST',
+                    headers: {
+                        // ⚠️ NE PAS mettre Content-Type (FormData le gère automatiquement)
+                        // ✅ Ajouter l'Authorization si token existe
+                        ...(token && token !== 'fake-token' && { 'Authorization': `Bearer ${token}` }),
+                    },
+                    credentials: 'include', // ✅ IMPORTANT : Pour envoyer les cookies de session
+                    body: formData
+                });
+
+                console.log('📡 Response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Erreur serveur:', errorText);
+                    throw new Error(errorText || 'Erreur lors de l\'envoi du fichier');
+                }
+
+                const data = await response.json();
+                console.log('✅ Message avec fichier envoyé:', data);
+                return data;
+            } catch (error) {
+                console.error('❌ Erreur envoyerMessageAvecFichier:', error);
+                throw error;
             }
-
-            return response.json();
         },
 
         /**
