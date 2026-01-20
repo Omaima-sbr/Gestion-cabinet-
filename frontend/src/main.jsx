@@ -1,17 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import { I18nProvider } from './i18n.jsx';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { I18nProvider } from './i18n';
 import { ThemeProvider } from './contexts/ThemeContext';
+import App from './App';
 import './pages/global.css';
-import Router from './Router';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <ThemeProvider>
-            <I18nProvider>
-                <Router />
-            </I18nProvider>
-        </ThemeProvider>
+        <BrowserRouter>
+            <ThemeProvider>
+                <I18nProvider>
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
+                </I18nProvider>
+            </ThemeProvider>
+        </BrowserRouter>
     </React.StrictMode>
 );

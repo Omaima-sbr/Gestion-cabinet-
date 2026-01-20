@@ -1,19 +1,19 @@
 package com.cabinetmedical.gestioncabinet.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference; // AJOUTEZ CET IMPORT
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;  // ✅ AJOUTEZ CET IMPORT
+
 
 @Entity
-// le nom du cabinet est unique
-@Table(
-        name = "Cabinet",
-        uniqueConstraints = @UniqueConstraint(columnNames = "nom", name = "uk_cabinet_nom")
-)
-
+@Table(name = "Cabinet")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +28,10 @@ public class Cabinet {
 
     @Column(nullable = false, length = 100)
     private String nom;
+
+    @Column(length = 100)
+    private String email;
+
 
     @Column(length = 100)
     private String specialite;
@@ -45,13 +49,22 @@ public class Cabinet {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Utilisateur> utilisateurs;
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Patient> patients;
 
     @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Facture> factures;
+
+    @OneToMany(mappedBy = "cabinet", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    @JsonIgnore
+    private List<AdminFacture> adminFactures;
+
 
     @PrePersist
     protected void onCreate() {
@@ -61,7 +74,12 @@ public class Cabinet {
         }
     }
 
+    public Integer getIdCabinet() {
+        return id;
+    }
+
     public boolean isActif() {
         return Boolean.TRUE.equals(this.actif);
     }
+
 }

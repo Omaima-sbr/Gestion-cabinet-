@@ -1,15 +1,15 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.List;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "Patient", indexes = {
@@ -54,6 +54,7 @@ public class Patient {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     @JoinColumn(name = "id_cabinet", foreignKey = @ForeignKey(name = "FK_Patient_Cabinet"))
     private Cabinet cabinet;
 
@@ -61,21 +62,32 @@ public class Patient {
     private LocalDateTime dateCreation = LocalDateTime.now();
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore  // ✅ AJOUTEZ CETTE LIGNE
     private DossierMedical dossierMedical;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<RendezVous> rendezVous;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Consultation> consultations;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @JsonIgnore // Ajoutez cette annotation
     private List<Facture> factures;
 
     public enum Sexe {
         HOMME, FEMME
     }
+    public String getTelephone() {
+        return this.numTel;
+    }
 
+    // ✅ APRÈS
+    public Integer getIdPatient() {
+        return this.id;
+    }
     @PrePersist
     protected void onCreate() {
         dateCreation = LocalDateTime.now();

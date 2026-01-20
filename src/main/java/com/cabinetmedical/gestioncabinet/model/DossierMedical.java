@@ -1,4 +1,5 @@
 package com.cabinetmedical.gestioncabinet.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class DossierMedical {
+public class DossierMedical {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,12 +41,15 @@ class DossierMedical {
     @OneToOne
     @JoinColumn(name = "id_patient", unique = true, nullable = false,
             foreignKey = @ForeignKey(name = "FK_DossierMedical_Patient"))
+    @JsonIgnore
     private Patient patient;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL)
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE
     private List<DocumentMedical> documents;
 
     @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL)
+    @JsonIgnore // ⬅️ AJOUTEZ CETTE LIGNE
     private List<Consultation> consultations;
 
     @PrePersist

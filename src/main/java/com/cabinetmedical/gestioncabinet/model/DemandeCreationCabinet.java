@@ -1,5 +1,7 @@
 package com.cabinetmedical.gestioncabinet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,12 +10,13 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Demande_Creation_Cabinet", indexes = {
-        @Index(name = "demande_idx_statut", columnList = "statut"),
-        @Index(name = "demande_idx_date", columnList = "date_demande")
+        @Index(name = "idx_demande_statut", columnList = "statut"),
+        @Index(name = "idx_demande_date", columnList = "date_demande")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DemandeCreationCabinet {
 
     @Id
@@ -88,7 +91,7 @@ public class DemandeCreationCabinet {
 
     // Informations de la demande
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'EN_ATTENTE'")
+    @Column(nullable = false, length = 20)
     private Statut statut = Statut.EN_ATTENTE;
 
     @Column(name = "date_demande", nullable = false)
@@ -100,9 +103,11 @@ public class DemandeCreationCabinet {
     @Column(name = "commentaire_admin", columnDefinition = "TEXT")
     private String commentaireAdmin;
 
+    // ✅ SOLUTION : Ignorer complètement adminTraitant lors de la sérialisation JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_admin_traitant",
             foreignKey = @ForeignKey(name = "FK_Demande_AdminTraitant"))
+    @JsonIgnore // ✅ N'essaie même pas de sérialiser cette relation
     private Utilisateur adminTraitant;
 
     // Documents justificatifs
@@ -118,7 +123,6 @@ public class DemandeCreationCabinet {
     public enum Statut {
         EN_ATTENTE, APPROUVEE, REJETEE
     }
-
 
     @PrePersist
     protected void onCreate() {
